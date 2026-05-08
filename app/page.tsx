@@ -619,6 +619,10 @@ function AIGeneratorPanel({ dispatch, styleText, styleImage, difficulty, setDiff
   const [lastTopic, setLastTopic] = useState("");
   const [importedQuizzes, setImportedQuizzes] = useState<ParsedQuiz[] | null>(null);
   const [importing, setImporting] = useState(false);
+  // True solange topicInput aus einem Datei-Import stammt und der Editor ihn
+  // nicht manuell überschrieben hat. Steuert, ob der Generieren-Button die
+  // Quiz-Texte neu schreibt oder nur ein Bild zum geladenen Topic baut.
+  const [importedFromFile, setImportedFromFile] = useState(false);
 
   const handleGenerate = async () => {
     const raw = topicInput.trim();
@@ -626,6 +630,30 @@ function AIGeneratorPanel({ dispatch, styleText, styleImage, difficulty, setDiff
     setError("");
     setLastImagePrompt("");
     setLastTopicElements([]);
+
+    // Nach Datei-Import: Quiz-Texte sind schon befüllt — nur ein passendes
+    // Bild generieren, importierte Inhalte NICHT mit KI-Output überschreiben.
+    if (importedFromFile) {
+      const topic = raw;
+      const imagePrompt = `${topic}, photorealistic, single coherent newspaper cover scene, bright midday sunlight`;
+      const topicElements = [topic];
+      try {
+        setStatus("imaging");
+        const dataUrl = personFile
+          ? await generateImageWithPerson({ file: personFile, topic, prompt: imagePrompt, styleInstruction: styleImage, topicElements })
+          : await generateImage(imagePrompt, styleImage, topicElements);
+        dispatch({ type: "SET_BACKGROUND_IMAGE", payload: dataUrl });
+        setLastImagePrompt(imagePrompt);
+        setLastTopicElements(topicElements);
+        setLastTopic(topic);
+        setStatus("done");
+      } catch (e) {
+        setError(`Bildgenerierung fehlgeschlagen: ${(e as Error).message}`);
+        setStatus("error");
+      }
+      return;
+    }
+
     const { applied, topic } = parseStyleCommand(raw);
     if (applied.layout.format || applied.layout.orientation || applied.theme.fontFamily || Object.keys(applied.colors).length) {
       dispatch({ type: "APPLY_STYLE_COMMAND", payload: { applied } });
@@ -756,6 +784,7 @@ function AIGeneratorPanel({ dispatch, styleText, styleImage, difficulty, setDiff
   const handleSelectImportedQuiz = (quiz: ParsedQuiz) => {
     dispatch({ type: "APPLY_IMPORTED_QUIZ", payload: quiz });
     setTopicInput(quiz.topic);
+    setImportedFromFile(true);
     setImportedQuizzes(null);
   };
 
@@ -777,7 +806,7 @@ function AIGeneratorPanel({ dispatch, styleText, styleImage, difficulty, setDiff
 
       <div className="flex gap-2">
         <Input value={topicInput} placeholder="z. B. Bern, Genfersee"
-          onChange={e => setTopicInput(e.target.value)}
+          onChange={e => { setTopicInput(e.target.value); setImportedFromFile(false); }}
           onKeyDown={e => { if (e.key === "Enter" && !busy) handleGenerate(); }}
           disabled={busy} />
         <label className={`px-2 py-1 text-sm border border-stone-300 bg-white rounded cursor-pointer hover:bg-stone-50 flex items-center gap-1 whitespace-nowrap ${busy ? "opacity-50 pointer-events-none" : ""}`}
@@ -799,7 +828,7 @@ function AIGeneratorPanel({ dispatch, styleText, styleImage, difficulty, setDiff
         <button onClick={handleGenerate} disabled={busy || !topicInput.trim()}
           className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap">
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-          {status === "generating" ? "Quiz..." : status === "imaging" ? "Bild..." : "Generieren"}
+          {status === "generating" ? "Quiz..." : status === "imaging" ? "Bild..." : importedFromFile ? "Bild generieren" : "Generieren"}
         </button>
       </div>
 
