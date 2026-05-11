@@ -1,14 +1,10 @@
 import mammoth from "mammoth";
 import type { ParsedQuiz, ParsedQuizQuestion, QuizDocumentParser } from "./types";
 
-const HEADER_RE = /^<p>\s*<strong>(\d+)\.\s*<\/strong>\s*<\/p>$/;
-const ALL_BOLD_RE = /^<p>\s*(<strong>[\s\S]*?<\/strong>\s*)+<\/p>$/;
-const ALL_ITALIC_RE = /^<p>\s*(<em>[\s\S]*?<\/em>\s*)+<\/p>$/;
-const QUESTION_LEAD_RE = /^\d+\.\s*/;
+const TOPIC_ALONE_RE = /^(\d+)\.\s*$/;
+const TOPIC_COMBINED_RE = /^(\d+)\.\s+(\S.*)$/;
+const QUESTION_RE = /^([1-5])\.\s*(\S.*)$/;
 const TRAILING_PAREN_RE = /^(.*?)\s*\(([^()]*)\)\s*$/;
-
-type ParaKind = "header" | "topic" | "question" | "answer" | "empty" | "unknown";
-type Para = { kind: ParaKind; plain: string; quizNumber?: number };
 
 function decodeHtml(s: string): string {
   return s
@@ -20,83 +16,93 @@ function decodeHtml(s: string): string {
     .replace(/&amp;/g, "&");
 }
 
-function classify(p: string): Para {
-  const headerMatch = p.match(HEADER_RE);
-  if (headerMatch) {
-    return { kind: "header", plain: "", quizNumber: parseInt(headerMatch[1], 10) };
-  }
-  const inner = p.replace(/^<p>/, "").replace(/<\/p>$/, "");
-  if (!inner.replace(/<[^>]+>/g, "").trim()) {
-    return { kind: "empty", plain: "" };
-  }
-  const plain = decodeHtml(inner.replace(/<[^>]+>/g, "")).trim();
-  if (ALL_BOLD_RE.test(p)) return { kind: "topic", plain };
-  if (ALL_ITALIC_RE.test(p)) return { kind: "answer", plain };
-  if (QUESTION_LEAD_RE.test(plain)) return { kind: "question", plain };
-  return { kind: "unknown", plain };
-}
-
 function stripTrailingParen(s: string): { text: string; note?: string } {
   const m = s.match(TRAILING_PAREN_RE);
   if (m && m[1].trim()) return { text: m[1].trim(), note: m[2].trim() };
   return { text: s.trim() };
 }
 
-function appendNote(existing: string | undefined, note: string): string {
-  return existing ? `${existing}; ${note}` : note;
+// A "topic header line" is either "N." alone, or "N. Title" where N > 5 (the
+// latter avoids confusing it with a Q1-Q5 question line in plain-text docs).
+function topicHeaderTitle(line: string): string | null {
+  if (TOPIC_ALONE_RE.test(line)) return ""; // header with no inline title
+  const combined = line.match(TOPIC_COMBINED_RE);
+  if (combined && parseInt(combined[1], 10) > 5) return combined[2].trim();
+  return null;
+}
+
+function isAnswerLine(line: string): boolean {
+  if (!line) return false;
+  if (QUESTION_RE.test(line)) return false;
+  if (topicHeaderTitle(line) !== null) return false;
+  return true;
 }
 
 async function parse(buffer: Buffer): Promise<ParsedQuiz[]> {
   const result = await mammoth.convertToHtml({ buffer });
   const html = result.value.replace(/<img[^>]*>/g, "");
-  const paragraphs = html.match(/<p>[\s\S]*?<\/p>/g) || [];
-  const classified = paragraphs.map(classify);
+  const rawParagraphs = html.match(/<p>[\s\S]*?<\/p>/g) || [];
+  const lines = rawParagraphs.map(p =>
+    decodeHtml(
+      p.replace(/^<p>/, "").replace(/<\/p>$/, "").replace(/<[^>]+>/g, "")
+    ).trim()
+  );
 
   const quizzes: ParsedQuiz[] = [];
   let i = 0;
-  while (i < classified.length) {
-    if (classified[i].kind !== "header") { i++; continue; }
-    const headerNumber = classified[i].quizNumber;
+  const N = lines.length;
 
-    let j = i + 1;
-    while (j < classified.length && classified[j].kind === "empty") j++;
+  while (i < N) {
+    while (i < N && !lines[i]) i++;
+    if (i >= N) break;
 
-    let topic = "";
-    if (j < classified.length && classified[j].kind === "topic") {
-      topic = classified[j].plain;
-      j++;
+    const headerTitle = topicHeaderTitle(lines[i]);
+    if (headerTitle === null) {
+      // Not a topic header — skip stray text.
+      i++;
+      continue;
+    }
+
+    let topic = headerTitle;
+    i++;
+
+    // If the header had no inline title, the next non-empty non-question line
+    // is the title.
+    if (!topic) {
+      while (i < N && !lines[i]) i++;
+      if (i < N && !QUESTION_RE.test(lines[i]) && topicHeaderTitle(lines[i]) === null) {
+        topic = lines[i].trim();
+        i++;
+      }
     }
 
     const questions: ParsedQuizQuestion[] = [];
-    let pending: ParsedQuizQuestion | null = null;
-    while (j < classified.length && classified[j].kind !== "header") {
-      const c = classified[j];
-      if (c.kind === "question") {
-        if (pending) questions.push(pending);
-        const stripped = stripTrailingParen(c.plain.replace(QUESTION_LEAD_RE, "").trim());
-        pending = { text: stripped.text, answer: "" };
-        if (stripped.note) pending.notes = stripped.note;
-      } else if (c.kind === "answer" && pending) {
-        const stripped = stripTrailingParen(c.plain);
-        pending.answer = stripped.text;
-        if (stripped.note) pending.notes = appendNote(pending.notes, stripped.note);
-        questions.push(pending);
-        pending = null;
-      }
-      j++;
-    }
-    if (pending) questions.push(pending);
+    while (questions.length < 5 && i < N) {
+      while (i < N && !lines[i]) i++;
+      if (i >= N) break;
 
-    const padded: ParsedQuizQuestion[] = [];
-    for (let k = 0; k < 5; k++) {
-      padded.push(questions[k] || { text: "", answer: "" });
+      const qMatch = lines[i].match(QUESTION_RE);
+      if (!qMatch) break;
+      i++;
+
+      let answer = "";
+      if (i < N && isAnswerLine(lines[i])) {
+        answer = lines[i].trim();
+        i++;
+      }
+
+      const stripped = stripTrailingParen(qMatch[2].trim());
+      const q: ParsedQuizQuestion = { text: stripped.text, answer };
+      if (stripped.note) q.notes = stripped.note;
+      questions.push(q);
     }
+
+    while (questions.length < 5) questions.push({ text: "", answer: "" });
 
     quizzes.push({
-      topic: topic || (headerNumber ? `Quiz ${headerNumber}` : `Quiz ${quizzes.length + 1}`),
-      questions: padded,
+      topic: topic || `Quiz ${quizzes.length + 1}`,
+      questions,
     });
-    i = j;
   }
 
   return quizzes;

@@ -327,6 +327,139 @@ async function generateImageWithPerson(opts: {
   return data.image as string;
 }
 
+type QuizCollection = { quizzes: Quiz[]; activeIndex: number };
+type BulkProgress = { current: number; total: number; topic: string; phase: "imaging" | "done"; failed: number };
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// Erzeugt eine eigenständige statische HTML-Seite mit allen Karten als
+// vorgerenderte JPEGs + Sidebar-Navigation. Funktioniert ohne JS-Build,
+// kann direkt auf Cloudflare Pages oder als File geöffnet werden.
+function buildViewerHtml(quizzes: Quiz[], cardImages: string[]): string {
+  const nav = quizzes.map((q, i) =>
+    `<a href="#quiz-${i + 1}">${i + 1}. ${escapeHtml(q.meta.title || `Quiz ${i + 1}`)}</a>`
+  ).join("\n      ");
+
+  const sections = quizzes.map((q, i) => {
+    const img = cardImages[i] || "";
+    const title = escapeHtml(q.meta.title || `Quiz ${i + 1}`);
+    return `<section class="card" id="quiz-${i + 1}">
+      <h2>${i + 1}. ${title}</h2>
+      ${img ? `<img src="${img}" alt="${title}" loading="lazy">` : `<div class="placeholder">Kein Bild</div>`}
+    </section>`;
+  }).join("\n    ");
+
+  return `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wissensquiz — ${quizzes.length} Themen</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #18181b; color: #f4f4f5; }
+  header { padding: 20px 40px; border-bottom: 1px solid #27272a; position: sticky; top: 0; background: rgba(24,24,27,0.95); backdrop-filter: blur(8px); z-index: 10; }
+  header h1 { margin: 0; font-size: 18px; font-weight: 600; }
+  header .meta { font-size: 12px; color: #a1a1aa; margin-top: 2px; }
+  .layout { display: flex; min-height: calc(100vh - 70px); }
+  nav { width: 280px; flex-shrink: 0; border-right: 1px solid #27272a; padding: 16px; overflow-y: auto; position: sticky; top: 70px; height: calc(100vh - 70px); }
+  nav a { display: block; padding: 6px 10px; color: #a1a1aa; text-decoration: none; font-size: 13px; border-radius: 4px; margin-bottom: 1px; }
+  nav a:hover { color: #fff; background: #27272a; }
+  main { flex: 1; padding: 24px 40px; max-width: 1200px; }
+  .card { margin-bottom: 48px; background: #0a0a0a; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+  .card h2 { margin: 0; padding: 14px 20px; font-size: 15px; font-weight: 500; color: #a1a1aa; border-bottom: 1px solid #27272a; }
+  .card img { width: 100%; height: auto; display: block; }
+  .placeholder { padding: 80px 20px; text-align: center; color: #71717a; font-style: italic; }
+  @media (max-width: 768px) {
+    nav { display: none; }
+    main { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Wissensquiz</h1>
+  <div class="meta">${quizzes.length} Themen · Veröffentlicht am ${new Date().toLocaleDateString("de-DE")}</div>
+</header>
+<div class="layout">
+  <nav>
+    ${nav}
+  </nav>
+  <main>
+    ${sections}
+  </main>
+</div>
+</body>
+</html>`;
+}
+
+// Default-Texte für Gewinner/AGB, falls noch nicht gesetzt. Werden sowohl von
+// APPLY_AI_CONTENT (siehe Zeile ~419) als auch vom Datei-Import verwendet, damit
+// die Blöcke nicht leer und damit unsichtbar bleiben.
+const DEFAULT_WINNERS_TEXT = "Gewinnerinnen und Gewinner werden hier veröffentlicht";
+const DEFAULT_TERMS_TEXT = "Teilnahmebedingungen unter 0800 890 890 / Dieser Anruf ist kostenlos. Zu diesem Gewinnspiel wird keine Korrespondenz geführt.";
+const DEFAULT_PHONE_TERMS_TEXT = "Telemedia interactive GmbH, 0,50€ pro Anruf aus dem dt. Festnetz, Mobilfunk teurer";
+const COLLECTION_STORAGE_KEY = "wissensquiz_collection_v1";
+
+function parsedQuizToQuiz(p: ParsedQuiz, template: Quiz): Quiz {
+  const incoming = p.questions || [];
+  // Die Datei listet Fragen von höchstem zu niedrigstem Preis (Q1 = 1000€,
+  // Q5 = 50€). Das Quiz-Template hat questions[0..4] aufsteigend nach Preis
+  // (questions[0] = 50€). Wir mappen File-Index 0 auf den Slot mit dem
+  // höchsten Preis, File-Index 4 auf den niedrigsten.
+  const slotsByPriceDesc = template.questions
+    .map((q, idx) => ({
+      idx,
+      value: template.prizes.find(pp => pp.id === q.prizeTierId)?.valueCents ?? 0,
+    }))
+    .sort((a, b) => b.value - a.value)
+    .map(r => r.idx);
+
+  const newQuestions = [...template.questions];
+  slotsByPriceDesc.forEach((qIdx, fileIdx) => {
+    const src = incoming[fileIdx];
+    newQuestions[qIdx] = {
+      ...template.questions[qIdx],
+      text: src?.text || "",
+      answerType: "text" as const,
+      options: undefined,
+      correctAnswer: src?.answer || "",
+    };
+  });
+
+  // (Variante c) — Headline-Logik: die 50€-Frage (= niedrigster Preis-Slot)
+  // wird ZUSÄTZLICH zum Titel hochgezogen. Die 50€-Zeile bleibt in der Liste
+  // sichtbar (Doppelung mit dem Titel ist gewollt). Untertitel bleibt hier
+  // leer — er wird vom Aufrufer mit KI-Subtitle befüllt.
+  const headlineSlotIdx = slotsByPriceDesc[slotsByPriceDesc.length - 1];
+  const headlineText = newQuestions[headlineSlotIdx].text || "";
+
+  return {
+    ...template,
+    meta: {
+      ...template.meta,
+      title: headlineText || p.topic,
+      subtitle: template.meta.subtitle || "",
+      titleAuto: false,
+      winnersText: template.meta.winnersText || DEFAULT_WINNERS_TEXT,
+      termsText: template.meta.termsText || DEFAULT_TERMS_TEXT,
+      phoneTermsText: template.meta.phoneTermsText || DEFAULT_PHONE_TERMS_TEXT,
+    },
+    theme: {
+      ...template.theme,
+      background: { ...template.theme.background, image: null },
+    },
+    questions: newQuestions,
+  };
+}
+
 type Action = { type: string; [k: string]: unknown };
 
 const LIGHT_COLORS: Record<string, string> = {
@@ -419,24 +552,12 @@ function quizReducer(state: Quiz, action: Action): Quiz {
     }
     case "APPLY_IMPORTED_QUIZ": {
       // Befüllt Titel + 5 Fragen + 5 Antworten aus einem Datei-Import (z.B. .docx).
-      // Theme, Bild, Telefonnummern, Preise und Schwierigkeit bleiben unverändert.
-      // Frage 1 wird auf Freitext umgestellt — Word-Dokumente liefern keine Choice-Optionen.
-      const p = action.payload as ParsedQuiz;
-      const incoming = p.questions || [];
-      return {
-        ...state,
-        meta: { ...state.meta, title: p.topic || state.meta.title, titleAuto: false },
-        questions: state.questions.map((q, i) => {
-          const src = incoming[i];
-          return {
-            ...q,
-            text: src?.text || "",
-            answerType: "text" as const,
-            options: undefined,
-            correctAnswer: src?.answer || "",
-          };
-        }),
-      };
+      // Telefonnummern, Preise und Schwierigkeit bleiben unverändert. Fragen
+      // werden nach Preis absteigend gemappt (File-Q1 = höchster Preis-Slot).
+      // Gewinner-/AGB-Text werden mit Defaults befüllt, falls leer.
+      // Hintergrundbild wird zurückgesetzt, damit beim Klick auf „Generieren"
+      // ein passendes Bild zum neuen Thema entsteht.
+      return parsedQuizToQuiz(action.payload as ParsedQuiz, state);
     }
     case "SET_BACKGROUND_IMAGE": return { ...state, theme: { ...state.theme, background: { ...state.theme.background, image: action.payload as string } } };
     case "LOAD_QUIZ": {
@@ -603,9 +724,11 @@ function DifficultyPicker({ value, onChange, disabled }: { value: Difficulty; on
   );
 }
 
-function AIGeneratorPanel({ dispatch, styleText, styleImage, difficulty, setDifficulty }: {
+function AIGeneratorPanel({ dispatch, styleText, styleImage, difficulty, setDifficulty, onBulkImport, bulkDisabled }: {
   dispatch: React.Dispatch<Action>; styleText: string; styleImage: string;
   difficulty: Difficulty; setDifficulty: (d: Difficulty) => void;
+  onBulkImport: (parsedQuizzes: ParsedQuiz[]) => void;
+  bulkDisabled: boolean;
 }) {
   const [topicInput, setTopicInput] = useState("");
   const [status, setStatus] = useState<"idle" | "generating" | "imaging" | "done" | "error">("idle");
@@ -631,12 +754,25 @@ function AIGeneratorPanel({ dispatch, styleText, styleImage, difficulty, setDiff
     setLastImagePrompt("");
     setLastTopicElements([]);
 
-    // Nach Datei-Import: Quiz-Texte sind schon befüllt — nur ein passendes
-    // Bild generieren, importierte Inhalte NICHT mit KI-Output überschreiben.
+    // Nach Datei-Import: Fragen sind schon befüllt — wir wollen nur Untertitel +
+    // passendes Bild. Fragen aus dem KI-Result werden bewusst verworfen.
     if (importedFromFile) {
       const topic = raw;
-      const imagePrompt = `${topic}, photorealistic, single coherent newspaper cover scene, bright midday sunlight`;
-      const topicElements = [topic];
+      let imagePrompt = `${topic}, photorealistic, single coherent newspaper cover scene, bright midday sunlight`;
+      let topicElements: string[] = [topic];
+      try {
+        setStatus("generating");
+        const result = await generateQuizContent(topic, styleText, difficulty);
+        if (result?.subtitle) {
+          dispatch({ type: "UPDATE_META", payload: { subtitle: String(result.subtitle) } });
+        }
+        if (result?.imagePrompt) imagePrompt = String(result.imagePrompt);
+        if (Array.isArray(result?.topicElements) && result.topicElements.length) {
+          topicElements = result.topicElements;
+        }
+      } catch (e) {
+        console.warn("KI-Metadaten fehlgeschlagen — fahre mit Default-Prompt fort:", e);
+      }
       try {
         setStatus("imaging");
         const dataUrl = personFile
@@ -804,32 +940,36 @@ function AIGeneratorPanel({ dispatch, styleText, styleImage, difficulty, setDiff
         <DifficultyPicker value={difficulty} onChange={setDifficulty} disabled={busy} />
       </Field>
 
-      <div className="flex gap-2">
+      <div className="space-y-2">
         <Input value={topicInput} placeholder="z. B. Bern, Genfersee"
           onChange={e => { setTopicInput(e.target.value); setImportedFromFile(false); }}
           onKeyDown={e => { if (e.key === "Enter" && !busy) handleGenerate(); }}
-          disabled={busy} />
-        <label className={`px-2 py-1 text-sm border border-stone-300 bg-white rounded cursor-pointer hover:bg-stone-50 flex items-center gap-1 whitespace-nowrap ${busy ? "opacity-50 pointer-events-none" : ""}`}
-          title="Foto mit Personen hochladen (optional)">
-          <Upload className="w-4 h-4" />
-          <span className="hidden sm:inline">Foto</span>
-          <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
-            onChange={e => { handleFilePick(e.target.files?.[0] || null); e.target.value = ""; }}
-            disabled={busy} />
-        </label>
-        <label className={`px-2 py-1 text-sm border border-stone-300 bg-white rounded cursor-pointer hover:bg-stone-50 flex items-center gap-1 whitespace-nowrap ${busy || importing ? "opacity-50 pointer-events-none" : ""}`}
-          title="Quiz-Inhalte aus Word-Datei (.docx) importieren">
-          {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-          <span className="hidden sm:inline">Aus Datei</span>
-          <input type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden"
-            onChange={e => { handleDocumentPick(e.target.files?.[0] || null); e.target.value = ""; }}
-            disabled={busy || importing} />
-        </label>
-        <button onClick={handleGenerate} disabled={busy || !topicInput.trim()}
-          className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap">
-          {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-          {status === "generating" ? "Quiz..." : status === "imaging" ? "Bild..." : importedFromFile ? "Bild generieren" : "Generieren"}
-        </button>
+          disabled={busy}
+          className="!px-4 !py-3 !text-base" />
+        <div className="flex gap-2">
+          <label className={`px-3 py-2 text-sm border border-stone-300 bg-white rounded cursor-pointer hover:bg-stone-50 flex items-center gap-1 whitespace-nowrap ${busy ? "opacity-50 pointer-events-none" : ""}`}
+            title="Foto mit Personen hochladen (optional)">
+            <Upload className="w-4 h-4" />
+            <span className="hidden sm:inline">Foto</span>
+            <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+              onChange={e => { handleFilePick(e.target.files?.[0] || null); e.target.value = ""; }}
+              disabled={busy} />
+          </label>
+          <label className={`px-3 py-2 text-sm border border-stone-300 bg-white rounded cursor-pointer hover:bg-stone-50 flex items-center gap-1 whitespace-nowrap ${busy || importing ? "opacity-50 pointer-events-none" : ""}`}
+            title="Quiz-Inhalte aus Word-Datei (.docx) importieren">
+            {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+            <span className="hidden sm:inline">Aus Datei</span>
+            <input type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden"
+              onChange={e => { handleDocumentPick(e.target.files?.[0] || null); e.target.value = ""; }}
+              disabled={busy || importing} />
+          </label>
+          <div className="flex-1" />
+          <button onClick={handleGenerate} disabled={busy || !topicInput.trim()}
+            className="px-4 py-2 text-base bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1.5 whitespace-nowrap font-medium">
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            {status === "generating" ? "Quiz..." : status === "imaging" ? "Bild..." : importedFromFile ? "Bild generieren" : "Generieren"}
+          </button>
+        </div>
       </div>
 
       {personFile && personPreview && (
@@ -877,10 +1017,22 @@ function AIGeneratorPanel({ dispatch, styleText, styleImage, difficulty, setDiff
                 );
               })}
             </div>
-            <div className="flex justify-end pt-2 border-t border-stone-200">
+            <div className="flex justify-between items-center gap-2 pt-2 border-t border-stone-200">
               <button onClick={() => setImportedQuizzes(null)}
                 className="px-3 py-1 text-xs border border-stone-300 rounded hover:bg-stone-50">
                 Abbrechen
+              </button>
+              <button
+                onClick={() => {
+                  const list = importedQuizzes;
+                  setImportedQuizzes(null);
+                  if (list) onBulkImport(list);
+                }}
+                disabled={bulkDisabled}
+                title="Erzeugt für jedes Quiz das KI-Hintergrundbild und legt eine Sammlung an, die du danach einzeln editieren kannst."
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1.5 font-medium">
+                <Sparkles className="w-4 h-4" />
+                Alle {importedQuizzes.length} mit Bild generieren
               </button>
             </div>
           </div>
@@ -971,12 +1123,116 @@ function StyleSettingsPanel({ styleText, setStyleText, resetText, styleImage, se
   );
 }
 
-function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty }: {
+function BulkProgressPanel({ progress }: { progress: BulkProgress }) {
+  const pct = progress.total ? Math.round((progress.current / progress.total) * 100) : 0;
+  return (
+    <div className="border-2 border-blue-300 rounded-md bg-blue-50 p-3 space-y-2">
+      <div className="flex items-center gap-2 text-sm font-medium text-blue-900">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        Bilder generieren — {progress.current} / {progress.total}
+        {progress.failed > 0 && (
+          <span className="text-amber-700 text-xs ml-1">({progress.failed} fehlgeschlagen)</span>
+        )}
+      </div>
+      <div className="w-full h-2 bg-stone-200 rounded overflow-hidden">
+        <div className="h-full bg-blue-600 transition-all" style={{ width: `${pct}%` }} />
+      </div>
+      <div className="text-xs text-stone-600 truncate" title={progress.topic}>
+        {progress.topic || "…"}
+      </div>
+    </div>
+  );
+}
+
+function QuizCollectionPicker({ collection, activeTitle, onSwitch, onClear, onRepair, onPublish, publishingDisabled }: {
+  collection: QuizCollection;
+  activeTitle: string;
+  onSwitch: (index: number) => void;
+  onClear: () => void;
+  onRepair: () => void;
+  onPublish: () => void;
+  publishingDisabled: boolean;
+}) {
+  const { quizzes, activeIndex } = collection;
+  return (
+    <div className="border-2 border-stone-300 rounded-md bg-white p-2 space-y-1">
+      <div className="flex items-center justify-between mb-1 px-1 gap-2">
+        <div className="text-xs font-semibold text-stone-700">
+          Quiz-Sammlung · {activeIndex + 1} / {quizzes.length}
+        </div>
+        <div className="flex items-center gap-1">
+          <button onClick={onRepair}
+            title="Reihenfolge umkehren (50€ ↔ 1000€-Slot), Gewinner-/AGB-Text füllen, 50€-Frage als Headline. Bilder und Edits bleiben erhalten."
+            className="text-[10px] px-1.5 py-0.5 border border-amber-400 text-amber-800 bg-amber-50 hover:bg-amber-100 rounded">
+            Fix anwenden
+          </button>
+          <button onClick={onClear}
+            title="Sammlung schließen und aus lokalem Speicher entfernen"
+            className="text-xs text-stone-400 hover:text-red-600 px-1">
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+      <div className="max-h-56 overflow-y-auto space-y-0.5">
+        {quizzes.map((q, i) => {
+          const title = i === activeIndex ? activeTitle : (q.meta.title || `Quiz ${i + 1}`);
+          const hasImage = !!q.theme.background?.image;
+          return (
+            <button key={i} onClick={() => onSwitch(i)}
+              className={`w-full text-left text-xs px-2 py-1 rounded flex items-center gap-1.5 ${
+                i === activeIndex
+                  ? "bg-blue-600 text-white"
+                  : "hover:bg-stone-100 text-stone-700"
+              }`}>
+              <span className={`tabular-nums w-5 text-right ${i === activeIndex ? "text-blue-100" : "text-stone-400"}`}>{i + 1}.</span>
+              <span className="flex-1 truncate">{title || "(ohne Titel)"}</span>
+              {!hasImage && (
+                <span title="Noch kein Bild" className={i === activeIndex ? "text-blue-200" : "text-amber-500"}>○</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <button onClick={onPublish} disabled={publishingDisabled}
+        title="Erzeugt 27 JSON + 27 PDFs + 1 Sammel-PDF + 1 HTML-Übersicht als ZIP-Download."
+        className="w-full mt-1 px-3 py-2 text-sm bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center gap-1.5 font-medium">
+        <Download className="w-4 h-4" />
+        Veröffentlichen (ZIP)
+      </button>
+    </div>
+  );
+}
+
+function PublishingProgressPanel({ progress }: { progress: { current: number; total: number; phase: string } }) {
+  const pct = progress.total ? Math.round((progress.current / progress.total) * 100) : 100;
+  return (
+    <div className="border-2 border-emerald-400 rounded-md bg-emerald-50 p-3 space-y-2">
+      <div className="flex items-center gap-2 text-sm font-medium text-emerald-900">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        Veröffentlichen — {progress.phase}
+        {progress.total > 0 && <span className="ml-1">({progress.current}/{progress.total})</span>}
+      </div>
+      <div className="w-full h-2 bg-stone-200 rounded overflow-hidden">
+        <div className="h-full bg-emerald-600 transition-all" style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing }: {
   quiz: Quiz; dispatch: React.Dispatch<Action>; canUndo: boolean; canRedo: boolean;
   onExport: () => void; onExportPdf: () => void; exportingPdf: boolean;
   onImport: React.ChangeEventHandler<HTMLInputElement>; onReset: () => void;
   styleProps: ReturnType<typeof useStyleInstructions>;
   difficulty: Difficulty; setDifficulty: (d: Difficulty) => void;
+  collection: QuizCollection | null;
+  bulkProgress: BulkProgress | null;
+  onSwitchQuiz: (index: number) => void;
+  onBulkImport: (parsedQuizzes: ParsedQuiz[]) => void;
+  onClearCollection: () => void;
+  onRepairCollection: () => void;
+  onPublish: () => void;
+  publishing: { current: number; total: number; phase: string } | null;
 }) {
   const r = quiz.theme.readability;
   const darkTitle = isDark(quiz.theme.colors.title);
@@ -1002,8 +1258,23 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
         <button onClick={onReset} className="px-2 py-1 text-xs border border-stone-300 rounded bg-white hover:bg-red-50 text-red-700">Reset</button>
       </div>
 
+      {bulkProgress && bulkProgress.phase === "imaging" && (
+        <BulkProgressPanel progress={bulkProgress} />
+      )}
+
+      {publishing && (
+        <PublishingProgressPanel progress={publishing} />
+      )}
+
+      {collection && (
+        <QuizCollectionPicker collection={collection} activeTitle={quiz.meta.title}
+          onSwitch={onSwitchQuiz} onClear={onClearCollection} onRepair={onRepairCollection}
+          onPublish={onPublish} publishingDisabled={!!publishing || !!bulkProgress} />
+      )}
+
       <AIGeneratorPanel dispatch={dispatch} styleText={styleProps.styleText} styleImage={styleProps.styleImage}
-        difficulty={difficulty} setDifficulty={setDifficulty} />
+        difficulty={difficulty} setDifficulty={setDifficulty}
+        onBulkImport={onBulkImport} bulkDisabled={bulkProgress?.phase === "imaging"} />
 
       <Section title="Lesbarkeit" defaultOpen icon={<Eye className="w-4 h-4" />}>
         <div className="text-xs text-stone-500 mb-1">
@@ -1907,6 +2178,265 @@ export default function Page() {
   const [exportingPdf, setExportingPdf] = useState(false);
   const pdfTargetRef = useRef<HTMLDivElement>(null);
 
+  const [collection, setCollection] = useState<QuizCollection | null>(null);
+  const [bulkProgress, setBulkProgress] = useState<BulkProgress | null>(null);
+  const [publishing, setPublishing] = useState<{ current: number; total: number; phase: string } | null>(null);
+  // Markiert, ob das initiale Hydrieren aus localStorage durch ist — verhindert,
+  // dass der "leere" Initial-State beim ersten Render localStorage überschreibt.
+  const hydratedRef = useRef(false);
+
+  // Beim Mount aus localStorage laden (falls vorhanden).
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(COLLECTION_STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as QuizCollection;
+        if (saved?.quizzes?.length) {
+          const idx = Math.min(Math.max(saved.activeIndex || 0, 0), saved.quizzes.length - 1);
+          setCollection({ quizzes: saved.quizzes, activeIndex: idx });
+          dispatch({ type: "LOAD_QUIZ", payload: saved.quizzes[idx] });
+        }
+      }
+    } catch (e) {
+      console.warn("Konnte gespeicherte Sammlung nicht laden:", e);
+    } finally {
+      hydratedRef.current = true;
+    }
+  }, []);
+
+  // Persistiert die Sammlung. Wenn localStorage zu klein ist (Bilder!), wird
+  // ein zweiter Versuch ohne Bilder gemacht; Edits/Texte bleiben dann erhalten.
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    try {
+      if (!collection) {
+        localStorage.removeItem(COLLECTION_STORAGE_KEY);
+        return;
+      }
+      localStorage.setItem(COLLECTION_STORAGE_KEY, JSON.stringify(collection));
+    } catch (e) {
+      // QuotaExceededError → ohne Bilder retry
+      try {
+        if (!collection) return;
+        const slim: QuizCollection = {
+          ...collection,
+          quizzes: collection.quizzes.map(q => ({
+            ...q,
+            theme: { ...q.theme, background: { ...q.theme.background, image: null } },
+          })),
+        };
+        localStorage.setItem(COLLECTION_STORAGE_KEY, JSON.stringify(slim));
+        console.warn("Sammlung zu groß für localStorage — ohne Bilder gespeichert. Bilder gehen beim Reload verloren.", e);
+      } catch (e2) {
+        console.warn("Konnte Sammlung nicht persistieren:", e2);
+      }
+    }
+  }, [collection]);
+
+  // Hält collection.quizzes[activeIndex] mit dem laufenden Editor-State (history.present)
+  // in Sync — sonst gingen Edits beim Wechsel des aktiven Quiz verloren.
+  useEffect(() => {
+    if (!collection) return;
+    if (collection.quizzes[collection.activeIndex] === quiz) return;
+    setCollection({
+      ...collection,
+      quizzes: collection.quizzes.map((q, i) => i === collection.activeIndex ? quiz : q),
+    });
+  }, [quiz, collection]);
+
+  const handleSwitchQuiz = (newIndex: number) => {
+    if (!collection) return;
+    if (newIndex < 0 || newIndex >= collection.quizzes.length) return;
+    if (newIndex === collection.activeIndex) return;
+    // Sicherheitssicht: aktiven Editor-Stand wegspeichern (der Sync-Effect macht
+    // das normalerweise schon, aber bei direkt aufeinanderfolgenden Wechseln
+    // wollen wir keinen Edit verlieren).
+    const snapshot = collection.quizzes.map((q, i) => i === collection.activeIndex ? quiz : q);
+    setCollection({ quizzes: snapshot, activeIndex: newIndex });
+    dispatch({ type: "LOAD_QUIZ", payload: snapshot[newIndex] });
+  };
+
+  const handleClearCollection = () => {
+    if (!confirm("Sammlung schließen? Wird auch aus dem lokalen Speicher entfernt.")) return;
+    setCollection(null);
+  };
+
+  // Quiz-Override für den Offscreen-PDF-Renderer während des Publish-Vorgangs.
+  // Wenn null, rendert pdfTargetRef.current das aktive `quiz` (wie sonst).
+  // Wenn gesetzt, rendert er das übergebene Quiz — so können wir nacheinander
+  // alle 27 abgreifen, ohne den Editor-State zu verändern.
+  const [publishingQuiz, setPublishingQuiz] = useState<Quiz | null>(null);
+
+  const handlePublish = async () => {
+    if (!collection || !pdfTargetRef.current) return;
+    setPublishing({ current: 0, total: collection.quizzes.length, phase: "Bereite vor…" });
+    try {
+      const [{ default: JSZip }, { domToJpeg }, { default: jsPDF }] = await Promise.all([
+        import("jszip"),
+        import("modern-screenshot"),
+        import("jspdf"),
+      ]);
+
+      const zip = new JSZip();
+      const cardImages: string[] = [];
+      let combined: InstanceType<typeof jsPDF> | null = null;
+
+      for (let i = 0; i < collection.quizzes.length; i++) {
+        const q = collection.quizzes[i];
+        setPublishingQuiz(q);
+        setPublishing({ current: i + 1, total: collection.quizzes.length, phase: "Karten rendern" });
+
+        // Auf Re-Render + Font-Load warten (analog handleExportPdf).
+        await new Promise(r => setTimeout(r, 100));
+        await new Promise(r => setTimeout(r, 600));
+
+        const imgData = await domToJpeg(pdfTargetRef.current!, { scale: 4, quality: 0.92 });
+        cardImages.push(imgData);
+
+        const fmt = FORMATS[q.layout.format]?.[q.layout.orientation] || FORMATS.berliner_halbformat.landscape;
+        const orientation: "portrait" | "landscape" = q.layout.orientation === "landscape" ? "landscape" : "portrait";
+
+        const onePdf = new jsPDF({ orientation, unit: "mm", format: [fmt.w, fmt.h] });
+        onePdf.addImage(imgData, "JPEG", 0, 0, fmt.w, fmt.h);
+        const onePdfBlob = onePdf.output("blob");
+
+        if (!combined) {
+          combined = new jsPDF({ orientation, unit: "mm", format: [fmt.w, fmt.h] });
+        } else {
+          combined.addPage([fmt.w, fmt.h], orientation);
+        }
+        combined.addImage(imgData, "JPEG", 0, 0, fmt.w, fmt.h);
+
+        const safeName = (effectiveTitle(q) || `quiz_${i + 1}`).replace(/[^a-zA-Z0-9äöüÄÖÜß]/g, "_").slice(0, 60);
+        const baseName = `${(i + 1).toString().padStart(2, "0")}_${safeName}`;
+        zip.file(`${baseName}.json`, JSON.stringify(q, null, 2));
+        zip.file(`${baseName}.pdf`, onePdfBlob);
+      }
+
+      setPublishing({ current: collection.quizzes.length, total: collection.quizzes.length, phase: "Sammel-PDF + HTML" });
+      if (combined) {
+        zip.file("alle_quizzes.pdf", combined.output("blob"));
+      }
+      zip.file("index.html", buildViewerHtml(collection.quizzes, cardImages));
+      zip.file("README.txt",
+        "Wissensquiz-Veröffentlichung\n\n" +
+        "Entpacken in dein Projekt:\n" +
+        "  unzip -o wissensquiz-publish-*.zip -d ./public/quizzes/\n\n" +
+        "Anschließend:\n" +
+        "  git add public/quizzes && git commit -m \"Quiz-Update\" && git push\n\n" +
+        "Cloudflare Pages deployt nach dem Push automatisch.\n"
+      );
+
+      setPublishing({ current: 0, total: 0, phase: "ZIP packen" });
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      const stamp = new Date().toISOString().slice(0, 10);
+      a.download = `wissensquiz-publish-${stamp}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Publish-Fehler:", e);
+      alert(`Veröffentlichen fehlgeschlagen: ${(e as Error).message}`);
+    } finally {
+      setPublishingQuiz(null);
+      setPublishing(null);
+    }
+  };
+
+  // Wendet die neue Mapping-Regel in-place auf eine bereits generierte Sammlung
+  // an: Fragentexte/Antworten werden so umgeordnet, dass die ehemals höchste
+  // Position (File-Q1) zum 1000€-Slot wandert. Anschließend wird die 50€-Frage
+  // als Headline (Titel + Untertitel) hochgezogen und ihr Slot geleert.
+  // Bilder, Telefonnummern, Preise, Style etc. bleiben unangetastet.
+  const handleRepairCollection = () => {
+    if (!collection) return;
+    const fixed = collection.quizzes.map(q => {
+      const reversed = [...q.questions].reverse();
+      // Schritt 1: Texte umsortieren (50€-Slot ↔ 1000€-Slot etc.)
+      const remapped = q.questions.map((qq, idx) => ({
+        ...qq,
+        text: reversed[idx].text,
+        correctAnswer: reversed[idx].correctAnswer,
+      }));
+      // Schritt 2: niedrigster Preis-Slot zur Headline machen.
+      // 50€-Zeile bleibt sichtbar (Doppelung gewollt). Untertitel wird vom
+      // Repair nicht angerührt — KI-Subtitle muss separat über Generieren-Flow.
+      const slotsByPriceDesc = remapped
+        .map((qq, idx) => ({ idx, value: q.prizes.find(pp => pp.id === qq.prizeTierId)?.valueCents ?? 0 }))
+        .sort((a, b) => b.value - a.value)
+        .map(r => r.idx);
+      const headlineIdx = slotsByPriceDesc[slotsByPriceDesc.length - 1];
+      const headlineText = remapped[headlineIdx].text;
+      return {
+        ...q,
+        meta: {
+          ...q.meta,
+          title: headlineText || q.meta.title,
+          titleAuto: false,
+          winnersText: q.meta.winnersText || DEFAULT_WINNERS_TEXT,
+          termsText: q.meta.termsText || DEFAULT_TERMS_TEXT,
+          phoneTermsText: q.meta.phoneTermsText || DEFAULT_PHONE_TERMS_TEXT,
+        },
+        questions: remapped,
+      };
+    });
+    setCollection({ ...collection, quizzes: fixed });
+    dispatch({ type: "LOAD_QUIZ", payload: fixed[collection.activeIndex] });
+  };
+
+  const handleBulkImport = async (parsedQuizzes: ParsedQuiz[]) => {
+    if (!parsedQuizzes.length) return;
+    const template = quiz;
+    const generated: Quiz[] = [];
+    let failed = 0;
+    setBulkProgress({ current: 0, total: parsedQuizzes.length, topic: "", phase: "imaging", failed: 0 });
+    for (let i = 0; i < parsedQuizzes.length; i++) {
+      const p = parsedQuizzes[i];
+      const base = parsedQuizToQuiz(p, template);
+      setBulkProgress({ current: i + 1, total: parsedQuizzes.length, topic: p.topic, phase: "imaging", failed });
+
+      // KI-Metadaten holen: Untertitel/Intro + besseren Image-Prompt + Topic-Elements.
+      // Fragen aus dem Result werden BEWUSST verworfen — die kommen aus der Datei.
+      let aiSubtitle = "";
+      let imagePrompt = `${p.topic}, photorealistic, single coherent newspaper cover scene, bright midday sunlight`;
+      let topicElements: string[] = [p.topic];
+      try {
+        const result = await generateQuizContent(p.topic, styleProps.styleText, difficulty);
+        if (result?.subtitle) aiSubtitle = String(result.subtitle);
+        if (result?.imagePrompt) imagePrompt = String(result.imagePrompt);
+        if (Array.isArray(result?.topicElements) && result.topicElements.length) {
+          topicElements = result.topicElements;
+        }
+      } catch (e) {
+        console.warn(`KI-Metadaten für "${p.topic}" fehlgeschlagen — fahre ohne fort:`, e);
+      }
+
+      const withSubtitle: Quiz = aiSubtitle
+        ? { ...base, meta: { ...base.meta, subtitle: aiSubtitle } }
+        : base;
+
+      try {
+        const dataUrl = await generateImage(imagePrompt, styleProps.styleImage, topicElements);
+        generated.push({
+          ...withSubtitle,
+          theme: { ...withSubtitle.theme, background: { ...withSubtitle.theme.background, image: dataUrl } },
+        });
+      } catch (e) {
+        failed++;
+        generated.push(withSubtitle);
+        console.error(`Bildgenerierung für "${p.topic}" fehlgeschlagen:`, e);
+      }
+    }
+    setBulkProgress({ current: parsedQuizzes.length, total: parsedQuizzes.length, topic: "", phase: "done", failed });
+    setCollection({ quizzes: generated, activeIndex: 0 });
+    dispatch({ type: "LOAD_QUIZ", payload: generated[0] });
+    // Progress-Panel nach kurzer Anzeigezeit ausblenden, Sammlung bleibt sichtbar.
+    setTimeout(() => setBulkProgress(null), 4000);
+  };
+
   const handleExport = () => {
     const json = JSON.stringify(quiz, null, 2);
     const blob = new Blob([json], { type: "application/json" });
@@ -1981,30 +2511,31 @@ export default function Page() {
         <EditorPanel quiz={quiz} dispatch={dispatch} canUndo={canUndo} canRedo={canRedo}
           onExport={handleExport} onExportPdf={handleExportPdf} exportingPdf={exportingPdf}
           onImport={handleImport} onReset={handleReset}
-          styleProps={styleProps} difficulty={difficulty} setDifficulty={setDifficulty} />
+          styleProps={styleProps} difficulty={difficulty} setDifficulty={setDifficulty}
+          collection={collection} bulkProgress={bulkProgress}
+          onSwitchQuiz={handleSwitchQuiz} onBulkImport={handleBulkImport}
+          onClearCollection={handleClearCollection} onRepairCollection={handleRepairCollection}
+          onPublish={handlePublish} publishing={publishing} />
         <PreviewPane quiz={quiz} selectedBlockId={selectedBlockId} onSelectBlock={setSelectedBlockId} />
       </div>
 
-      {/* Hidden offscreen render target for PDF export — same internal dimensions as editor preview */}
+      {/* Hidden offscreen render target for PDF export — same internal dimensions as editor preview.
+          Während des Publish-Vorgangs wird hier statt dem aktiven Quiz das jeweils zu exportierende
+          gerendert (publishingQuiz), damit der Editor-State unverändert bleibt. */}
       <div style={{ position: "fixed", left: -99999, top: 0, pointerEvents: "none" }} aria-hidden>
-        <div ref={pdfTargetRef} style={(() => {
-          const fmt = FORMATS[quiz.layout.format]?.[quiz.layout.orientation] || FORMATS.berliner_halbformat.landscape;
+        {(() => {
+          const renderQuiz = publishingQuiz || quiz;
+          const fmt = FORMATS[renderQuiz.layout.format]?.[renderQuiz.layout.orientation] || FORMATS.berliner_halbformat.landscape;
           const aspect = fmt.w / fmt.h;
           const w = aspect >= 1 ? 900 : 700 * aspect;
           const h = aspect >= 1 ? 900 / aspect : 700;
-          return { width: w, height: h };
-        })()}>
-          {(() => {
-            const fmt = FORMATS[quiz.layout.format]?.[quiz.layout.orientation] || FORMATS.berliner_halbformat.landscape;
-            const aspect = fmt.w / fmt.h;
-            const w = aspect >= 1 ? 900 : 700 * aspect;
-            const h = aspect >= 1 ? 900 / aspect : 700;
-            return (
-              <PreviewRenderer quiz={quiz} width={w} height={h}
+          return (
+            <div ref={pdfTargetRef} style={{ width: w, height: h }}>
+              <PreviewRenderer quiz={renderQuiz} width={w} height={h}
                 selectedBlockId={null} onSelectBlock={() => {}} />
-            );
-          })()}
-        </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
