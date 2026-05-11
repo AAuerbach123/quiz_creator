@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useReducer, useEffect, useRef, useLayoutEffect } from "react";
+import { useState, useReducer, useEffect, useRef, useLayoutEffect, Fragment } from "react";
 import { Plus, Trash2, Undo2, Redo2, Download, Upload, ChevronDown, ChevronRight, Sparkles, Loader2, X, Wand2, Settings, RotateCcw, Eye, Lightbulb, FileText } from "lucide-react";
 import type { ParsedQuiz } from "./api/import-quiz-document/parsers/types";
 
@@ -106,9 +106,9 @@ const defaultQuiz: Quiz = {
   theme: {
     fontFamily: "Georgia, serif",
     colors: { title: "#FFFFFF", intro: "#F5F5F5", prize: "#FFD27A", question: "#FFFFFF", phone: "#FFD27A", winners: "#F0F0F0", terms: "#F0F0F0" },
-    fontSizes: { title: 56, intro: 14, prize: 22, question: 20, phone: 20 },
+    fontSizes: { title: 80, intro: 32, prize: 46, question: 52, phone: 36, telemedia: 11, winners: 13, terms: 13 },
     background: { image: null, opacity: 1, position: { x: 50, y: 50 } },
-    readability: { scrim: 0.0, textShadow: 0.7, blockBackdrop: "none" }
+    readability: { scrim: 0.3, textShadow: 0.7, blockBackdrop: "none" }
   },
   layout: { format: "berliner_halbformat", orientation: "landscape" },
   prizes: [
@@ -533,6 +533,10 @@ const LIGHT_COLORS: Record<string, string> = {
 function quizReducer(state: Quiz, action: Action): Quiz {
   switch (action.type) {
     case "UPDATE_META": return { ...state, meta: { ...state.meta, ...(action.payload as object) } };
+    case "UPDATE_FONT_SIZE": {
+      const p = action.payload as { key: string; value: number };
+      return { ...state, theme: { ...state.theme, fontSizes: { ...state.theme.fontSizes, [p.key]: p.value } } };
+    }
     case "UPDATE_THEME": return { ...state, theme: { ...state.theme, ...(action.payload as object) } };
     case "UPDATE_COLOR": return { ...state, theme: { ...state.theme, colors: { ...state.theme.colors, [action.key as string]: action.value as string } } };
     case "UPDATE_FONTSIZE": return { ...state, theme: { ...state.theme, fontSizes: { ...state.theme.fontSizes, [action.key as string]: action.value as number } } };
@@ -1393,6 +1397,30 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
         )}
       </Section>
 
+      <Section title="Schriftgrößen" icon={<Eye className="w-4 h-4" />}>
+        <div className="text-xs text-stone-500 mb-2">
+          Pro-Quiz manuelle Anpassung. Auto-Fit skaliert den Content-Block (Titel/Intro/Preise/Fragen/Telefon) zusätzlich, damit er die Zone füllt — diese Werte sind die Basis-Größen.
+        </div>
+        {([
+          { key: "title", label: "Titel", min: 20, max: 140 },
+          { key: "intro", label: "Untertitel / Intro", min: 10, max: 60 },
+          { key: "prize", label: "Preise (1000€…)", min: 14, max: 80 },
+          { key: "question", label: "Fragen", min: 14, max: 90 },
+          { key: "phone", label: "Telefonnummern", min: 10, max: 60 },
+          { key: "telemedia", label: "Telemedia-Hinweis (klein)", min: 6, max: 24 },
+          { key: "winners", label: "Gewinner-Text (Footer)", min: 8, max: 28 },
+          { key: "terms", label: "Teilnahmebed. (Footer)", min: 8, max: 28 },
+        ] as const).map(item => {
+          const value = quiz.theme.fontSizes[item.key] ?? 0;
+          return (
+            <Field key={item.key} label={`${item.label} (${value}pt)`}>
+              <Slider value={value} min={item.min} max={item.max} unit="pt"
+                onChange={e => dispatch({ type: "UPDATE_FONT_SIZE", payload: { key: item.key, value: Number(e.target.value) } })} />
+            </Field>
+          );
+        })}
+      </Section>
+
       <Section title="Metadaten">
         <Field label="Titel (Headline)">
           <div className="space-y-1">
@@ -1706,8 +1734,8 @@ function PreviewRenderer({ quiz, width, height, selectedBlockId, onSelectBlock }
     );
   };
 
-  const padX = width * 0.06;
-  const padY = height * 0.05;
+  const padX = width * 0.05;
+  const padY = height * 0.03;
   const footerHeight = Math.max(60, height * 0.11);
   const footerScrimHeight = footerHeight + 20;
   const contentBottomGap = 16; // gap between content area and footer
@@ -1752,19 +1780,21 @@ function PreviewRenderer({ quiz, width, height, selectedBlockId, onSelectBlock }
       bestSafeScaleRef.current = contentScale;
     }
 
-    if (iterCountRef.current >= 10) {
-      // Cap reached — if we're still overflowing, fall back to the last
-      // known safe scale rather than leaving the user with clipped content.
+    if (iterCountRef.current >= 30) {
       if (renderedH > zoneH && bestSafeScaleRef.current < contentScale) {
         setContentScale(bestSafeScaleRef.current);
       }
       return;
     }
 
-    const targetH = zoneH * 0.93; // aim for 93% fill — leaves a tiny breathing room
+    // Aim for 97% fill — Priorität "Volle Platzausnutzung". Lieber etwas
+    // randvoll als deutlich leer.
+    const targetH = zoneH * 0.97;
     const ratio = targetH / renderedH;
-    if (ratio >= 0.96 && ratio <= 1.04) return;
-    const newScale = Math.max(0.3, Math.min(1, contentScale * ratio));
+    // Konvergenz-Band [0.93, 1.07] — stabil, aber so eng wie's Wrapping zulässt.
+    if (ratio >= 0.93 && ratio <= 1.07) return;
+    // Scale-Cap 2.5 bleibt.
+    const newScale = Math.max(0.3, Math.min(2.5, contentScale * ratio));
     const rounded = Math.round(newScale * 100) / 100;
     if (rounded !== contentScale) {
       iterCountRef.current += 1;
@@ -1780,31 +1810,49 @@ function PreviewRenderer({ quiz, width, height, selectedBlockId, onSelectBlock }
   // Render the inner content block. Used both for visible rendering (with current
   // contentScale) and for the hidden measure container (always at scale=1).
   // The `forMeasure` flag suppresses click handlers and outlines for the hidden version.
-  const renderContentBody = (s: number, forMeasure: boolean) => {
+  // `distribute=true` wraps the content in a flex-space-between layout so dass der
+  // Titel-Block oben und die Fragen unten kleben (visuelle Variante). Im
+  // forMeasure-Pfad steht distribute=false, damit scrollHeight die natürliche
+  // Gesamthöhe für den Auto-Fit liefert.
+  const renderContentBody = (s: number, forMeasure: boolean, distribute = false) => {
     const sw = s * widthScale;
     const onClickProp = forMeasure ? () => {} : undefined;
     const showSelect = !forMeasure;
     return (
       <div style={{
         width: "100%",
+        height: distribute ? "100%" : undefined,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center"
+        alignItems: "center",
+        // distribute=true: Titel-Gruppe oben, Fragen-Gruppe füllt Rest mit
+        // flex:1 + interner space-around-Verteilung (siehe unten).
+        // distribute=false: natürliches flex-start für scrollHeight-Messung.
+        justifyContent: "flex-start"
       }}>
-        {titleText && (
-          <Block id="title" align="center"
-            style={{
-              color: theme.colors.title,
-              fontSize: `${theme.fontSizes.title * sw}pt`,
-              fontWeight: "bold",
-              textAlign: "center",
-              lineHeight: 1.05,
-              marginBottom: 10 * sw,
-              width: "100%"
-            }}>
-            {titleText}
-          </Block>
-        )}
+        <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+        {titleText && (() => {
+          // Title-Length-Scaling nur noch als Notausgang für extreme Titel.
+          // Auto-Fit shrinkt jetzt den Gesamt-Content (große Base-FontSizes)
+          // — übernimmt die Hauptarbeit für die Platzausnutzung.
+          const titleFactor = titleText.length > 100 ? 0.85
+            : titleText.length > 75 ? 0.92
+            : 1.0;
+          return (
+            <Block id="title" align="center"
+              style={{
+                color: theme.colors.title,
+                fontSize: `${theme.fontSizes.title * sw * titleFactor}pt`,
+                fontWeight: "bold",
+                textAlign: "center",
+                lineHeight: 1.05,
+                marginBottom: 6 * sw,
+                width: "100%"
+              }}>
+              {titleText}
+            </Block>
+          );
+        })()}
         {meta.subtitle && (
           <Block id="intro" align="center"
             style={{
@@ -1814,18 +1862,26 @@ function PreviewRenderer({ quiz, width, height, selectedBlockId, onSelectBlock }
               lineHeight: 1.4,
               textAlign: "center",
               maxWidth: "78%",
-              marginBottom: 18 * sw
+              marginBottom: 10 * sw
             }}>
             {meta.subtitle}
           </Block>
         )}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 * sw, width: "100%" }}>
+        </div>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: `auto 1fr auto`,
+          columnGap: 48 * sw,
+          rowGap: 16 * sw,
+          width: "100%",
+          alignItems: "baseline"
+        }}>
             {[...questions].reverse().map((q) => {
               const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];
               const hasContent = q.text || q.phoneNumber;
               if (!hasContent) return null;
               return (
-                <div key={q.id} style={{ display: "grid", gridTemplateColumns: `${110 * sw}px 1fr auto`, gap: 24 * sw, alignItems: "baseline" }}>
+                <Fragment key={q.id}>
                   <Block id={`prize_${q.id}`} align="right" inline
                     style={{ color: theme.colors.prize, fontSize: `${theme.fontSizes.prize * sw}pt`, fontWeight: "bold", textAlign: "right", whiteSpace: "nowrap" }}>
                     {prize ? getPrizeLabel(prize) : ""}
@@ -1834,7 +1890,7 @@ function PreviewRenderer({ quiz, width, height, selectedBlockId, onSelectBlock }
                     style={{ color: theme.colors.question, fontSize: `${theme.fontSizes.question * sw}pt`, fontWeight: "bold" }}>
                     {q.text}
                   </Block>
-                  {q.phoneNumber && (
+                  {q.phoneNumber ? (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
                       <Block id={`phone_${q.id}`} align="right" inline
                         style={{ color: theme.colors.phone, fontSize: `${theme.fontSizes.phone * sw}pt`, fontWeight: "bold", whiteSpace: "nowrap" }}>
@@ -1843,7 +1899,7 @@ function PreviewRenderer({ quiz, width, height, selectedBlockId, onSelectBlock }
                       {meta.phoneTermsText && (
                         <div style={{
                           color: theme.colors.terms,
-                          fontSize: `${8.5 * sw}pt`,
+                          fontSize: `${(theme.fontSizes.telemedia ?? 11) * sw}pt`,
                           fontWeight: "bold",
                           opacity: 0.95,
                           textAlign: "right",
@@ -1856,8 +1912,8 @@ function PreviewRenderer({ quiz, width, height, selectedBlockId, onSelectBlock }
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
+                  ) : <div />}
+                </Fragment>
               );
             })}
           </div>
@@ -1909,25 +1965,38 @@ function PreviewRenderer({ quiz, width, height, selectedBlockId, onSelectBlock }
         </div>
       )}
 
-      {/* CONTENT ZONE — strictly bounded above the footer */}
+      {/* CONTENT ZONE — strictly bounded above the footer.
+          Enthält zwei Rendering-Pässe:
+          (1) versteckter Measure-Pfad mit visibleInnerRef → liefert natürliche
+              Gesamt-Höhe via scrollHeight, an dem der Auto-Fit-Scale konvergiert.
+          (2) sichtbarer Distribution-Pfad → Titel-Gruppe oben, Fragen-Gruppe
+              unten, dazwischen wandert restlicher Platz. Verhindert Leere oben/unten. */}
       <div ref={contentZoneRef} style={{
         position: "absolute",
         top: padY,
         left: padX,
         right: padX,
         height: contentZoneHeight,
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center"
+        overflow: "hidden"
       }}>
+        {/* Hidden measure pass — natural top-aligned flex column */}
         <div ref={visibleInnerRef} style={{
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center"
+          position: "absolute",
+          top: 0, left: 0, right: 0,
+          visibility: "hidden",
+          pointerEvents: "none"
         }}>
-          {renderContentBody(contentScale, false)}
+          {renderContentBody(contentScale, true, false)}
+        </div>
+
+        {/* Visible pass — vertically centered. Auto-fit skaliert den Content auf
+            ~93% der Zone, sodass oben und unten gleich wenig Restplatz bleibt. */}
+        <div style={{
+          width: "100%", height: "100%",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center"
+        }}>
+          {renderContentBody(contentScale, false, false)}
         </div>
       </div>
 
@@ -1941,11 +2010,16 @@ function PreviewRenderer({ quiz, width, height, selectedBlockId, onSelectBlock }
           justifyContent: "space-between",
           alignItems: "flex-end",
           gap: 20 * widthScale,
-          fontSize: `${10 * widthScale}pt`,
           lineHeight: 1.3
         }}>
-          <Block id="winners" align="left" style={{ color: theme.colors.winners, maxWidth: "45%" }}>{meta.winnersText}</Block>
-          <Block id="terms" align="right" style={{ color: theme.colors.terms, maxWidth: "45%", textAlign: "right" }}>{meta.termsText}</Block>
+          <Block id="winners" align="left"
+            style={{ color: theme.colors.winners, maxWidth: "45%", fontSize: `${(theme.fontSizes.winners ?? 13) * widthScale}pt` }}>
+            {meta.winnersText}
+          </Block>
+          <Block id="terms" align="right"
+            style={{ color: theme.colors.terms, maxWidth: "45%", textAlign: "right", fontSize: `${(theme.fontSizes.terms ?? 13) * widthScale}pt` }}>
+            {meta.termsText}
+          </Block>
         </div>
       )}
     </div>
