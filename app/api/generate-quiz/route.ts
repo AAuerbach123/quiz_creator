@@ -1,7 +1,21 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+// Lazy init: in dev mit Turbopack ist process.env.ANTHROPIC_API_KEY beim
+// Module-Load nicht zwingend gesetzt — der SDK-Konstruktor wirft dann
+// "Could not resolve authentication method" und bleibt für immer kaputt.
+// Erst beim ersten Request initialisieren, dann ist Env garantiert geladen.
+let _client: Anthropic | null = null;
+function client(): Anthropic {
+  if (!_client) {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new Error("ANTHROPIC_API_KEY ist nicht gesetzt. Lege ihn in .env.local an und starte den Dev-Server neu (npm run dev).");
+    }
+    _client = new Anthropic({ apiKey });
+  }
+  return _client;
+}
 
 const DEFAULT_TEXT_STYLE = `Schreibe in einem freundlichen, einladenden Ton, der typisch für deutsche Lokal-Zeitungen ist.
 Bleibe bei Sie-Form. Vermeide Anglizismen. Fragen kurz und prägnant, max. 8 Wörter.
@@ -253,7 +267,7 @@ Antworte AUSSCHLIESSLICH mit gültigem JSON in genau diesem Format, ohne Markdow
   "topicElements": ["...", "..."]
 }`;
 
-    const response = await client.messages.create({
+    const response = await client().messages.create({
       model: "claude-sonnet-4-5",
       max_tokens: 1500,
       messages: [{ role: "user", content: prompt }],

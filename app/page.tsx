@@ -406,7 +406,70 @@ function buildViewerHtml(quizzes: Quiz[], cardImages: string[]): string {
 const DEFAULT_WINNERS_TEXT = "Gewinnerinnen und Gewinner werden hier veröffentlicht";
 const DEFAULT_TERMS_TEXT = "Teilnahmebedingungen unter 0800 890 890 / Dieser Anruf ist kostenlos. Zu diesem Gewinnspiel wird keine Korrespondenz geführt.";
 const DEFAULT_PHONE_TERMS_TEXT = "Telemedia interactive GmbH, 0,50€ pro Anruf aus dem dt. Festnetz, Mobilfunk teurer";
+
+// IndexedDB-Persistenz für die Quiz-Sammlung.
+// localStorage hat ~5-10 MB Limit, das reicht für 27 Quizzes mit Bildern nicht.
+// IndexedDB erlaubt deutlich größere Datenmengen (oft >50% der freien Disk).
+const IDB_NAME = "wissensquiz";
+const IDB_VERSION = 1;
+const IDB_STORE = "collection";
+const IDB_KEY = "current";
+// Alt-Key aus der localStorage-Phase — wir migrieren beim ersten Load.
 const COLLECTION_STORAGE_KEY = "wissensquiz_collection_v1";
+
+function openIdb(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(IDB_STORE)) {
+        db.createObjectStore(IDB_STORE);
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbLoadCollection(): Promise<QuizCollection | null> {
+  try {
+    const db = await openIdb();
+    return await new Promise<QuizCollection | null>((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, "readonly");
+      const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+      req.onsuccess = () => resolve((req.result as QuizCollection | undefined) || null);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (e) {
+    console.warn("IDB load fehlgeschlagen:", e);
+    return null;
+  }
+}
+
+async function idbSaveCollection(c: QuizCollection): Promise<void> {
+  const db = await openIdb();
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, "readwrite");
+    tx.objectStore(IDB_STORE).put(c, IDB_KEY);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+async function idbClearCollection(): Promise<void> {
+  try {
+    const db = await openIdb();
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      tx.objectStore(IDB_STORE).delete(IDB_KEY);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (e) {
+    console.warn("IDB clear fehlgeschlagen:", e);
+  }
+}
 
 function parsedQuizToQuiz(p: ParsedQuiz, template: Quiz): Quiz {
   const incoming = p.questions || [];
@@ -1144,7 +1207,7 @@ function BulkProgressPanel({ progress }: { progress: BulkProgress }) {
   );
 }
 
-function QuizCollectionPicker({ collection, activeTitle, onSwitch, onClear, onRepair, onPublish, publishingDisabled }: {
+function QuizCollectionPicker({ collection, activeTitle, onSwitch, onClear, onRepair, onPublish, publishingDisabled, onGenerateMissingImages }: {
   collection: QuizCollection;
   activeTitle: string;
   onSwitch: (index: number) => void;
@@ -1152,8 +1215,14 @@ function QuizCollectionPicker({ collection, activeTitle, onSwitch, onClear, onRe
   onRepair: () => void;
   onPublish: () => void;
   publishingDisabled: boolean;
+  onGenerateMissingImages: () => void;
 }) {
   const { quizzes, activeIndex } = collection;
+  // Zählt Quizzes mit fehlendem Bild ODER fehlendem Untertitel — der Knopf
+  // löst beides nach.
+  const missingImages = quizzes.filter(q =>
+    !q.theme.background?.image || !q.meta.subtitle?.trim()
+  ).length;
   return (
     <div className="border-2 border-stone-300 rounded-md bg-white p-2 space-y-1">
       <div className="flex items-center justify-between mb-1 px-1 gap-2">
@@ -1193,8 +1262,18 @@ function QuizCollectionPicker({ collection, activeTitle, onSwitch, onClear, onRe
           );
         })}
       </div>
-      <button onClick={onPublish} disabled={publishingDisabled}
-        title="Erzeugt 27 JSON + 27 PDFs + 1 Sammel-PDF + 1 HTML-Übersicht als ZIP-Download."
+      {missingImages > 0 && (
+        <button onClick={onGenerateMissingImages} disabled={publishingDisabled}
+          title="Erzeugt für alle Quizzes ohne Bild ein KI-Bild. Texte und Untertitel bleiben unberührt."
+          className="w-full mt-1 px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-1.5 font-medium">
+          <Sparkles className="w-4 h-4" />
+          Fehlende Bilder generieren ({missingImages})
+        </button>
+      )}
+      <button onClick={onPublish} disabled={publishingDisabled || missingImages > 0}
+        title={missingImages > 0
+          ? `${missingImages} Quizzes haben noch kein Bild. Zuerst „Fehlende Bilder generieren" klicken.`
+          : "Erzeugt 27 JSON + 27 PDFs + 1 Sammel-PDF + 1 HTML-Übersicht als ZIP-Download."}
         className="w-full mt-1 px-3 py-2 text-sm bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center gap-1.5 font-medium">
         <Download className="w-4 h-4" />
         Veröffentlichen (ZIP)
@@ -1219,7 +1298,7 @@ function PublishingProgressPanel({ progress }: { progress: { current: number; to
   );
 }
 
-function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing }: {
+function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages }: {
   quiz: Quiz; dispatch: React.Dispatch<Action>; canUndo: boolean; canRedo: boolean;
   onExport: () => void; onExportPdf: () => void; exportingPdf: boolean;
   onImport: React.ChangeEventHandler<HTMLInputElement>; onReset: () => void;
@@ -1233,6 +1312,7 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
   onRepairCollection: () => void;
   onPublish: () => void;
   publishing: { current: number; total: number; phase: string } | null;
+  onGenerateMissingImages: () => void;
 }) {
   const r = quiz.theme.readability;
   const darkTitle = isDark(quiz.theme.colors.title);
@@ -1269,7 +1349,8 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
       {collection && (
         <QuizCollectionPicker collection={collection} activeTitle={quiz.meta.title}
           onSwitch={onSwitchQuiz} onClear={onClearCollection} onRepair={onRepairCollection}
-          onPublish={onPublish} publishingDisabled={!!publishing || !!bulkProgress} />
+          onPublish={onPublish} publishingDisabled={!!publishing || !!bulkProgress}
+          onGenerateMissingImages={onGenerateMissingImages} />
       )}
 
       <AIGeneratorPanel dispatch={dispatch} styleText={styleProps.styleText} styleImage={styleProps.styleImage}
@@ -2185,52 +2266,65 @@ export default function Page() {
   // dass der "leere" Initial-State beim ersten Render localStorage überschreibt.
   const hydratedRef = useRef(false);
 
-  // Beim Mount aus localStorage laden (falls vorhanden).
+  // Beim Mount aus IndexedDB laden. Migriert evtl. vorhandene localStorage-Daten
+  // (alte Version) einmalig in die IDB.
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(COLLECTION_STORAGE_KEY);
-      if (raw) {
-        const saved = JSON.parse(raw) as QuizCollection;
+    let cancelled = false;
+    (async () => {
+      try {
+        let saved = await idbLoadCollection();
+        if (!saved) {
+          // Migration: alten localStorage-Eintrag rüberziehen, falls vorhanden
+          const raw = localStorage.getItem(COLLECTION_STORAGE_KEY);
+          if (raw) {
+            try {
+              const parsed = JSON.parse(raw) as QuizCollection;
+              if (parsed?.quizzes?.length) {
+                await idbSaveCollection(parsed);
+                saved = parsed;
+                localStorage.removeItem(COLLECTION_STORAGE_KEY);
+                console.info("Sammlung aus localStorage in IndexedDB migriert.");
+              }
+            } catch { /* ignore parse errors */ }
+          }
+        }
+        if (cancelled) return;
         if (saved?.quizzes?.length) {
           const idx = Math.min(Math.max(saved.activeIndex || 0, 0), saved.quizzes.length - 1);
           setCollection({ quizzes: saved.quizzes, activeIndex: idx });
           dispatch({ type: "LOAD_QUIZ", payload: saved.quizzes[idx] });
         }
+      } catch (e) {
+        console.warn("Konnte gespeicherte Sammlung nicht laden:", e);
+      } finally {
+        hydratedRef.current = true;
       }
-    } catch (e) {
-      console.warn("Konnte gespeicherte Sammlung nicht laden:", e);
-    } finally {
-      hydratedRef.current = true;
-    }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
-  // Persistiert die Sammlung. Wenn localStorage zu klein ist (Bilder!), wird
-  // ein zweiter Versuch ohne Bilder gemacht; Edits/Texte bleiben dann erhalten.
+  // Persistiert die Sammlung in IndexedDB. Debounced via Timer, damit schnelle
+  // Folge-Updates (jeder Tastendruck im Editor) nicht 100 Schreibzugriffe lösen.
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!hydratedRef.current) return;
-    try {
-      if (!collection) {
-        localStorage.removeItem(COLLECTION_STORAGE_KEY);
-        return;
-      }
-      localStorage.setItem(COLLECTION_STORAGE_KEY, JSON.stringify(collection));
-    } catch (e) {
-      // QuotaExceededError → ohne Bilder retry
-      try {
-        if (!collection) return;
-        const slim: QuizCollection = {
-          ...collection,
-          quizzes: collection.quizzes.map(q => ({
-            ...q,
-            theme: { ...q.theme, background: { ...q.theme.background, image: null } },
-          })),
-        };
-        localStorage.setItem(COLLECTION_STORAGE_KEY, JSON.stringify(slim));
-        console.warn("Sammlung zu groß für localStorage — ohne Bilder gespeichert. Bilder gehen beim Reload verloren.", e);
-      } catch (e2) {
-        console.warn("Konnte Sammlung nicht persistieren:", e2);
-      }
-    }
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      (async () => {
+        try {
+          if (!collection) {
+            await idbClearCollection();
+            return;
+          }
+          await idbSaveCollection(collection);
+        } catch (e) {
+          console.warn("Konnte Sammlung nicht persistieren:", e);
+        }
+      })();
+    }, 400);
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
   }, [collection]);
 
   // Hält collection.quizzes[activeIndex] mit dem laufenden Editor-State (history.present)
@@ -2387,6 +2481,76 @@ export default function Page() {
     dispatch({ type: "LOAD_QUIZ", payload: fixed[collection.activeIndex] });
   };
 
+  // Generiert nur die fehlenden Hintergrundbilder für Quizzes der Sammlung,
+  // die noch keines haben. Texte, Untertitel, Fragen bleiben unangetastet.
+  // Falls der Untertitel bei einem Quiz noch leer ist, wird er aus dem
+  // KI-Result mitübernommen (sonst beibehalten).
+  const handleGenerateMissingImages = async () => {
+    if (!collection) return;
+    // "Fehlend" heißt: kein Bild ODER kein Untertitel. So holen wir
+    // beides nach, falls eines davon beim ersten Lauf fehlgeschlagen ist.
+    const missing = collection.quizzes
+      .map((q, i) => {
+        const noImage = !q.theme.background?.image;
+        const noSubtitle = !q.meta.subtitle?.trim();
+        return (noImage || noSubtitle) ? i : null;
+      })
+      .filter((i): i is number => i !== null);
+    if (!missing.length) {
+      alert("Alle Quizzes haben bereits Bild und Untertitel.");
+      return;
+    }
+    let failed = 0;
+    setBulkProgress({ current: 0, total: missing.length, topic: "", phase: "imaging", failed: 0 });
+    const updated = [...collection.quizzes];
+    for (let step = 0; step < missing.length; step++) {
+      const i = missing[step];
+      const q = updated[i];
+      const topic = q.meta.title || `Quiz ${i + 1}`;
+      setBulkProgress({ current: step + 1, total: missing.length, topic, phase: "imaging", failed });
+
+      let imagePrompt = `${topic}, photorealistic, single coherent newspaper cover scene, bright midday sunlight`;
+      let topicElements: string[] = [topic];
+      let aiSubtitle = "";
+      try {
+        const result = await generateQuizContent(topic, styleProps.styleText, difficulty);
+        if (result?.imagePrompt) imagePrompt = String(result.imagePrompt);
+        if (Array.isArray(result?.topicElements) && result.topicElements.length) {
+          topicElements = result.topicElements;
+        }
+        if (result?.subtitle) aiSubtitle = String(result.subtitle);
+      } catch (e) {
+        console.warn(`KI-Metadaten für "${topic}" fehlgeschlagen:`, e);
+      }
+
+      const withMaybeSubtitle: Quiz = (!q.meta.subtitle?.trim() && aiSubtitle)
+        ? { ...q, meta: { ...q.meta, subtitle: aiSubtitle } }
+        : q;
+
+      // Bild nur generieren, wenn keines vorhanden — sonst sparen wir uns
+      // den OpenAI-Call und behalten das bestehende.
+      if (q.theme.background?.image) {
+        updated[i] = withMaybeSubtitle;
+      } else {
+        try {
+          const dataUrl = await generateImage(imagePrompt, styleProps.styleImage, topicElements);
+          updated[i] = {
+            ...withMaybeSubtitle,
+            theme: { ...withMaybeSubtitle.theme, background: { ...withMaybeSubtitle.theme.background, image: dataUrl } },
+          };
+        } catch (e) {
+          failed++;
+          updated[i] = withMaybeSubtitle;
+          console.error(`Bildgenerierung für "${topic}" fehlgeschlagen:`, e);
+        }
+      }
+    }
+    setBulkProgress({ current: missing.length, total: missing.length, topic: "", phase: "done", failed });
+    setCollection({ quizzes: updated, activeIndex: collection.activeIndex });
+    dispatch({ type: "LOAD_QUIZ", payload: updated[collection.activeIndex] });
+    setTimeout(() => setBulkProgress(null), 4000);
+  };
+
   const handleBulkImport = async (parsedQuizzes: ParsedQuiz[]) => {
     if (!parsedQuizzes.length) return;
     const template = quiz;
@@ -2515,7 +2679,8 @@ export default function Page() {
           collection={collection} bulkProgress={bulkProgress}
           onSwitchQuiz={handleSwitchQuiz} onBulkImport={handleBulkImport}
           onClearCollection={handleClearCollection} onRepairCollection={handleRepairCollection}
-          onPublish={handlePublish} publishing={publishing} />
+          onPublish={handlePublish} publishing={publishing}
+          onGenerateMissingImages={handleGenerateMissingImages} />
         <PreviewPane quiz={quiz} selectedBlockId={selectedBlockId} onSelectBlock={setSelectedBlockId} />
       </div>
 
