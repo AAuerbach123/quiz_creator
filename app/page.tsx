@@ -2384,14 +2384,18 @@ export default function Page() {
         await new Promise(r => setTimeout(r, 100));
         await new Promise(r => setTimeout(r, 600));
 
-        const imgData = await domToJpeg(pdfTargetRef.current!, { scale: 4, quality: 0.92 });
-        cardImages.push(imgData);
+        // Zwei Captures: hochauflösend (scale 3) für PDFs (druckfähig),
+        // moderat (scale 1.5) für die HTML-Übersicht (web-tauglich, kleinere Dateien).
+        // Vorher: scale 4 für alles → 67 MB index.html, über Cloudflare-Limit.
+        const imgDataHi = await domToJpeg(pdfTargetRef.current!, { scale: 3, quality: 0.88 });
+        const imgDataLo = await domToJpeg(pdfTargetRef.current!, { scale: 1.5, quality: 0.85 });
+        cardImages.push(imgDataLo);
 
         const fmt = FORMATS[q.layout.format]?.[q.layout.orientation] || FORMATS.berliner_halbformat.landscape;
         const orientation: "portrait" | "landscape" = q.layout.orientation === "landscape" ? "landscape" : "portrait";
 
         const onePdf = new jsPDF({ orientation, unit: "mm", format: [fmt.w, fmt.h] });
-        onePdf.addImage(imgData, "JPEG", 0, 0, fmt.w, fmt.h);
+        onePdf.addImage(imgDataHi, "JPEG", 0, 0, fmt.w, fmt.h);
         const onePdfBlob = onePdf.output("blob");
 
         if (!combined) {
@@ -2399,9 +2403,16 @@ export default function Page() {
         } else {
           combined.addPage([fmt.w, fmt.h], orientation);
         }
-        combined.addImage(imgData, "JPEG", 0, 0, fmt.w, fmt.h);
+        combined.addImage(imgDataHi, "JPEG", 0, 0, fmt.w, fmt.h);
 
-        const safeName = (effectiveTitle(q) || `quiz_${i + 1}`).replace(/[^a-zA-Z0-9äöüÄÖÜß]/g, "_").slice(0, 60);
+        // ASCII-only Filenames — Umlaute transliterieren, dann strippen.
+        // Vorher: K+?che → mit macOS unzip nicht extrahierbar.
+        const safeName = (effectiveTitle(q) || `quiz_${i + 1}`)
+          .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue")
+          .replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue")
+          .replace(/ß/g, "ss")
+          .replace(/[^a-zA-Z0-9]/g, "_")
+          .slice(0, 60);
         const baseName = `${(i + 1).toString().padStart(2, "0")}_${safeName}`;
         zip.file(`${baseName}.json`, JSON.stringify(q, null, 2));
         zip.file(`${baseName}.pdf`, onePdfBlob);
