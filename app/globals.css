@@ -24,3 +24,35 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Beim Drucken (Cmd+P → Als PDF sichern) den gesamten Editor inkl. aller
+   Sections plus Quiz-Preview auf mehreren Seiten zeigen. */
+@media print {
+  html, body {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  /* Page-Wrapper mit height: 100vh aufmachen */
+  [style*="100vh"], [style*="100%"] {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+  /* Scrollable Container entsperren — überall, wo overflow-y-auto */
+  .overflow-y-auto, [class*="overflow-y-auto"] {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  /* Sticky-Toolbar wandert mit, statisch beim Print */
+  .sticky, [class*="sticky"] {
+    position: static !important;
+  }
+  /* min-h-0 aufheben, damit Flex-Container Content nicht abschneiden */
+  .min-h-0 { min-height: 0 !important; }
+  /* Flex-1 darf wachsen */
+  .flex-1 { flex: 1 1 auto !important; }
+  /* Verhindern, dass ein Element zu früh umbricht */
+  section, [class*="border"] { break-inside: avoid; }
+}
