@@ -1671,8 +1671,8 @@ function AIGeneratorPanel({ quiz, dispatch, styleText, styleImage, difficulty, s
   const handleDocumentPick = async (file: File | null) => {
     if (!file) return;
     setError("");
-    if (!/\.(docx|xlsx|xlsm|xls)$/i.test(file.name)) {
-      setError("Erlaubte Formate: .docx oder .xlsx.");
+    if (!/\.(docx|xlsx|xlsm|xls|csv|tsv)$/i.test(file.name)) {
+      setError("Erlaubte Formate: .docx, .xlsx oder .csv.");
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
@@ -1729,7 +1729,7 @@ function AIGeneratorPanel({ quiz, dispatch, styleText, styleImage, difficulty, s
           {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
           Fragenkatalog importieren
           <input type="file"
-            accept=".docx,.xlsx,.xlsm,.xls,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+            accept=".docx,.xlsx,.xlsm,.xls,.csv,.tsv,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,text/tab-separated-values"
             className="hidden"
             onChange={e => { handleDocumentPick(e.target.files?.[0] || null); e.target.value = ""; }}
             disabled={busy || importing} />
@@ -6505,14 +6505,16 @@ export default function Page() {
   const handleQuestionnaireImport: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
     const file = e.target.files?.[0]; e.target.value = "";
     if (!file) return;
-    if (!/\.(docx|xlsx|xlsm|xls)$/i.test(file.name)) {
+    if (!/\.(docx|xlsx|xlsm|xls|csv|tsv)$/i.test(file.name)) {
       alert([
-        "Erlaubte Formate: .docx oder .xlsx.",
+        "Erlaubte Formate: .docx, .xlsx oder .csv.",
         "",
         "Word (.docx): Themen-Überschrift (Nr. > 5), darunter 5 Fragen 1.–5. mit Antwort in der nächsten Zeile.",
         "",
         "Excel (.xlsx) — Layout A (pro Blatt ein Quiz): Blatt-Name = Thema, Spalten 'Frage' und 'Antwort', bis zu 5 Zeilen.",
-        "Layout B (alles in einem Blatt): Spalten 'Thema | Frage 1 | Antwort 1 | … | Frage 5 | Antwort 5', jede Zeile ein Quiz."
+        "Layout B (alles in einem Blatt): Spalten 'Thema | Frage 1 | Antwort 1 | … | Frage 5 | Antwort 5', jede Zeile ein Quiz.",
+        "",
+        "CSV/TSV: gleiche Spalten-Layouts wie Excel. Trennzeichen (Semikolon, Komma, Tab) wird automatisch erkannt."
       ].join("\n"));
       return;
     }
@@ -6620,11 +6622,11 @@ export default function Page() {
           <Upload className="w-3.5 h-3.5" /> JSON
           <input type="file" accept=".json,application/json" className="hidden" onChange={handleImport} />
         </label>
-        <label className={`${tbBtn} cursor-pointer`} title="Frageliste aus Word (.docx) oder Excel (.xlsx) importieren">
+        <label className={`${tbBtn} cursor-pointer`} title="Frageliste aus Word (.docx), Excel (.xlsx) oder CSV importieren">
           {importingDocx ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
           Fragen
           <input type="file"
-            accept=".docx,.xlsx,.xlsm,.xls,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+            accept=".docx,.xlsx,.xlsm,.xls,.csv,.tsv,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,text/tab-separated-values"
             className="hidden" onChange={handleQuestionnaireImport} disabled={importingDocx} />
         </label>
         {collection && (

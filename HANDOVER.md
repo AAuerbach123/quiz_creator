@@ -101,11 +101,19 @@ Störer aus `meta.stoererText`, Fußzeile aus `meta.termsText`/`phoneTermsText`.
 - Karte austauschbar: `public/schatzinsel.png` ersetzen (höhere Auflösung empfohlen,
   aktuelle Datei ist nur 348×350 px).
 
-## In Arbeit / offene Punkte
-- **Datei-Import (`app/api/import-quiz-document/`)** ist noch in Arbeit. Aktuell ist nur der
-  DOCX-Parser registriert (`parsers/docx.ts`). Weitere Formate (CSV, XLSX) sollen über die in
-  `parsers/types.ts` definierte `QuizDocumentParser`-Schnittstelle ergänzt werden. Die
-  Parser-Registry liegt in `app/api/import-quiz-document/route.ts`.
+## Datei-Import (`app/api/import-quiz-document/`)
+Unterstützte Formate: **DOCX** (`parsers/docx.ts`), **XLSX/XLSM/XLS** (`parsers/xlsx.ts`)
+und **CSV/TSV** (`parsers/csv.ts`). Registry: `app/api/import-quiz-document/route.ts`.
+
+Die zeilenbasierten Formate (XLSX, CSV/TSV) teilen sich die Layout-Erkennung in
+`parsers/rows.ts` (`rowsToQuizzes`) — erkennt Layout A (ein Quiz je Blatt, Spalten
+Frage/Antwort), Layout B (alles in einem Blatt: Thema | Frage 1 | Antwort 1 | …) und
+Layout C (Frageblock ohne Header: Themen-Nr. Spalte A, Thema B, Frage C, Antwort D).
+Der CSV-Parser erkennt das Trennzeichen (Semikolon/Komma/Tab) automatisch und versteht
+Anführungszeichen-Felder samt verdoppelter Quotes und BOM.
+
+Weitere Formate über die `QuizDocumentParser`-Schnittstelle (`parsers/types.ts`) ergänzen
+und in der Registry eintragen; zeilenbasierte Formate können `rowsToQuizzes` wiederverwenden.
 
 ## Wichtige Hinweise
 - Diese Next.js-Version (16.x) bringt **Breaking Changes** ggü. älteren Versionen. Vor Änderungen

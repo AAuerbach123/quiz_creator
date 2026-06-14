@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
 import { docxParser } from "./parsers/docx";
 import { xlsxParser } from "./parsers/xlsx";
+import { csvParser } from "./parsers/csv";
 import type { QuizDocumentParser } from "./parsers/types";
 
 export const runtime = "nodejs";
 
-// Parser-Registry. Weitere Formate (csv …) hier eintragen — Interface
+// Parser-Registry. Weitere Formate hier eintragen — Interface
 // `QuizDocumentParser` in ./parsers/types.ts implementieren.
 const parsers: Record<string, QuizDocumentParser> = {
   docx: docxParser,
   xlsx: xlsxParser,
   xlsm: xlsxParser,
   xls: xlsxParser,
+  csv: csvParser,
+  tsv: csvParser,
 };
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
