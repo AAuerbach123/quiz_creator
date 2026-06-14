@@ -115,6 +115,11 @@ Anführungszeichen-Felder samt verdoppelter Quotes und BOM.
 Weitere Formate über die `QuizDocumentParser`-Schnittstelle (`parsers/types.ts`) ergänzen
 und in der Registry eintragen; zeilenbasierte Formate können `rowsToQuizzes` wiederverwenden.
 
+**CSV-Vorlage für die Redaktion:** `docs/vorlage-fragenkatalog.csv` — eine Zeile = ein
+Quiz, Spalten `Thema | Frage 1 | Antwort 1 | … | Frage 5 | Antwort 5` (Layout B). In Excel
+befüllen und als CSV speichern, dann im Tool über **Fragen** importieren. Das Trennzeichen
+(Semikolon/Komma/Tab) erkennt der Parser automatisch.
+
 ## Wichtige Hinweise
 - Diese Next.js-Version (16.x) bringt **Breaking Changes** ggü. älteren Versionen. Vor Änderungen
   an Routing/APIs unbedingt die lokalen Docs unter `node_modules/next/dist/docs/` konsultieren
