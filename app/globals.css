@@ -1,5 +1,36 @@
 @import "tailwindcss";
 
+/* Lexend, Montserrat (Ersatz für die lizenzpflichtige Proxima Nova) und
+   Roboto werden in app/layout.tsx per <link> aus Google Fonts geladen —
+   nicht hier per @import, da Tailwind v4 vorher schon CSS-Regeln einfügt
+   und @import vor allen Regeln stehen müsste. */
+
+/* ----------------------------------------------------------------------
+   Verlagsschriften (Web-Fonts). Dateien liegen in public/fonts/.
+   Nötig, damit beim Rendern (modern-screenshot) die echten Schriften
+   erscheinen – ohne diese Definitionen würde der Browser auf eine
+   Standardschrift zurückfallen.
+   Nicht vorhanden (müssen separat beschafft werden): Proxima Nova, Lexend,
+   Roboto (regular). Diese fallen weiterhin auf sans-serif zurück.
+---------------------------------------------------------------------- */
+@font-face { font-family: "Myriad Pro"; src: url("/fonts/MyriadPro-Regular.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Myriad Pro"; src: url("/fonts/MyriadPro-Bold.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+
+@font-face { font-family: "Museo Sans"; src: url("/fonts/MuseoSans-300.otf") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Museo Sans"; src: url("/fonts/MuseoSans-500.otf") format("opentype"); font-weight: 400 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Museo Sans"; src: url("/fonts/MuseoSans-700.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "MuseoSansCyrl-900"; src: url("/fonts/MuseoSansCyrl-900.ttf") format("truetype"); font-weight: 900; font-style: normal; font-display: swap; }
+
+@font-face { font-family: "Utopia Std"; src: url("/fonts/UtopiaStd-Regular.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Utopia Std"; src: url("/fonts/UtopiaStd-Bold.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+
+@font-face { font-family: "Tabac Sans"; src: url("/fonts/TabacSans-Regular.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Tabac Sans"; src: url("/fonts/TabacSans-Medium.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Tabac Sans"; src: url("/fonts/TabacSans-Bold.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+
+@font-face { font-family: "Roboto Condensed"; src: url("/fonts/RobotoCondensed-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Roboto Condensed"; src: url("/fonts/RobotoCondensed-Bold.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: swap; }
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -22,7 +53,9 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Beim Drucken (Cmd+P → Als PDF sichern) den gesamten Editor inkl. aller

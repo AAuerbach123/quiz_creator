@@ -124,35 +124,52 @@ function sanitizePrompt(prompt: string): { sanitized: string; changed: boolean; 
 
 function isSafetyBlock(error: unknown): boolean {
   const msg = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+  // Nur echte Safety-Hinweise — nicht jeder 400er ist ein Safety-Block.
+  // "Unknown parameter" / "Invalid parameter" sind reine API-Validierungs-
+  // Fehler, die nichts mit dem Bildinhalt zu tun haben.
   return msg.includes("safety system") ||
+         msg.includes("safety_system") ||
          msg.includes("rejected by") ||
          msg.includes("content policy") ||
-         msg.includes("400");
+         msg.includes("content_policy_violation");
 }
 
-async function tryGenerate(prompt: string): Promise<{ b64: string; model: string } | { error: unknown }> {
+async function tryGenerate(prompt: string, chain: string[], styleHint?: "vivid" | "natural"): Promise<{ b64: string; model: string } | { error: unknown }> {
   let lastError: unknown = null;
-  for (const model of MODEL_FALLBACK_CHAIN) {
+  for (const model of chain) {
     try {
-      console.log(`[generate-image] Trying model: ${model}`);
-      const response = await client.images.generate({
-        model,
-        prompt,
-        size: "1536x1024",
-        quality: "medium",
-        n: 1,
-      });
-      const b64 = response.data?.[0]?.b64_json;
+      console.log(`[generate-image] ────────────────────────────────────────────`);
+      console.log(`[generate-image] Versuche Modell: ${model}${styleHint ? `  (style=${styleHint})` : ""}`);
+      console.log(`[generate-image] Prompt (erste 200 Zeichen): ${prompt.slice(0, 200)}…`);
+      const isDalle3 = model === "dall-e-3";
+      // OpenAI hat sowohl `style` als auch `response_format` für DALL-E 3
+      // entfernt. Stilwahl läuft rein über den Prompt; das Bild kommt entweder
+      // als b64 oder als URL zurück — wir behandeln beides.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const params: any = isDalle3
+        ? { model, prompt, size: "1792x1024", quality: "hd", n: 1 }
+        : { model, prompt, size: "1536x1024", quality: "medium", n: 1 };
+      const response = await client.images.generate(params);
+      const item = response.data?.[0];
+      const revised = item?.revised_prompt;
+      if (revised) console.log(`[generate-image] DALL-E hat den Prompt umgeschrieben zu: ${String(revised).slice(0, 200)}…`);
+      let b64 = item?.b64_json;
+      if (!b64 && item?.url) {
+        // URL-Antwort herunterladen und nach Base64 konvertieren.
+        const imgRes = await fetch(item.url);
+        if (imgRes.ok) {
+          const buf = Buffer.from(await imgRes.arrayBuffer());
+          b64 = buf.toString("base64");
+        }
+      }
       if (b64) {
-        console.log(`[generate-image] ✓ Success with model: ${model}`);
+        console.log(`[generate-image] ✓ Erfolg mit Modell: ${model}`);
         return { b64, model };
       }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      console.warn(`[generate-image] ${model} failed: ${msg}`);
+      console.warn(`[generate-image] ✗ ${model} fehlgeschlagen: ${msg}`);
       lastError = e;
-      // If this is a safety block, don't try other models with the same prompt —
-      // they will all reject it. Bail out and let the caller retry with sanitization.
       if (isSafetyBlock(e)) {
         return { error: e };
       }
@@ -163,7 +180,7 @@ async function tryGenerate(prompt: string): Promise<{ b64: string; model: string
 
 export async function POST(req: Request) {
   try {
-    const { prompt, styleInstruction, topicElements } = await req.json();
+    const { prompt, styleInstruction, topicElements, preferredModel, styleHint } = await req.json();
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json({ error: "Prompt fehlt" }, { status: 400 });
     }
@@ -178,8 +195,14 @@ export async function POST(req: Request) {
 
     const fullPrompt = `${prompt}${elementsBlock}\n\nSTYLE REQUIREMENTS:\n${styleBlock}`;
 
+    // Wenn der Client ein konkretes Modell wünscht (z. B. "dall-e-3" für
+    // illustrative Stile), wird das zuerst probiert; danach die Default-Kette.
+    const chain = (typeof preferredModel === "string" && preferredModel)
+      ? [preferredModel, ...MODEL_FALLBACK_CHAIN.filter(m => m !== preferredModel)]
+      : MODEL_FALLBACK_CHAIN;
+
     // First attempt: original prompt
-    let result = await tryGenerate(fullPrompt);
+    let result = await tryGenerate(fullPrompt, chain, styleHint);
 
     // If first attempt failed with safety block, sanitize and retry
     let sanitizationNote: string | null = null;
@@ -189,7 +212,7 @@ export async function POST(req: Request) {
       if (changed) {
         console.log(`[generate-image] Sanitized prompt. Replacements: ${replacements.join("; ")}`);
         sanitizationNote = `Bekannte Markennamen wurden ersetzt durch beschreibende Begriffe: ${replacements.slice(0, 3).join("; ")}`;
-        const result2 = await tryGenerate(sanitized);
+        const result2 = await tryGenerate(sanitized, chain, styleHint);
         if ("b64" in result2) {
           return NextResponse.json({
             image: `data:image/png;base64,${result2.b64}`,

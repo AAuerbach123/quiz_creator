@@ -1,0 +1,118 @@
+<mxfile host="app.diagrams.net" agent="claude" version="24.7.17">
+  <diagram name="Wissensquiz-Architektur" id="arch">
+    <mxGraphModel dx="1422" dy="846" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lane_user" value="USER" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=0;resizeParentMax=0;collapsible=0;swimlaneFillColor=#fafafa;fillColor=#fafafa;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1500" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="user" value="Andreas&#xa;(Editor / Reviewer)" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="720" y="60" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_browser" value="BROWSER" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=0;resizeParentMax=0;collapsible=0;swimlaneFillColor=#fff2cc;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="40" y="160" width="1500" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="editor_ui" value="React Editor UI&#xa;(Sidebar mit Sections + Preview-Pane)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="220" width="280" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="reducer" value="quizReducer + History&#xa;(UPDATE_META, UPDATE_FONT_SIZE,&#xa;APPLY_IMPORTED_QUIZ, LOAD_QUIZ, …)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="120" y="340" width="280" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="idb" value="IndexedDB&#xa;wissensquiz / collection&#xa;{quizzes[], activeIndex}" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="480" y="340" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="renderer" value="Offscreen Renderer&#xa;PreviewRenderer + modern-screenshot&#xa;(domToJpeg → JPEG für PDF/HTML)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="740" y="220" width="280" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="zip" value="ZIP-Builder&#xa;(JSZip + jsPDF)&#xa;27 JSON + 27 PDF + index.html" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="740" y="340" width="280" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_dev" value="NEXT.JS DEV-SERVER (localhost:3000)" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=0;resizeParentMax=0;collapsible=0;swimlaneFillColor=#e1d5e7;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="1500" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="api_quiz" value="/api/generate-quiz&#xa;(Anthropic SDK)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="120" y="560" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="api_image" value="/api/generate-image&#xa;(OpenAI SDK)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="340" y="560" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="api_import" value="/api/import-quiz-document&#xa;(mammoth — docx Parser)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="560" y="560" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="env" value=".env.local&#xa;ANTHROPIC_API_KEY&#xa;OPENAI_API_KEY" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="820" y="560" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_ext" value="EXTERNE APIs" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;horizontal=1;startSize=30;resizeParent=0;collapsible=0;swimlaneFillColor=#f5f5f5;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="740" width="720" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="anthropic" value="Anthropic&#xa;Claude API&#xa;(Subtitle, ImagePrompt, TopicElements)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="120" y="780" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="openai" value="OpenAI&#xa;gpt-image API&#xa;(Quiz-Hintergrundbild)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="400" y="780" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_deploy" value="DEPLOYMENT" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;horizontal=1;startSize=30;resizeParent=0;collapsible=0;swimlaneFillColor=#dae8fc;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="820" y="740" width="720" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="github" value="GitHub Repository&#xa;AAuerbach123/quiz_creator" style="shape=mscae/Box.GitHub;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="900" y="780" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cf" value="Cloudflare Pages&#xa;quiz-creator-djn.pages.dev/quizzes/" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="780" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="docx" value="DOCX-Datei&#xa;(Wissensquiz Fragen)" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="220" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="zip_file" value="wissensquiz-publish-*.zip&#xa;(Download)" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="340" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_user_ui" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classicThin;startArrow=classicThin;" edge="1" parent="1" source="user" target="editor_ui">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ui_reducer" value="dispatch" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="editor_ui" target="reducer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_reducer_idb" value="auto-sync + debounce" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;endArrow=classicThin;startArrow=classicThin;" edge="1" parent="1" source="reducer" target="idb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ui_renderer" value="publishingQuiz" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="editor_ui" target="renderer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_renderer_zip" value="JPEG hi+lo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="renderer" target="zip">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_docx_ui" value="Import-Button" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" edge="1" parent="1" source="docx" target="editor_ui">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_zip_zipfile" value="Browser-Download" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="zip" target="zip_file">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ui_apis" value="REST" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="editor_ui" target="api_quiz">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ui_apiimg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.6;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="editor_ui" target="api_image">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ui_apiimport" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.7;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="editor_ui" target="api_import">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_env_apis" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;dashed=1;" edge="1" parent="1" source="env" target="api_quiz">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_api_anthropic" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="api_quiz" target="anthropic">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_api_openai" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="api_image" target="openai">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_zipfile_github" value="git push (manuell)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=1;entryX=0;entryY=0.5;" edge="1" parent="1" source="zip_file" target="github">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_github_cf" value="auto-deploy" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="github" target="cf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

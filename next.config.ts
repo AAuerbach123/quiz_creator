@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Blendet den Next.js-DevTools-Button (schwarzes "N" unten links) im
+  // Dev-Modus aus — er überdeckte den KI-Bereich der Seitenleiste.
+  devIndicators: false,
 };
 
 export default nextConfig;

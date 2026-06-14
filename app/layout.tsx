@@ -1,6 +1,25 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+// Verlagsschriften SELBST GEHOSTET (@fontsource) statt Google-Fonts-CDN:
+// Der PDF-Export (modern-screenshot) kann Cross-Origin-Schriften oft nicht
+// einbetten — der Rasterizer fiel dann auf breitere Systemschriften zurück,
+// Texte brachen anders um und überlappten. Same-Origin-Fonts werden
+// zuverlässig eingebettet.
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+import "@fontsource/lexend/300.css";
+import "@fontsource/lexend/400.css";
+import "@fontsource/lexend/500.css";
+import "@fontsource/lexend/600.css";
+import "@fontsource/lexend/700.css";
+import "@fontsource/montserrat/300.css";
+import "@fontsource/montserrat/400.css";
+import "@fontsource/montserrat/500.css";
+import "@fontsource/montserrat/600.css";
+import "@fontsource/montserrat/700.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
