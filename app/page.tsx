@@ -4578,8 +4578,10 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const cTerms = onWhite(theme.colors.terms, "#555555");
 
   const winners = (meta.winners ?? []).slice(0, Math.max(0, Math.min(5, meta.winnerCount ?? 0)));
-  // "ohne Gewinner"-Variante: keine Gewinner -> Spalte 4 entfällt, Fragen breiter.
+  // "ohne Gewinner"-Variante: keine Gewinner -> Spalte 4 entfällt. Damit kein
+  // Weißraum entsteht, werden Spalten und Schriftgrößen vergrößert (wide=true).
   const showWinners = winners.length > 0;
+  const wide = !showWinners;
   const imgTop = theme.background?.image || null;
   const imgBottom = theme.background?.imageBottom || null;
   const topPrize = prizes.length ? getPrizeLabel(prizes.reduce((a, b) => (b.valueCents > a.valueCents ? b : a))) : "1000€";
@@ -4694,10 +4696,10 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             Bewusst OHNE overflow:hidden — der Freiform-Editor erlaubt es,
             Elemente über die Spaltengrenze hinaus zu ziehen; Clipping würde
             sie abschneiden. */}
-        <div style={{ flex: "0 0 17%", display: "flex", flexDirection: "column",
+        <div style={{ flex: wide ? "0 0 21%" : "0 0 17%", display: "flex", flexDirection: "column",
           minWidth: 0, minHeight: 0 }}>
           {wrap("howto",
-            <div style={{ color: cIntro, fontSize: px(9.5),
+            <div style={{ color: cIntro, fontSize: px(wide ? 12.5 : 9.5),
               lineHeight: 1.45, whiteSpace: "pre-line", textAlign: "justify",
               hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
               {ed(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO, v => setMeta({ howToText: v }), { multiline: true, placeholder: "Story-Text" })}
@@ -4741,7 +4743,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         </div>
 
         {/* SPALTE 2: zwei gestapelte Bilder */}
-        <div style={{ flex: "0 0 30%", display: "flex", flexDirection: "column", gap: px(8), minWidth: 0 }}>
+        <div style={{ flex: wide ? "0 0 40%" : "0 0 30%", display: "flex", flexDirection: "column", gap: px(8), minWidth: 0 }}>
           {/* Bilder werden auf Datenebene passend zugeschnitten (fitCardImage);
               objectFit:cover gleicht Rest-Differenzen aus. */}
           {wrap("img_top",
@@ -4772,7 +4774,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             fontSize: px(150), fontWeight: 800, color: cPrize, opacity: 0.08,
             lineHeight: 0.8, pointerEvents: "none", userSelect: "none" }}>!?</div>
           {wrap("questionsHeadline",
-            <div style={{ color: cPrize, fontSize: px(12.5), fontWeight: 700, lineHeight: 1.15 }}>
+            <div style={{ color: cPrize, fontSize: px(wide ? 16 : 12.5), fontWeight: 700, lineHeight: 1.15 }}>
               {ed(meta.questionsHeadline ?? "", v => setMeta({ questionsHeadline: v }),
                 { placeholder: DEFAULT_QUESTIONS_HEADLINE }) }
               {!edit && !meta.questionsHeadline && DEFAULT_QUESTIONS_HEADLINE}
@@ -4791,8 +4793,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                           Frage verankert, aus dem Textfluss gelöst — einzeln
                           verschieb-/skalier-/editier-/löschbar. Der Fragetext
                           reserviert rechts Platz dafür. */}
-                      <div style={{ color: cQuestion, fontSize: px(10.5), fontWeight: 700,
-                        lineHeight: 1.25, paddingRight: px(46) }}>
+                      <div style={{ color: cQuestion, fontSize: px(wide ? 14 : 10.5), fontWeight: 700,
+                        lineHeight: 1.25, paddingRight: px(wide ? 66 : 46) }}>
                         {edit
                           ? <InlineEditable value={q.text} placeholder="Frage eingeben"
                               onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { text: v } })} />
@@ -4800,8 +4802,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                       </div>
                       {prize && wrap(`prize_${q.id}`,
                         <span style={{ display: "inline-block", background: cPrize, color: "#FFFFFF",
-                          fontSize: px(12), fontWeight: 700, padding: `${px(1.5)} ${px(9)}`,
-                          borderRadius: px(9), whiteSpace: "nowrap", textAlign: "center" }}>
+                          fontSize: px(wide ? 16 : 12), fontWeight: 700, padding: `${px(wide ? 2.5 : 1.5)} ${px(wide ? 12 : 9)}`,
+                          borderRadius: px(wide ? 12 : 9), whiteSpace: "nowrap", textAlign: "center" }}>
                           {edit
                             ? <InlineEditable value={getPrizeLabel(prize)}
                                 style={{ minWidth: "1ch", padding: 0, margin: 0 }}
@@ -4811,14 +4813,14 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                         { position: "absolute", top: 0, right: 0 })}
                       {/* Telefonnummer deutlich größer; Kostenhinweis (Telemedia)
                           steht unter JEDER Nummer. */}
-                      <div style={{ color: cPhone, fontSize: px(13), fontWeight: 700, letterSpacing: 0.3 }}>
+                      <div style={{ color: cPhone, fontSize: px(wide ? 17 : 13), fontWeight: 700, letterSpacing: 0.3 }}>
                         {edit
                           ? <InlineEditable value={q.phoneNumber ?? ""} placeholder="Telefonnummer"
                               onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } })} />
                           : q.phoneNumber}
                       </div>
                       {meta.phoneTermsText && (
-                        <div style={{ color: cTerms, fontSize: px(9), lineHeight: 1.2 }}>
+                        <div style={{ color: cTerms, fontSize: px(wide ? 11 : 9), lineHeight: 1.2 }}>
                           {cleanPhoneTerms(meta.phoneTermsText)}
                         </div>
                       )}
