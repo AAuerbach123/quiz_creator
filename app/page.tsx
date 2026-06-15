@@ -854,7 +854,10 @@ function buildViewerHtml(quizzes: Quiz[], cardImages: string[]): string {
 // die Blöcke nicht leer und damit unsichtbar bleiben.
 const DEFAULT_WINNERS_TEXT = "Gewinnerinnen und Gewinner werden hier veröffentlicht";
 const DEFAULT_TERMS_TEXT = "Teilnahmebedingungen unter 0800 890 890 / Dieser Anruf ist kostenlos. Zu diesem Gewinnspiel wird keine Korrespondenz geführt.";
-const DEFAULT_PHONE_TERMS_TEXT = "Telemedia interactive GmbH, 0,50€ pro Anruf aus dem dt. Festnetz, Mobilfunk teurer";
+const DEFAULT_PHONE_TERMS_TEXT = "Telemedia interactive GmbH, 0,50€ pro Anruf aus dem dt. Festnetz";
+// Entfernt den (auf Kundenwunsch unerwünschten) Zusatz "Mobilfunk teurer" beim
+// Rendern — greift auch für bereits gespeicherte Quizze, ohne Daten zu ändern.
+const cleanPhoneTerms = (s?: string) => (s || "").replace(/[,;]?\s*Mobilfunk\s+teurer\.?/gi, "").trim();
 
 // IndexedDB-Persistenz für die Quiz-Sammlung.
 // localStorage hat ~5-10 MB Limit, das reicht für 27 Quizzes mit Bildern nicht.
@@ -1244,7 +1247,7 @@ function quizReducer(state: Quiz, action: Action): Quiz {
       const newShadow = state.theme.readability.textShadow < 0.9 ? 0.95 : state.theme.readability.textShadow;
       const winnersText = state.meta.winnersText || "Gewinnerinnen und Gewinner werden hier veröffentlicht";
       const termsText = state.meta.termsText || "Teilnahmebedingungen unter 0800 890 890 / Dieser Anruf ist kostenlos. Zu diesem Gewinnspiel wird keine Korrespondenz geführt.";
-      const phoneTermsText = state.meta.phoneTermsText || "Telemedia interactive GmbH, 0,50€ pro Anruf aus dem dt. Festnetz, Mobilfunk teurer";
+      const phoneTermsText = state.meta.phoneTermsText || "Telemedia interactive GmbH, 0,50€ pro Anruf aus dem dt. Festnetz";
       // Titel = zufälliger kreativer Satz mit Thema + Hauptgewinn
       // (Kundenwunsch: KEINE Frage als Titel, Gewinnsumme muss vorkommen).
       const aiQuestions = p.questions || [];
@@ -4247,7 +4250,7 @@ function BeilageRenderer({ quiz, width, height, selectedBlockId, onSelectBlock, 
                     )}
                     {meta.phoneTermsText && (
                       <div style={{ color: cTerms, fontSize: px(7), lineHeight: 1.15, maxWidth: px(200),
-                        marginLeft: "auto" }}>{meta.phoneTermsText}</div>
+                        marginLeft: "auto" }}>{cleanPhoneTerms(meta.phoneTermsText)}</div>
                     )}
                   </div>
                 </Fragment>
@@ -4505,7 +4508,7 @@ function QuerformatRenderer({ quiz, width, height, selectedBlockId, onSelectBloc
             {meta.phoneTermsText && (
               <div style={{ color: cTerms, fontSize: px(7), lineHeight: 1.2,
                 marginTop: px(4), textAlign: "right" }}>
-                {meta.phoneTermsText}
+                {cleanPhoneTerms(meta.phoneTermsText)}
               </div>
             )}
           </div>
@@ -4810,8 +4813,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                           : q.phoneNumber}
                       </div>
                       {meta.phoneTermsText && (
-                        <div style={{ color: cTerms, fontSize: px(5.5), lineHeight: 1.15 }}>
-                          {meta.phoneTermsText}
+                        <div style={{ color: cTerms, fontSize: px(9), lineHeight: 1.2 }}>
+                          {cleanPhoneTerms(meta.phoneTermsText)}
                         </div>
                       )}
                     </div>,
@@ -5160,7 +5163,7 @@ function OverlayRenderer({ quiz, width, height, selectedBlockId, onSelectBlock }
                           maxWidth: 320 * sw,
                           lineHeight: 1.2
                         }}>
-                          {meta.phoneTermsText}
+                          {cleanPhoneTerms(meta.phoneTermsText)}
                         </div>
                       )}
                     </div>
@@ -5291,7 +5294,7 @@ const SW_TITLE = "Gewinnen Sie jeden Tag 1'000 Euro!";
 const SW_FONT_FAMILY = `var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
 const SW_PHONE_FALLBACK = "01378 802725";
 const SW_PHONE_HEADLINE = "Teilnehmen und 1'000 Euro gewinnen!";
-const SW_TELEMEDIA = "Telemedia interactive GmbH, 0,50€ pro Anruf aus dem dt. Festnetz, Mobilfunk teurer";
+const SW_TELEMEDIA = "Telemedia interactive GmbH, 0,50€ pro Anruf aus dem dt. Festnetz";
 const SW_FOOTER_LEFT = "Gewinnerinnen und Gewinner werden hier veröffentlicht";
 const SW_FOOTER_RIGHT = "Teilnahmebedingungen unter 0800 890 890 / Dieser Anruf ist kostenlos. Zu diesem Gewinnspiel wird keine Korrespondenz geführt.";
 
