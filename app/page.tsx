@@ -6044,6 +6044,19 @@ export default function Page() {
     return h ? h.verlag : "";
   })();
 
+  // Sammlungs-weiter Umschalter "mit/ohne Gewinner": setzt winnerCount auf ALLEN
+  // Quizzen (5 = mit, 0 = ohne). Im redaktionellen Layout entfällt bei 0 die
+  // Gewinner-Spalte und die Fragen werden breiter — gilt für jede Zeitung.
+  const handleSetWinnersAll = (show: boolean) => {
+    if (!collection) return;
+    const count = show ? 5 : 0;
+    const base = collection.quizzes.map((q, i) => i === collection.activeIndex ? quiz : q);
+    const quizzes = base.map(q => ({ ...q, meta: { ...q.meta, winnerCount: count } }));
+    setCollection({ quizzes, activeIndex: collection.activeIndex });
+    dispatch({ type: "LOAD_QUIZ", payload: quizzes[collection.activeIndex] });
+  };
+  const winnersShown = (quiz.meta.winnerCount ?? 0) > 0;
+
   const handleClearCollection = () => {
     if (!confirm("Sammlung schließen? Wird auch aus dem lokalen Speicher entfernt.")) return;
     setCollection(null);
@@ -6817,6 +6830,27 @@ export default function Page() {
                   : <div className="text-[10.5px] text-stone-400 mt-1">Aktuell Platzhalter-Nummern</div>}
               </div>
             )}
+            {/* Mit/ohne Gewinner — gilt für ALLE Quizze (jede Zeitung). */}
+            <div className="mb-3 pb-3 border-b border-stone-200">
+              <label className="block text-[11px] font-medium text-stone-600 mb-1">
+                Gewinner (alle {collection.quizzes.length} Quizze)
+              </label>
+              <div className="flex p-0.5 rounded-lg bg-stone-200/70">
+                {([["mit", true], ["ohne", false]] as const).map(([label, show]) => {
+                  const active = winnersShown === show;
+                  return (
+                    <button key={label}
+                      onClick={() => { if (!active) handleSetWinnersAll(show); }}
+                      className={`flex-1 h-7 text-[12px] rounded-md transition-colors ${
+                        active ? "bg-white text-stone-900 font-medium shadow-sm" : "text-stone-500 hover:text-stone-700"
+                      }`}
+                      title={show ? "Gewinner-Spalte anzeigen" : "Ohne Gewinner — Spalte entfällt, Fragen breiter"}>
+                      {label} Gewinner
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <QuizCollectionPicker collection={collection} activeTitle={quiz.meta.title}
               onSwitch={handleSwitchQuiz} onClear={handleClearCollection} onRepair={handleRepairCollection}
               onPublish={handlePublish} publishingDisabled={!!publishing || !!bulkProgress}
