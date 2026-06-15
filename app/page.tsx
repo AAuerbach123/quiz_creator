@@ -283,19 +283,22 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
   const autoTitle = buildPublisherTitle(preset, pubName);
   const isPrevAutoTitle = !q.meta.title || /^Das große Wissensquiz/i.test(q.meta.title);
   const newTitle = isPrevAutoTitle && autoTitle ? autoTitle : q.meta.title;
-  // Optionale Vorlagen-Texte (aus KI-Analyse). Nicht-leere Felder überschreiben
-  // die entsprechenden meta-Texte; Titel und Fragen-Überschrift bleiben außen
-  // vor (werden generiert). Teilnahmebedingungen NUR als Lückenfüller: kuratierte
-  // TNB (newTerms) und vorhandener Quiz-Text haben Vorrang.
+  // Optionale Vorlagen-Texte (aus KI-Analyse) — NUR als Lückenfüller: ein vom
+  // Nutzer gesetzter (nicht leerer) Quiz-Text bleibt IMMER erhalten, die Vorlage
+  // überschreibt ihn nie. So gehen manuelle Änderungen (z. B. ein eigener
+  // "So geht's"-Text) beim Anwenden/Vorschauen einer Vorlage nicht verloren.
+  // Titel und Fragen-Überschrift bleiben außen vor (werden generiert).
   const pt = preset.texts;
   const presetMeta: Partial<Quiz["meta"]> = {};
   if (pt) {
-    if (pt.subtitle?.trim()) presetMeta.subtitle = pt.subtitle.trim();
-    if (pt.howToText?.trim()) presetMeta.howToText = pt.howToText.trim();
-    if (pt.winnersText?.trim()) presetMeta.winnersText = pt.winnersText.trim();
-    if (pt.phoneTermsText?.trim()) presetMeta.phoneTermsText = pt.phoneTermsText.trim();
-    if (pt.solutionWords?.trim()) presetMeta.solutionWords = pt.solutionWords.trim();
+    if (pt.subtitle?.trim() && !q.meta.subtitle?.trim()) presetMeta.subtitle = pt.subtitle.trim();
+    if (pt.howToText?.trim() && !q.meta.howToText?.trim()) presetMeta.howToText = pt.howToText.trim();
+    if (pt.winnersText?.trim() && !q.meta.winnersText?.trim()) presetMeta.winnersText = pt.winnersText.trim();
+    if (pt.phoneTermsText?.trim() && !q.meta.phoneTermsText?.trim()) presetMeta.phoneTermsText = pt.phoneTermsText.trim();
+    if (pt.solutionWords?.trim() && !q.meta.solutionWords?.trim()) presetMeta.solutionWords = pt.solutionWords.trim();
   }
+  // Teilnahmebedingungen ebenso: kuratierte TNB (newTerms) und vorhandener
+  // Quiz-Text haben Vorrang vor dem Vorlagen-Text.
   const finalTerms = (!tv && !q.meta.termsText?.trim() && pt?.termsText?.trim())
     ? pt.termsText.trim()
     : newTerms;
