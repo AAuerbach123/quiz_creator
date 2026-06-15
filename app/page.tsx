@@ -2419,7 +2419,7 @@ function PublishingProgressPanel({ progress }: { progress: { current: number; to
   );
 }
 
-function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages, activeSection, embedded, previewPreset, setPreviewPreset, downloadingPresetId, onDownloadPreset, onDownloadPresetsBulk, presetBulk, onPushPresetsMonday, mondayBulk, imageStyleMode, setImageStyleMode, onUpdateQuizImage, onRegenerateAllImages, onSetWinners, winnersShown }: {
+function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages, activeSection, embedded, previewPreset, setPreviewPreset, downloadingPresetId, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, presetBulk, onPushPresetsMonday, mondayBulk, imageStyleMode, setImageStyleMode, onUpdateQuizImage, onRegenerateAllImages, onSetWinners, winnersShown }: {
   quiz: Quiz; dispatch: React.Dispatch<Action>; canUndo: boolean; canRedo: boolean;
   onExport: () => void; onExportPdf: () => void; exportingPdf: boolean;
   onImport: React.ChangeEventHandler<HTMLInputElement>; onReset: () => void;
@@ -2443,6 +2443,7 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
   setPreviewPreset?: (p: VerlagsPreset | null) => void;
   downloadingPresetId?: string | null;
   onDownloadPreset?: (p: VerlagsPreset) => void;
+  onDownloadPresetTiff?: (p: VerlagsPreset) => void;
   onDownloadPresetsBulk?: (presets: VerlagsPreset[]) => Promise<void> | void;
   presetBulk?: { current: number; total: number; name: string } | null;
   onPushPresetsMonday?: (presets: VerlagsPreset[]) => Promise<void> | void;
@@ -2875,6 +2876,7 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
           mondayProgress={mondayBulk ?? null}
           onPreviewPreset={(p) => setPreviewPreset?.(p)}
           onDownloadPreset={(p) => onDownloadPreset?.(p)}
+          onDownloadPresetTiff={(p) => onDownloadPresetTiff?.(p)}
           onDownloadPresetsBulk={(list) => onDownloadPresetsBulk?.(list) || undefined}
           onPushPresetsMonday={(list) => onPushPresetsMonday?.(list) || undefined}
           applyPreset={(preset: VerlagsPreset) => {
@@ -6641,6 +6643,35 @@ export default function Page() {
     }
   };
 
+  // Wie handleDownloadPreset, aber als verlustfreies TIFF (für InDesign/Druck).
+  const handleDownloadPresetTiff = async (preset: VerlagsPreset) => {
+    if (!pdfTargetRef.current) return;
+    setDownloadingPresetId(preset.id);
+    try {
+      const { domToPng } = await import("modern-screenshot");
+      const overridden = applyPresetToQuiz(quiz, preset, { preferPresetLogo: true });
+      setPublishingQuiz(overridden);
+      await new Promise(r => setTimeout(r, 120));
+      ensureRenderable(pdfTargetRef.current);
+      await waitForRenderReady(pdfTargetRef.current);
+      const png = await domToPng(pdfTargetRef.current, { scale: 3 });
+      const safe = (s: string) => s.replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue")
+        .replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss")
+        .replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+      const titleForFile = effectiveTitle(quiz) || "quiz";
+      const titelTeil = preset.titelKanonisch && preset.titelKanonisch.trim() && preset.titelKanonisch !== "n/a"
+        ? preset.titelKanonisch
+        : (preset.titel && preset.titel !== "n/a" ? preset.titel : preset.verlag);
+      await downloadImageAsTiff(png, `${safe(preset.verlag)}__${safe(titelTeil)}__${safe(titleForFile)}__${timestampForFilename()}.tif`);
+    } catch (e) {
+      console.error("TIFF (Verlag) fehlgeschlagen:", e);
+      alert(`TIFF-Export fehlgeschlagen: ${(e as Error).message}`);
+    } finally {
+      setPublishingQuiz(null);
+      setDownloadingPresetId(null);
+    }
+  };
+
   const handleImport: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const f = e.target.files?.[0]; if (!f) return;
     const r = new FileReader();
@@ -6896,6 +6927,7 @@ export default function Page() {
               onSetWinners={handleSetWinnersAll} winnersShown={winnersShown}
               downloadingPresetId={downloadingPresetId}
               onDownloadPreset={handleDownloadPreset}
+              onDownloadPresetTiff={handleDownloadPresetTiff}
               onDownloadPresetsBulk={handleDownloadPresetsBulk}
               presetBulk={presetBulk}
               onPushPresetsMonday={handlePushPresetsToMonday}

@@ -15,6 +15,8 @@ type Props = {
   onPreviewPreset: (preset: VerlagsPreset | null) => void;
   // Lädt das aktive Quiz als PDF in der Größe/Optik einer Vorlage herunter.
   onDownloadPreset: (preset: VerlagsPreset) => void;
+  // Wie onDownloadPreset, aber als verlustfreies TIFF (Druck/InDesign).
+  onDownloadPresetTiff?: (preset: VerlagsPreset) => void;
   // Mehrere Vorlagen: erzeugt je ein PDF und packt alles in ein ZIP.
   onDownloadPresetsBulk: (presets: VerlagsPreset[]) => Promise<void> | void;
   // Mehrere Vorlagen: erzeugt je ein PDF und pusht es an monday.com.
@@ -36,7 +38,7 @@ export function parseAdSize(s: string): { w: number; h: number } | null {
   return { w: parseFloat(m[1]), h: parseFloat(m[2]) };
 }
 
-export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetsBulk, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
+export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
   const [presets, setPresets] = useState<VerlagsPreset[]>([]);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
@@ -296,6 +298,16 @@ export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloa
                       onMouseLeave={e => (e.currentTarget.style.background = "#0071e3")}>
                       {downloading ? "…" : "PDF"}
                     </button>
+                    {onDownloadPresetTiff && (
+                      <button onClick={() => onDownloadPresetTiff(p)} disabled={downloading}
+                        title="Als verlustfreies TIFF herunterladen (Druck/InDesign)"
+                        className="h-7 px-3 text-[11.5px] rounded-md text-white disabled:opacity-50 transition-colors shrink-0"
+                        style={{ background: "#0E7C66" }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "#0F8C72")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "#0E7C66")}>
+                        {downloading ? "…" : "TIFF"}
+                      </button>
+                    )}
                   </div>
                 );
               })}
