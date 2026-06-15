@@ -773,7 +773,7 @@ function cardImageSubjects(q: Quiz, fallbackTopic: string): [string, string] {
   return [subj(3), subj(4)];
 }
 
-type QuizCollection = { quizzes: Quiz[]; activeIndex: number };
+type QuizCollection = { quizzes: Quiz[]; activeIndex: number; __v?: number };
 type BulkProgress = { current: number; total: number; topic: string; phase: "imaging" | "done"; failed: number };
 
 function escapeHtml(s: string): string {
@@ -900,6 +900,41 @@ async function idbSaveCollection(c: QuizCollection): Promise<void> {
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
     tx.onabort = () => reject(tx.error);
+  });
+}
+
+// Optimistische Sperre gegen das gegenseitige Überschreiben mehrerer Tabs:
+// Jeder gespeicherte Stand trägt eine fortlaufende Version (__v). Gespeichert
+// wird nur, wenn der in der DB liegende Stand NICHT neuer ist als der, auf dem
+// dieses Tab basiert (baseVersion). Ist er neuer (anderes Tab hat zwischenzeitlich
+// gespeichert), wird NICHT überschrieben — der neuere Stand wird zurückgegeben,
+// damit das aufrufende Tab ihn übernehmen kann statt ihn (z. B. ohne Bilder) zu
+// zerstören.
+type GuardedSaveResult =
+  | { ok: true; version: number }
+  | { ok: false; current: QuizCollection | null; version: number };
+async function idbSaveCollectionGuarded(c: QuizCollection, baseVersion: number): Promise<GuardedSaveResult> {
+  const db = await openIdb();
+  return await new Promise<GuardedSaveResult>((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, "readwrite");
+    const store = tx.objectStore(IDB_STORE);
+    let result: GuardedSaveResult | null = null;
+    const getReq = store.get(IDB_KEY);
+    getReq.onsuccess = () => {
+      const cur = getReq.result as QuizCollection | undefined;
+      const curV = cur && typeof cur.__v === "number" ? cur.__v : 0;
+      if (cur && curV > baseVersion) {
+        result = { ok: false, current: cur, version: curV };
+        tx.abort();
+        return;
+      }
+      const newV = Math.max(curV, baseVersion) + 1;
+      store.put({ ...c, __v: newV }, IDB_KEY);
+      result = { ok: true, version: newV };
+    };
+    tx.oncomplete = () => resolve(result ?? { ok: true, version: baseVersion + 1 });
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => resolve(result ?? { ok: false, current: null, version: baseVersion });
   });
 }
 
@@ -5868,6 +5903,8 @@ export default function Page() {
   // Markiert, ob das initiale Hydrieren aus localStorage durch ist — verhindert,
   // dass der "leere" Initial-State beim ersten Render localStorage überschreibt.
   const hydratedRef = useRef(false);
+  // Version, auf der der aktuelle In-Memory-Stand basiert (für die Speicher-Sperre).
+  const loadedVersionRef = useRef(0);
 
   // Beim Mount aus IndexedDB laden. Migriert evtl. vorhandene localStorage-Daten
   // (alte Version) einmalig in die IDB.
@@ -5894,7 +5931,8 @@ export default function Page() {
         if (cancelled) return;
         if (saved?.quizzes?.length) {
           const idx = Math.min(Math.max(saved.activeIndex || 0, 0), saved.quizzes.length - 1);
-          setCollection({ quizzes: saved.quizzes, activeIndex: idx });
+          loadedVersionRef.current = saved.__v ?? 0;
+          setCollection({ quizzes: saved.quizzes, activeIndex: idx, __v: saved.__v });
           dispatch({ type: "LOAD_QUIZ", payload: saved.quizzes[idx] });
         }
       } catch (e) {
@@ -5919,7 +5957,21 @@ export default function Page() {
             await idbClearCollection();
             return;
           }
-          await idbSaveCollection(collection);
+          const res = await idbSaveCollectionGuarded(collection, loadedVersionRef.current);
+          if (res.ok) {
+            loadedVersionRef.current = res.version;
+          } else {
+            // Konflikt: in der DB liegt ein NEUERER Stand (anderes Tab). Diesen
+            // NICHT überschreiben, sondern übernehmen — so verliert ein veraltetes
+            // Tab keine Bilder/Inhalte mehr.
+            console.warn("Speichern abgebrochen — neuerer Stand in der DB, wird übernommen.");
+            loadedVersionRef.current = res.version;
+            if (res.current?.quizzes?.length) {
+              const idx2 = Math.min(Math.max(res.current.activeIndex || 0, 0), res.current.quizzes.length - 1);
+              setCollection({ quizzes: res.current.quizzes, activeIndex: idx2, __v: res.version });
+              dispatch({ type: "LOAD_QUIZ", payload: res.current.quizzes[idx2] });
+            }
+          }
         } catch (e) {
           console.warn("Konnte Sammlung nicht persistieren:", e);
         }
