@@ -2419,7 +2419,7 @@ function PublishingProgressPanel({ progress }: { progress: { current: number; to
   );
 }
 
-function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages, activeSection, embedded, previewPreset, setPreviewPreset, downloadingPresetId, onDownloadPreset, onDownloadPresetsBulk, presetBulk, onPushPresetsMonday, mondayBulk, imageStyleMode, setImageStyleMode, onUpdateQuizImage, onRegenerateAllImages }: {
+function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages, activeSection, embedded, previewPreset, setPreviewPreset, downloadingPresetId, onDownloadPreset, onDownloadPresetsBulk, presetBulk, onPushPresetsMonday, mondayBulk, imageStyleMode, setImageStyleMode, onUpdateQuizImage, onRegenerateAllImages, onSetWinners, winnersShown }: {
   quiz: Quiz; dispatch: React.Dispatch<Action>; canUndo: boolean; canRedo: boolean;
   onExport: () => void; onExportPdf: () => void; exportingPdf: boolean;
   onImport: React.ChangeEventHandler<HTMLInputElement>; onReset: () => void;
@@ -2453,6 +2453,9 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
   // Bilder-Galerie: generiert die angewählten Karten-Bilder der Sammlung neu.
   onRegenerateAllImages?: (keys: string[]) => void;
   setImageStyleMode?: (m: ImageStyleMode) => void;
+  // Sammlungs-weiter "mit/ohne Gewinner"-Schalter (für jede Zeitung).
+  onSetWinners?: (show: boolean) => void;
+  winnersShown?: boolean;
 }) {
   const r = quiz.theme.readability;
   const darkTitle = isDark(quiz.theme.colors.title);
@@ -2864,6 +2867,8 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
 
       <Section title="Verlags-Vorlage" defaultOpen={false} tabKey="verlag">
         <VerlagsVorlage
+          onSetWinners={onSetWinners}
+          winnersShown={winnersShown}
           previewPresetId={previewPreset?.id ?? null}
           downloadingPresetId={downloadingPresetId ?? null}
           bulkProgress={presetBulk ?? null}
@@ -6886,6 +6891,7 @@ export default function Page() {
               onUpdateQuizImage={handleUpdateQuizImage}
               onRegenerateAllImages={handleRegenerateAllImages}
               previewPreset={previewPreset} setPreviewPreset={setPreviewPreset}
+              onSetWinners={handleSetWinnersAll} winnersShown={winnersShown}
               downloadingPresetId={downloadingPresetId}
               onDownloadPreset={handleDownloadPreset}
               onDownloadPresetsBulk={handleDownloadPresetsBulk}

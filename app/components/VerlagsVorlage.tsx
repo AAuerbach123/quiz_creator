@@ -23,6 +23,9 @@ type Props = {
   previewPresetId: string | null;
   bulkProgress: { current: number; total: number; name: string } | null;
   mondayProgress: { current: number; total: number; name: string; failed: number } | null;
+  // Sammlungs-weiter "mit/ohne Gewinner"-Schalter (gilt für jede Zeitung).
+  onSetWinners?: (show: boolean) => void;
+  winnersShown?: boolean;
 };
 
 // Parst eine Anzeigengröße im Stil "315x220" / "282,5 x 215" / "325 × 240"
@@ -33,7 +36,7 @@ export function parseAdSize(s: string): { w: number; h: number } | null {
   return { w: parseFloat(m[1]), h: parseFloat(m[2]) };
 }
 
-export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetsBulk, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress }: Props) {
+export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetsBulk, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
   const [presets, setPresets] = useState<VerlagsPreset[]>([]);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
@@ -131,6 +134,28 @@ export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloa
         mit Schrift und Farben des Verlags) herunterladen. Klick auf einen Titel
         zeigt ihn rechts in der Vorschau.
       </p>
+
+      {/* Mit/ohne Gewinner — gilt für jede Zeitung (setzt es auf allen Quizzen). */}
+      {onSetWinners && (
+        <div className="flex items-center gap-2">
+          <span className="text-[12px] font-medium text-stone-600">Layout:</span>
+          <div className="flex p-0.5 rounded-lg bg-stone-200/70">
+            {([["mit Gewinner", true], ["ohne Gewinner", false]] as const).map(([label, show]) => {
+              const active = winnersShown === show;
+              return (
+                <button key={label} type="button"
+                  onClick={() => { if (!active) onSetWinners(show); }}
+                  className={`h-7 px-3 text-[12px] rounded-md transition-colors ${
+                    active ? "bg-white text-stone-900 font-medium shadow-sm" : "text-stone-500 hover:text-stone-700"
+                  }`}
+                  title={show ? "Gewinner-Spalte anzeigen" : "Ohne Gewinner — Spalte entfällt, Fragen breiter"}>
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <input value={search} onChange={e => setSearch(e.target.value)}
         placeholder="Zeitung oder Verlag suchen …"
