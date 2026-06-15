@@ -1,0 +1,272 @@
+{
+ "01": {
+  "oben": {
+   "datei": "01_oben_Fledermaus.png",
+   "antwort": "Fledermaus"
+  },
+  "unten": {
+   "datei": "01_unten_Kugelfisch.png",
+   "antwort": "Kugelfisch"
+  }
+ },
+ "02": {
+  "oben": {
+   "datei": "02_oben_Bayern.png",
+   "antwort": "Bayern"
+  },
+  "unten": {
+   "datei": "02_unten_Brandenburg.png",
+   "antwort": "Brandenburg"
+  }
+ },
+ "03": {
+  "oben": {
+   "datei": "03_oben_Afrika.png",
+   "antwort": "Afrika"
+  },
+  "unten": {
+   "datei": "03_unten_Sahara.png",
+   "antwort": "Sahara"
+  }
+ },
+ "04": {
+  "unten": {
+   "datei": "04_unten_Kennedy.png",
+   "antwort": "Kennedy"
+  },
+  "oben": {
+   "datei": "04_oben_Napoleon.png",
+   "antwort": "Napoleon"
+  }
+ },
+ "05": {
+  "oben": {
+   "datei": "05_oben_Basketball.png",
+   "antwort": "Basketball"
+  },
+  "unten": {
+   "datei": "05_unten_Schwimmen.png",
+   "antwort": "Schwimmen"
+  }
+ },
+ "06": {
+  "oben": {
+   "datei": "06_oben_Karamellisieren.png",
+   "antwort": "Karamellisieren"
+  },
+  "unten": {
+   "datei": "06_unten_Trüffel.png",
+   "antwort": "Trüffel"
+  }
+ },
+ "07": {
+  "unten": {
+   "datei": "07_unten_Ostsee.png",
+   "antwort": "Ostsee"
+  },
+  "oben": {
+   "datei": "07_oben_Spanien.png",
+   "antwort": "Spanien"
+  }
+ },
+ "08": {
+  "unten": {
+   "datei": "08_unten_Albert_Einstein.png",
+   "antwort": "Albert Einstein"
+  },
+  "oben": {
+   "datei": "08_oben_Lindbergh.png",
+   "antwort": "Lindbergh"
+  }
+ },
+ "09": {
+  "unten": {
+   "datei": "09_unten_Beatles.png",
+   "antwort": "Beatles"
+  },
+  "oben": {
+   "datei": "09_oben_Mozart.png",
+   "antwort": "Mozart"
+  }
+ },
+ "10": {
+  "oben": {
+   "datei": "10_oben_Das_Weiße_Haus.png",
+   "antwort": "Das Weiße Haus"
+  },
+  "unten": {
+   "datei": "10_unten_Sydney.png",
+   "antwort": "Sydney"
+  }
+ },
+ "11": {
+  "oben": {
+   "datei": "11_oben_Erich_Kästner.png",
+   "antwort": "Erich Kästner"
+  },
+  "unten": {
+   "datei": "11_unten_Harry_Potter.png",
+   "antwort": "Harry Potter"
+  }
+ },
+ "12": {
+  "oben": {
+   "datei": "12_oben_Frankreich.png",
+   "antwort": "Frankreich"
+  },
+  "unten": {
+   "datei": "12_unten_Kichererbsen.png",
+   "antwort": "Kichererbsen"
+  }
+ },
+ "13": {
+  "unten": {
+   "datei": "13_unten_Hitchcock.png",
+   "antwort": "Hitchcock"
+  },
+  "oben": {
+   "datei": "13_oben_Old_Shatterhand.png",
+   "antwort": "Old Shatterhand"
+  }
+ },
+ "14": {
+  "oben": {
+   "datei": "14_oben_Donau.png",
+   "antwort": "Donau"
+  },
+  "unten": {
+   "datei": "14_unten_Istanbul.png",
+   "antwort": "Istanbul"
+  }
+ },
+ "15": {
+  "unten": {
+   "datei": "15_unten_Eishockey.png",
+   "antwort": "Eishockey"
+  },
+  "oben": {
+   "datei": "15_oben_Golf.png",
+   "antwort": "Golf"
+  }
+ },
+ "16": {
+  "unten": {
+   "datei": "16_unten_Tennis.png",
+   "antwort": "Tennis"
+  },
+  "oben": {
+   "datei": "16_oben_Timmy.png",
+   "antwort": "Timmy"
+  }
+ },
+ "17": {
+  "oben": {
+   "datei": "17_oben_Amazonas.png",
+   "antwort": "Amazonas"
+  },
+  "unten": {
+   "datei": "17_unten_Mittelmeer.png",
+   "antwort": "Mittelmeer"
+  }
+ },
+ "18": {
+  "unten": {
+   "datei": "18_unten_Griechenland.png",
+   "antwort": "Griechenland"
+  },
+  "oben": {
+   "datei": "18_oben_Gulasch.png",
+   "antwort": "Gulasch"
+  }
+ },
+ "19": {
+  "unten": {
+   "datei": "19_unten_Helene_Fischer.png",
+   "antwort": "Helene Fischer"
+  },
+  "oben": {
+   "datei": "19_oben_Nena.png",
+   "antwort": "Nena"
+  }
+ },
+ "20": {
+  "unten": {
+   "datei": "20_unten_Bär.png",
+   "antwort": "Bär"
+  },
+  "oben": {
+   "datei": "20_oben_Yen.png",
+   "antwort": "Yen"
+  }
+ },
+ "21": {
+  "oben": {
+   "datei": "21_oben_Portugiesisch.png",
+   "antwort": "Portugiesisch"
+  },
+  "unten": {
+   "datei": "21_unten_Wasser.png",
+   "antwort": "Wasser"
+  }
+ },
+ "22": {
+  "oben": {
+   "datei": "22_oben_Indien.png",
+   "antwort": "Indien"
+  },
+  "unten": {
+   "datei": "22_unten_Vatikanstadt.png",
+   "antwort": "Vatikanstadt"
+  }
+ },
+ "23": {
+  "unten": {
+   "datei": "23_unten_Barometer.png",
+   "antwort": "Barometer"
+  },
+  "oben": {
+   "datei": "23_oben_Meteorologie.png",
+   "antwort": "Meteorologie"
+  }
+ },
+ "24": {
+  "oben": {
+   "datei": "24_oben_Griechenland.png",
+   "antwort": "Griechenland"
+  },
+  "unten": {
+   "datei": "24_unten_Paralympics.png",
+   "antwort": "Paralympics"
+  }
+ },
+ "25": {
+  "oben": {
+   "datei": "25_oben_Quecksilber.png",
+   "antwort": "Quecksilber"
+  },
+  "unten": {
+   "datei": "25_unten_Seide.png",
+   "antwort": "Seide"
+  }
+ },
+ "26": {
+  "unten": {
+   "datei": "26_unten_Sauerstoff.png",
+   "antwort": "Sauerstoff"
+  },
+  "oben": {
+   "datei": "26_oben_Skelett.png",
+   "antwort": "Skelett"
+  }
+ },
+ "27": {
+  "oben": {
+   "datei": "27_oben_London.png",
+   "antwort": "London"
+  },
+  "unten": {
+   "datei": "27_unten_New_York.png",
+   "antwort": "New York"
+  }
+ }
+}
