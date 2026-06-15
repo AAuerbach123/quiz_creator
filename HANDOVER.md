@@ -120,6 +120,20 @@ Quiz, Spalten `Thema | Frage 1 | Antwort 1 | … | Frage 5 | Antwort 5` (Layout 
 befüllen und als CSV speichern, dann im Tool über **Fragen** importieren. Das Trennzeichen
 (Semikolon/Komma/Tab) erkennt der Parser automatisch.
 
+## Verlags-Hotlines (Telefonnummern-Umschalter)
+`public/hotlines.json` enthält je Verlag fünf fertige Rufnummern (`phoneNumbers[0..4]`,
+Endziffern 1–5 = Antwort 1–5; Format wie das `phoneNumber`-Feld, z. B. `01378 408171`).
+Quelle war die Excel „Hotlines a 5" (Stammnummer mit Platzhalter `x`).
+
+In der **Sammlungs-Spalte** (links, nur wenn eine Sammlung geladen ist) gibt es das Dropdown
+**„Verlag-Hotline"**: Auswahl stempelt die fünf Nummern des Verlags auf **alle** Quizze
+(`questions[i].phoneNumber`), „Platzhalter zurücksetzen" stellt `01378 80272x` wieder her.
+Logik: `handleApplyHotline` in `app/page.tsx`; der aktive Verlag wird per Nummern-Abgleich
+erkannt (`activeHotlineVerlag`), `meta.publisher` bleibt unangetastet. Pro Verlag wird so eine
+Variante erzeugt → veröffentlichen → nächsten Verlag wählen. Neu generieren der Daten:
+`outputs`/Skript aus der Excel; zwei Verlage ohne Stammnummer und eine Tippfehler-Vorwahl
+(`0378…`) sind in `docs/hotlines-phonenumbers.json` dokumentiert.
+
 ## Wichtige Hinweise
 - Diese Next.js-Version (16.x) bringt **Breaking Changes** ggü. älteren Versionen. Vor Änderungen
   an Routing/APIs unbedingt die lokalen Docs unter `node_modules/next/dist/docs/` konsultieren

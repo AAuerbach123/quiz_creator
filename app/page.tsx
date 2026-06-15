@@ -5826,6 +5826,13 @@ export default function Page() {
   const [collection, setCollection] = useState<QuizCollection | null>(null);
   const [bulkProgress, setBulkProgress] = useState<BulkProgress | null>(null);
   const [publishing, setPublishing] = useState<{ current: number; total: number; phase: string } | null>(null);
+  // Verlags-Hotlines (public/hotlines.json): je Verlag fünf fertige Rufnummern
+  // (Endziffern 1–5). Werden über den Umschalter in der Sammlungs-Spalte auf
+  // alle Quizze gestempelt (q1→Nr.1 … q5→Nr.5).
+  const [hotlines, setHotlines] = useState<{ verlag: string; stamm: string; phoneNumbers: string[]; warnung?: string; serviceHotline?: string }[]>([]);
+  useEffect(() => {
+    fetch("/hotlines.json").then(r => r.json()).then(d => setHotlines(d.verlage || [])).catch(() => {});
+  }, []);
   // Markiert, ob das initiale Hydrieren aus localStorage durch ist — verhindert,
   // dass der "leere" Initial-State beim ersten Render localStorage überschreibt.
   const hydratedRef = useRef(false);
@@ -5913,6 +5920,38 @@ export default function Page() {
     setCollection({ quizzes: snapshot, activeIndex: newIndex });
     dispatch({ type: "LOAD_QUIZ", payload: snapshot[newIndex] });
   };
+
+  // Stempelt die Rufnummern eines Verlags (oder Platzhalter) auf ALLE Quizze der
+  // Sammlung: questions[i].phoneNumber = phones[i] (Endziffer 1–5). Ändert nur die
+  // Telefonnummern, sonst nichts. Der aktive Editor-Stand wird vorher gesichert
+  // und danach neu geladen, damit der Sync-Effekt die Änderung nicht überschreibt.
+  const PLACEHOLDER_PHONES = ["01378 802721", "01378 802722", "01378 802723", "01378 802724", "01378 802725"];
+  const handleApplyHotline = (verlagName: string) => {
+    if (!collection) return;
+    let phones: string[];
+    if (verlagName === "__reset__") {
+      phones = PLACEHOLDER_PHONES;
+    } else {
+      const h = hotlines.find(x => x.verlag === verlagName);
+      if (!h) return;
+      phones = h.phoneNumbers;
+    }
+    const base = collection.quizzes.map((q, i) => i === collection.activeIndex ? quiz : q);
+    const quizzes = base.map(q => ({
+      ...q,
+      questions: q.questions.map((qq, i) => ({ ...qq, phoneNumber: phones[i] ?? qq.phoneNumber })),
+    }));
+    setCollection({ quizzes, activeIndex: collection.activeIndex });
+    dispatch({ type: "LOAD_QUIZ", payload: quizzes[collection.activeIndex] });
+  };
+
+  // Erkennt anhand der ersten Frage, welcher Verlag aktuell „aktiv" ist.
+  const activeHotlineVerlag = (() => {
+    const p0 = quiz.questions?.[0]?.phoneNumber;
+    if (!p0) return "";
+    const h = hotlines.find(x => x.phoneNumbers[0] === p0);
+    return h ? h.verlag : "";
+  })();
 
   const handleClearCollection = () => {
     if (!confirm("Sammlung schließen? Wird auch aus dem lokalen Speicher entfernt.")) return;
@@ -6666,6 +6705,27 @@ export default function Page() {
         {collection && (
           <aside className="w-64 shrink-0 p-3 flex flex-col"
             style={{ background: "rgba(255,255,255,0.5)", borderRight: "1px solid rgba(0,0,0,0.06)" }}>
+            {hotlines.length > 0 && (
+              <div className="mb-3 pb-3 border-b border-stone-200">
+                <label className="block text-[11px] font-medium text-stone-600 mb-1">
+                  Verlag-Hotline (alle {collection.quizzes.length} Quizze)
+                </label>
+                <select
+                  className="w-full text-[12px] border border-stone-300 rounded-lg px-2 py-1.5 bg-white"
+                  value={activeHotlineVerlag}
+                  onChange={e => { if (e.target.value) handleApplyHotline(e.target.value); }}
+                  title="Setzt die Rufnummern dieses Verlags (Endziffern 1–5) auf alle Quizze.">
+                  <option value="">— Verlag wählen —</option>
+                  <option value="__reset__">— Platzhalter zurücksetzen —</option>
+                  {hotlines.map(h => (
+                    <option key={h.verlag} value={h.verlag}>{h.verlag}{h.warnung ? " ⚠︎" : ""}</option>
+                  ))}
+                </select>
+                {activeHotlineVerlag
+                  ? <div className="text-[10.5px] text-emerald-700 mt-1">Aktiv: {activeHotlineVerlag}</div>
+                  : <div className="text-[10.5px] text-stone-400 mt-1">Aktuell Platzhalter-Nummern</div>}
+              </div>
+            )}
             <QuizCollectionPicker collection={collection} activeTitle={quiz.meta.title}
               onSwitch={handleSwitchQuiz} onClear={handleClearCollection} onRepair={handleRepairCollection}
               onPublish={handlePublish} publishingDisabled={!!publishing || !!bulkProgress}

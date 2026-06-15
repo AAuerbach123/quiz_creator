@@ -1,0 +1,473 @@
+{
+  "_hinweis": "phoneNumbers[i] gehoert an questions[i].phoneNumber (q1..q5). Endziffer = Antwort/Frage 1-5.",
+  "legende": {
+    "endziffer": "1-5",
+    "preise": {
+      "1": "50€",
+      "2": "100€",
+      "3": "250€",
+      "4": "500€"
+    }
+  },
+  "anzahlVerlage": 40,
+  "verlage": [
+    {
+      "verlag": "Schwarzwälder Bote (Die Oberbadische/Markgräfler Tagblatt laufen unter SB)",
+      "stamm": "01378-40817x",
+      "phoneNumbers": [
+        "01378 408171",
+        "01378 408172",
+        "01378 408173",
+        "01378 408174",
+        "01378 408175"
+      ],
+      "serviceHotline": "0800-2224449"
+    },
+    {
+      "verlag": "Frankenpost",
+      "stamm": "01378-40827x",
+      "phoneNumbers": [
+        "01378 408271",
+        "01378 408272",
+        "01378 408273",
+        "01378 408274",
+        "01378 408275"
+      ]
+    },
+    {
+      "verlag": "Neue Presse",
+      "stamm": "01378-40837x",
+      "phoneNumbers": [
+        "01378 408371",
+        "01378 408372",
+        "01378 408373",
+        "01378 408374",
+        "01378 408375"
+      ]
+    },
+    {
+      "verlag": "Suhler Verlagsgesellschaft",
+      "stamm": "01378-40847x",
+      "phoneNumbers": [
+        "01378 408471",
+        "01378 408472",
+        "01378 408473",
+        "01378 408474",
+        "01378 408475"
+      ]
+    },
+    {
+      "verlag": "Nordbayerischer Kurier",
+      "stamm": "01378-40857x",
+      "phoneNumbers": [
+        "01378 408571",
+        "01378 408572",
+        "01378 408573",
+        "01378 408574",
+        "01378 408575"
+      ]
+    },
+    {
+      "verlag": "SWP",
+      "stamm": "01378-80387x",
+      "phoneNumbers": [
+        "01378 803871",
+        "01378 803872",
+        "01378 803873",
+        "01378 803874",
+        "01378 803875"
+      ],
+      "serviceHotline": "0800-7779889"
+    },
+    {
+      "verlag": "Saarbrücker Zeitung",
+      "stamm": "01378-80617x",
+      "phoneNumbers": [
+        "01378 806171",
+        "01378 806172",
+        "01378 806173",
+        "01378 806174",
+        "01378 806175"
+      ],
+      "serviceHotline": "0800-2223385"
+    },
+    {
+      "verlag": "Trierischer Volksfreund",
+      "stamm": "01378-80627x",
+      "phoneNumbers": [
+        "01378 806271",
+        "01378 806272",
+        "01378 806273",
+        "01378 806274",
+        "01378 806275"
+      ]
+    },
+    {
+      "verlag": "Pfälzischer Merkur",
+      "stamm": "01378-80637x",
+      "phoneNumbers": [
+        "01378 806371",
+        "01378 806372",
+        "01378 806373",
+        "01378 806374",
+        "01378 806375"
+      ]
+    },
+    {
+      "verlag": "sh:z",
+      "stamm": "01378-80278x",
+      "phoneNumbers": [
+        "01378 802781",
+        "01378 802782",
+        "01378 802783",
+        "01378 802784",
+        "01378 802785"
+      ],
+      "serviceHotline": "0800-2223365"
+    },
+    {
+      "verlag": "A.Beig",
+      "stamm": "01378-80477x",
+      "phoneNumbers": [
+        "01378 804771",
+        "01378 804772",
+        "01378 804773",
+        "01378 804774",
+        "01378 804775"
+      ]
+    },
+    {
+      "verlag": "NOZ",
+      "stamm": "01378-80577x",
+      "phoneNumbers": [
+        "01378 805771",
+        "01378 805772",
+        "01378 805773",
+        "01378 805774",
+        "01378 805775"
+      ]
+    },
+    {
+      "verlag": "Neue Westfälische",
+      "stamm": "01378-60827x",
+      "phoneNumbers": [
+        "01378 608271",
+        "01378 608272",
+        "01378 608273",
+        "01378 608274",
+        "01378 608275"
+      ],
+      "serviceHotline": "0800-7779878"
+    },
+    {
+      "verlag": "Haller Kreisblatt",
+      "stamm": "01378-60837x",
+      "phoneNumbers": [
+        "01378 608371",
+        "01378 608372",
+        "01378 608373",
+        "01378 608374",
+        "01378 608375"
+      ]
+    },
+    {
+      "verlag": "Mittelrhein",
+      "stamm": "01378-80379x",
+      "phoneNumbers": [
+        "01378 803791",
+        "01378 803792",
+        "01378 803793",
+        "01378 803794",
+        "01378 803795"
+      ],
+      "serviceHotline": "0800-1088100"
+    },
+    {
+      "verlag": "Nürnberg",
+      "stamm": "01378-22027x",
+      "phoneNumbers": [
+        "01378 220271",
+        "01378 220272",
+        "01378 220273",
+        "01378 220274",
+        "01378 220275"
+      ],
+      "serviceHotline": "0800-1011326"
+    },
+    {
+      "verlag": "Thüringische Landeszeitung",
+      "stamm": "01379-44127x",
+      "phoneNumbers": [
+        "01379 441271",
+        "01379 441272",
+        "01379 441273",
+        "01379 441274",
+        "01379 441275"
+      ],
+      "serviceHotline": "0800-7779872"
+    },
+    {
+      "verlag": "Thüringer Allgemeine",
+      "stamm": "01379-44128x",
+      "phoneNumbers": [
+        "01379 441281",
+        "01379 441282",
+        "01379 441283",
+        "01379 441284",
+        "01379 441285"
+      ]
+    },
+    {
+      "verlag": "Ostthüringer Zeitung",
+      "stamm": "01379-44129x",
+      "phoneNumbers": [
+        "01379 441291",
+        "01379 441292",
+        "01379 441293",
+        "01379 441294",
+        "01379 441295"
+      ]
+    },
+    {
+      "verlag": "Augsburger Allgemeine",
+      "stamm": "01378-00556x",
+      "phoneNumbers": [
+        "01378 005561",
+        "01378 005562",
+        "01378 005563",
+        "01378 005564",
+        "01378 005565"
+      ],
+      "serviceHotline": "0800-2001199"
+    },
+    {
+      "verlag": "C. Beckers Buchdruckerei GmbH & Co. KG",
+      "stamm": "01378-40378x",
+      "phoneNumbers": [
+        "01378 403781",
+        "01378 403782",
+        "01378 403783",
+        "01378 403784",
+        "01378 403785"
+      ],
+      "serviceHotline": "0800-2223384"
+    },
+    {
+      "verlag": "Zeitungsverlag tz  GmbH & Co. KG",
+      "stamm": "01378-40388x",
+      "phoneNumbers": [
+        "01378 403881",
+        "01378 403882",
+        "01378 403883",
+        "01378 403884",
+        "01378 403885"
+      ]
+    },
+    {
+      "verlag": "Münchener Zeitungs-Verlag GmbH & Co. KG",
+      "stamm": "01378-40398x",
+      "phoneNumbers": [
+        "01378 403981",
+        "01378 403982",
+        "01378 403983",
+        "01378 403984",
+        "01378 403985"
+      ]
+    },
+    {
+      "verlag": "Pressehaus Bintz-Verlag GmbH & Co. KG",
+      "stamm": "01378-40428x",
+      "phoneNumbers": [
+        "01378 404281",
+        "01378 404282",
+        "01378 404283",
+        "01378 404284",
+        "01378 404285"
+      ]
+    },
+    {
+      "verlag": "Hanauer Anzeiger GmbH & Co.KG ",
+      "stamm": "01378-40438x",
+      "phoneNumbers": [
+        "01378 404381",
+        "01378 404382",
+        "01378 404383",
+        "01378 404384",
+        "01378 404385"
+      ]
+    },
+    {
+      "verlag": "Kreiszeitung Verlagsgesellschaft mbH & Co. KG",
+      "stamm": "01378-40379x",
+      "phoneNumbers": [
+        "01378 403791",
+        "01378 403792",
+        "01378 403793",
+        "01378 403794",
+        "01378 403795"
+      ]
+    },
+    {
+      "verlag": "Karl Sasse GmbH & Co. KG",
+      "stamm": "01378-40389x",
+      "phoneNumbers": [
+        "01378 403891",
+        "01378 403892",
+        "01378 403893",
+        "01378 403894",
+        "01378 403895"
+      ]
+    },
+    {
+      "verlag": "Ludwig Löschen GmbH & Co. OHG (Wildeshausener)",
+      "stamm": "01378-40518x",
+      "phoneNumbers": [
+        "01378 405181",
+        "01378 405182",
+        "01378 405183",
+        "01378 405184",
+        "01378 405185"
+      ]
+    },
+    {
+      "verlag": "Frankfurter Societäts-Medien GmbH",
+      "stamm": "01378-40528x",
+      "phoneNumbers": [
+        "01378 405281",
+        "01378 405282",
+        "01378 405283",
+        "01378 405284",
+        "01378 405285"
+      ]
+    },
+    {
+      "verlag": "Frankfurter Rundschau GmbH",
+      "stamm": "01378-40568x",
+      "phoneNumbers": [
+        "01378 405681",
+        "01378 405682",
+        "01378 405683",
+        "01378 405684",
+        "01378 405685"
+      ]
+    },
+    {
+      "verlag": "Mittelhessische Druck- und Verlagshaus",
+      "stamm": "01378-40578x",
+      "phoneNumbers": [
+        "01378 405781",
+        "01378 405782",
+        "01378 405783",
+        "01378 405784",
+        "01378 405785"
+      ]
+    },
+    {
+      "verlag": "GA Media GmbH & Co. KG (Gießener A.)",
+      "stamm": "01378-40728x",
+      "phoneNumbers": [
+        "01378 407281",
+        "01378 407282",
+        "01378 407283",
+        "01378 407284",
+        "01378 407285"
+      ]
+    },
+    {
+      "verlag": "Verlag Dierichs GmbH & Co. KG",
+      "stamm": "01378-40588x",
+      "phoneNumbers": [
+        "01378 405881",
+        "01378 405882",
+        "01378 405883",
+        "01378 405884",
+        "01378 405885"
+      ]
+    },
+    {
+      "verlag": "Wilhelm Bing, Druckerei und Verlag GmbH",
+      "stamm": "01378-40598x",
+      "phoneNumbers": [
+        "01378 405981",
+        "01378 405982",
+        "01378 405983",
+        "01378 405984",
+        "01378 405985"
+      ]
+    },
+    {
+      "verlag": "Werra Verlag Kluthe GmbH & Co. KG",
+      "stamm": "01378-40618x",
+      "phoneNumbers": [
+        "01378 406181",
+        "01378 406182",
+        "01378 406183",
+        "01378 406184",
+        "01378 406185"
+      ]
+    },
+    {
+      "verlag": "Hoehl-Druck GmbH + Co. Hersfelder Zeitung KG",
+      "stamm": "0378-40628x",
+      "phoneNumbers": [
+        "0378 406281",
+        "0378 406282",
+        "0378 406283",
+        "0378 406284",
+        "0378 406285"
+      ],
+      "warnung": "Vorwahl '0378' wirkt unvollständig — vermutlich '01378'. Hier UNVERÄNDERT übernommen."
+    },
+    {
+      "verlag": "Zeitungsverlag F. Wolff & Sohn KG",
+      "stamm": "01378-40638x",
+      "phoneNumbers": [
+        "01378 406381",
+        "01378 406382",
+        "01378 406383",
+        "01378 406384",
+        "01378 406385"
+      ]
+    },
+    {
+      "verlag": "Westfälischer Anzeiger Verlagsgesellschaft mbH & Co. KG",
+      "stamm": "01378-40658x",
+      "phoneNumbers": [
+        "01378 406581",
+        "01378 406582",
+        "01378 406583",
+        "01378 406584",
+        "01378 406585"
+      ]
+    },
+    {
+      "verlag": "Jahn Verlag GmbH & CO. KG",
+      "stamm": "01378-40678x",
+      "phoneNumbers": [
+        "01378 406781",
+        "01378 406782",
+        "01378 406783",
+        "01378 406784",
+        "01378 406785"
+      ]
+    },
+    {
+      "verlag": "Märkischer Zeitungsverlag GmbH & CO.KG",
+      "stamm": "01378-40688x",
+      "phoneNumbers": [
+        "01378 406881",
+        "01378 406882",
+        "01378 406883",
+        "01378 406884",
+        "01378 406885"
+      ]
+    }
+  ],
+  "offen_ohne_stammnummer": [
+    "Burg-Verlag GmbH & Co. KG",
+    "OVB GmbH & Co. KG"
+  ],
+  "warnungen": [
+    "Hoehl-Druck GmbH + Co. Hersfelder Zeitung KG: Vorwahl '0378' wirkt unvollständig — vermutlich '01378'. Hier UNVERÄNDERT übernommen."
+  ]
+}
