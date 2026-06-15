@@ -408,15 +408,14 @@
     },
     {
       "verlag": "Hoehl-Druck GmbH + Co. Hersfelder Zeitung KG",
-      "stamm": "0378-40628x",
+      "stamm": "01378-40628x",
       "phoneNumbers": [
-        "0378 406281",
-        "0378 406282",
-        "0378 406283",
-        "0378 406284",
-        "0378 406285"
-      ],
-      "warnung": "Vorwahl '0378' wirkt unvollständig — vermutlich '01378'. Hier UNVERÄNDERT übernommen."
+        "01378 406281",
+        "01378 406282",
+        "01378 406283",
+        "01378 406284",
+        "01378 406285"
+      ]
     },
     {
       "verlag": "Zeitungsverlag F. Wolff & Sohn KG",
@@ -467,7 +466,5 @@
     "Burg-Verlag GmbH & Co. KG",
     "OVB GmbH & Co. KG"
   ],
-  "warnungen": [
-    "Hoehl-Druck GmbH + Co. Hersfelder Zeitung KG: Vorwahl '0378' wirkt unvollständig — vermutlich '01378'. Hier UNVERÄNDERT übernommen."
-  ]
+  "warnungen": []
 }
