@@ -283,9 +283,25 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
   const autoTitle = buildPublisherTitle(preset, pubName);
   const isPrevAutoTitle = !q.meta.title || /^Das große Wissensquiz/i.test(q.meta.title);
   const newTitle = isPrevAutoTitle && autoTitle ? autoTitle : q.meta.title;
+  // Optionale Vorlagen-Texte (aus KI-Analyse). Nicht-leere Felder überschreiben
+  // die entsprechenden meta-Texte; Titel und Fragen-Überschrift bleiben außen
+  // vor (werden generiert). Teilnahmebedingungen NUR als Lückenfüller: kuratierte
+  // TNB (newTerms) und vorhandener Quiz-Text haben Vorrang.
+  const pt = preset.texts;
+  const presetMeta: Partial<Quiz["meta"]> = {};
+  if (pt) {
+    if (pt.subtitle?.trim()) presetMeta.subtitle = pt.subtitle.trim();
+    if (pt.howToText?.trim()) presetMeta.howToText = pt.howToText.trim();
+    if (pt.winnersText?.trim()) presetMeta.winnersText = pt.winnersText.trim();
+    if (pt.phoneTermsText?.trim()) presetMeta.phoneTermsText = pt.phoneTermsText.trim();
+    if (pt.solutionWords?.trim()) presetMeta.solutionWords = pt.solutionWords.trim();
+  }
+  const finalTerms = (!tv && !q.meta.termsText?.trim() && pt?.termsText?.trim())
+    ? pt.termsText.trim()
+    : newTerms;
   return {
     ...q,
-    meta: { ...q.meta, termsText: newTerms, title: newTitle, titleAuto: isPrevAutoTitle },
+    meta: { ...q.meta, ...presetMeta, termsText: finalTerms, title: newTitle, titleAuto: isPrevAutoTitle },
     theme: {
       ...q.theme,
       fontFamily: preset.fontFamily,
@@ -1595,6 +1611,18 @@ function AIGeneratorPanel({ quiz, dispatch, styleText, styleImage, difficulty, s
         setTplStatus(`„${baseName}" auf die Gruppe ${tplGroup} übertragen${count ? ` (${count} Titel)` : ""} — ${parts}.${filledNote}${conf}`);
       } else {
         // Ohne Gruppe: als freie eigene Vorlage speichern (altes Verhalten).
+        // Die analysierten Texte wandern auch ins Preset, damit "Anwenden"
+        // später dieselben Texte setzt (Titel/Fragen-Überschrift ausgenommen).
+        const cleanSolution = String(t.solutionWords ?? "")
+          .replace(/auflösung der letzten (folge|ausgabe):?\s*/gi, "").trim();
+        const presetTexts: NonNullable<VerlagsPreset["texts"]> = {
+          ...(String(t.subtitle ?? "").trim() ? { subtitle: String(t.subtitle).trim() } : {}),
+          ...(String(t.howTo ?? "").trim() ? { howToText: String(t.howTo).trim() } : {}),
+          ...(String(t.winners ?? "").trim() ? { winnersText: String(t.winners).trim() } : {}),
+          ...(String(t.terms ?? "").trim() ? { termsText: String(t.terms).trim() } : {}),
+          ...(String(t.phoneTerms ?? "").trim() ? { phoneTermsText: String(t.phoneTerms).trim() } : {}),
+          ...(cleanSolution ? { solutionWords: cleanSolution } : {}),
+        };
         const preset: VerlagsPreset = {
           id: genId("custom"),
           gruppe: "Eigene Vorlagen",
@@ -1609,6 +1637,7 @@ function AIGeneratorPanel({ quiz, dispatch, styleText, styleImage, difficulty, s
           logoPosition: String(a.logoPosition || "n/a"),
           logoUrl: "",
           layoutVariant,
+          ...(Object.keys(presetTexts).length ? { texts: presetTexts } : {}),
         };
         saveCustomPreset(preset);
         onPresetCreated?.(preset);

@@ -84,6 +84,26 @@ Regeln:
   Nichts erfinden, nichts umformulieren — wörtlich übernehmen.
 - Keine Phantasie-Verlagsnamen: lieber leer lassen als raten.`;
 
+// Zieht das JSON-Objekt robust aus der Modell-Antwort. Häufigste Fehlerquelle:
+// das Modell setzt in langen Texten (z. B. Teilnahmebedingungen) echte Zeilen-
+// umbrüche IN die Strings — das ist ungültiges JSON. Reparatur-Versuch: Code-
+// Zäune entfernen, echte Steuerzeichen durch Leerzeichen ersetzen (außerhalb von
+// Strings nur Whitespace, innerhalb macht es das JSON gültig) und Komma vor
+// schließender Klammer streichen. Wirft, wenn auch danach nicht parsebar.
+function extractAnalysisJson(text: string): unknown {
+  let s = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+  const start = s.indexOf("{");
+  const end = s.lastIndexOf("}");
+  if (start < 0 || end < 0) throw new Error("Kein JSON-Objekt in der Antwort gefunden.");
+  const body = s.slice(start, end + 1);
+  try {
+    return JSON.parse(body);
+  } catch {
+    const repaired = body.replace(/[\n\r\t]+/g, " ").replace(/,\s*([}\]])/g, "$1");
+    return JSON.parse(repaired); // wirft erneut, wenn weiterhin kaputt
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const fd = await req.formData();
@@ -110,27 +130,42 @@ export async function POST(req: Request) {
       ? { type: "document" as const, source: { type: "base64" as const, media_type: "application/pdf" as const, data: b64 } }
       : { type: "image" as const, source: { type: "base64" as const, media_type: mime as "image/png" | "image/jpeg" | "image/webp" | "image/gif", data: b64 } };
 
-    const msg = await client().messages.create({
-      model: "claude-sonnet-4-5",
-      // Teilnahmebedingungen können lang sein — genug Platz für wörtliche Texte.
-      max_tokens: 4000,
-      messages: [{
-        role: "user",
-        content: [mediaBlock, { type: "text", text: ANALYZE_PROMPT }],
-      }],
-    });
-
-    const text = msg.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-      .map(b => b.text)
-      .join("\n");
-
-    // JSON robust herausziehen (falls das Modell doch Text drumherum setzt).
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return NextResponse.json({ error: "KI-Antwort enthielt kein JSON.", raw: text }, { status: 502 });
+    // Die Modell-Ausgabe ist nicht deterministisch — gelegentlich liefert sie
+    // ungültiges JSON (echte Zeilenumbrüche/Anführungszeichen in langen Texten).
+    // Deshalb bis zu 3 Versuche mit robustem Parsen/Reparatur statt sofortigem 500.
+    let analysis: unknown = null;
+    let lastErr = "";
+    let lastRaw = "";
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const msg = await client().messages.create({
+        model: "claude-sonnet-4-5",
+        // Teilnahmebedingungen können lang sein — genug Platz für wörtliche Texte.
+        max_tokens: 4000,
+        messages: [{
+          role: "user",
+          content: [mediaBlock, { type: "text", text: ANALYZE_PROMPT }],
+        }],
+      });
+      const text = msg.content
+        .filter((b): b is Anthropic.TextBlock => b.type === "text")
+        .map(b => b.text)
+        .join("\n");
+      lastRaw = text;
+      try {
+        analysis = extractAnalysisJson(text);
+        break;
+      } catch (e) {
+        lastErr = (e as Error).message;
+        console.warn(`[analyze-template] Versuch ${attempt}/3 — JSON nicht parsebar: ${lastErr}`);
+      }
     }
-    const analysis = JSON.parse(jsonMatch[0]);
+
+    if (analysis == null) {
+      return NextResponse.json(
+        { error: `KI-Antwort war nach 3 Versuchen kein gültiges JSON: ${lastErr}`, raw: lastRaw.slice(0, 500) },
+        { status: 502 }
+      );
+    }
     return NextResponse.json({ analysis });
   } catch (e) {
     console.error("analyze-template fehlgeschlagen:", e);

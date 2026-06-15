@@ -25,6 +25,17 @@ export type VerlagsPreset = {
   // Optionale Layout-Variante (aus KI-Analyse einer hochgeladenen Vorlage).
   // Wenn gesetzt, schaltet applyPresetToQuiz die Renderer-Variante um.
   layoutVariant?: "beilage" | "querformat" | "redaktionell";
+  // Optionale Vorlagen-Texte (aus KI-Analyse). Wenn gesetzt, füllt
+  // applyPresetToQuiz die entsprechenden meta-Felder. Titel und Fragen-
+  // Überschrift sind bewusst NICHT enthalten (werden generiert).
+  texts?: {
+    subtitle?: string;
+    howToText?: string;
+    winnersText?: string;
+    termsText?: string;
+    phoneTermsText?: string;
+    solutionWords?: string;
+  };
 };
 
 // Präfix (normalisiert) -> [CSS-Familie, generisch, verfügbar?]

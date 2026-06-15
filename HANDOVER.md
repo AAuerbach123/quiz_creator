@@ -134,6 +134,19 @@ Variante erzeugt → veröffentlichen → nächsten Verlag wählen. Neu generier
 `outputs`/Skript aus der Excel; zwei Verlage ohne Stammnummer und eine Tippfehler-Vorwahl
 (`0378…`) sind in `docs/hotlines-phonenumbers.json` dokumentiert.
 
+## Verlags-Vorlagen aus Anzeige (KI-Analyse)
+`app/api/analyze-template/route.ts` analysiert eine hochgeladene Beispielanzeige
+(PDF/Bild) mit Claude Vision und liefert Farben, Schrift, Format, Logo-Position,
+Layout-Variante und Texte. Das KI-Panel baut daraus eine eigene Vorlage
+(`saveCustomPreset`). Die Route ist robust: bis zu **3 Versuche** mit JSON-Reparatur
+(`extractAnalysisJson`) — lange Teilnahmebedingungen mit Zeilenumbrüchen führten früher
+zu 500-Fehlern.
+
+Ein `VerlagsPreset` kann jetzt optionale **Texte** tragen (`texts`: subtitle, howToText,
+winnersText, termsText, phoneTermsText, solutionWords). `applyPresetToQuiz` setzt sie beim
+Anwenden (Titel und Fragen-Überschrift bleiben generiert; Teilnahmebedingungen nur als
+Lückenfüller). So bringt „Anwenden" einer Vorlage auch deren Texte mit.
+
 ## Wichtige Hinweise
 - Diese Next.js-Version (16.x) bringt **Breaking Changes** ggü. älteren Versionen. Vor Änderungen
   an Routing/APIs unbedingt die lokalen Docs unter `node_modules/next/dist/docs/` konsultieren
