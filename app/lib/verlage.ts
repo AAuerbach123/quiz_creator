@@ -39,6 +39,10 @@ export type VerlagsPreset = {
   // "ohne Gewinner"-Variante: blendet beim Anwenden/Vorschauen die Gewinner-Spalte
   // aus (winnerCount → 0), das redaktionelle Layout verbreitert dann die Fragen.
   hideWinners?: boolean;
+  // Verlags-Hotline (0137x) pro Frage 1–5. Wenn gesetzt, setzt applyPresetToQuiz
+  // diese Rufnummern auf die fünf Fragen — so ist die Hotline an die Verlagswahl
+  // gekoppelt (eine Auswahl = Design + 0800 in den TNB + 0137 pro Frage).
+  phoneNumbers?: string[];
 };
 
 // Präfix (normalisiert) -> [CSS-Familie, generisch, verfügbar?]

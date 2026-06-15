@@ -302,8 +302,13 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
   const finalTerms = (!tv && !q.meta.termsText?.trim() && pt?.termsText?.trim())
     ? pt.termsText.trim()
     : newTerms;
+  // Verlags-Hotline (0137x) an die Vorlage koppeln: setzt die Rufnummer je Frage.
+  const newQuestions = preset.phoneNumbers && preset.phoneNumbers.length
+    ? q.questions.map((qq, i) => ({ ...qq, phoneNumber: preset.phoneNumbers![i] ?? qq.phoneNumber }))
+    : q.questions;
   return {
     ...q,
+    questions: newQuestions,
     meta: { ...q.meta, ...presetMeta, termsText: finalTerms, title: newTitle, titleAuto: isPrevAutoTitle,
       ...(preset.hideWinners ? { winnerCount: 0 } : {}) },
     theme: {
