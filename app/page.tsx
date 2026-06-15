@@ -304,7 +304,8 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
     : newTerms;
   return {
     ...q,
-    meta: { ...q.meta, ...presetMeta, termsText: finalTerms, title: newTitle, titleAuto: isPrevAutoTitle },
+    meta: { ...q.meta, ...presetMeta, termsText: finalTerms, title: newTitle, titleAuto: isPrevAutoTitle,
+      ...(preset.hideWinners ? { winnerCount: 0 } : {}) },
     theme: {
       ...q.theme,
       fontFamily: preset.fontFamily,
@@ -4567,6 +4568,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const cTerms = onWhite(theme.colors.terms, "#555555");
 
   const winners = (meta.winners ?? []).slice(0, Math.max(0, Math.min(5, meta.winnerCount ?? 0)));
+  // "ohne Gewinner"-Variante: keine Gewinner -> Spalte 4 entfällt, Fragen breiter.
+  const showWinners = winners.length > 0;
   const imgTop = theme.background?.image || null;
   const imgBottom = theme.background?.imageBottom || null;
   const topPrize = prizes.length ? getPrizeLabel(prizes.reduce((a, b) => (b.valueCents > a.valueCents ? b : a))) : "1000€";
@@ -4817,9 +4820,10 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           </div>
         </div>
 
-        {/* SPALTE 4: Gewinner-Boxen mit großen Beträgen. Bewusst OHNE
-            overflow:hidden — sonst werden vom Nutzer verschobene/vergrößerte
-            Elemente an der Spaltenkante abgeschnitten. */}
+        {/* SPALTE 4: Gewinner-Boxen — nur wenn Gewinner vorhanden (winnerCount>0).
+            Bei "ohne Gewinner" entfällt die Spalte; Spalte 3 (Fragen) dehnt sich
+            dadurch automatisch aus. Bewusst OHNE overflow:hidden. */}
+        {showWinners && (
         <div style={{ flex: "0 0 24%", display: "flex", flexDirection: "column",
           minWidth: 0, minHeight: 0 }}>
           {/* Gewinner-Überschrift als EIGENER Block: separat verschieb-,
@@ -4868,6 +4872,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             </div>,
             { flex: 1, minHeight: 0 }, true)}
         </div>
+        )}
       </div>
 
       {/* FUSSZEILE: lange Teilnahmebedingungen über volle Breite (sehr klein) */}

@@ -36,6 +36,9 @@ export type VerlagsPreset = {
     phoneTermsText?: string;
     solutionWords?: string;
   };
+  // "ohne Gewinner"-Variante: blendet beim Anwenden/Vorschauen die Gewinner-Spalte
+  // aus (winnerCount → 0), das redaktionelle Layout verbreitert dann die Fragen.
+  hideWinners?: boolean;
 };
 
 // Präfix (normalisiert) -> [CSS-Familie, generisch, verfügbar?]
