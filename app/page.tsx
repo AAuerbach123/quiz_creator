@@ -317,7 +317,9 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
     layout: {
       ...q.layout,
       ...(size ? { customSize: size } : {}),
-      ...(preset.layoutVariant ? { variant: preset.layoutVariant } : {})
+      // Alle Zeitungen nutzen das Augsburger-Layout: ohne explizite Vorgabe
+      // wird "redaktionell" verwendet (statt des alten Defaults "beilage").
+      variant: preset.layoutVariant || "redaktionell"
     }
   };
 }
