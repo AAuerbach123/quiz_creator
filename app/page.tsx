@@ -3639,6 +3639,16 @@ function InlineEditable({
       // Quiz-Bilder beim Ziehen versehentlich IM Text.
       onDrop={e => e.preventDefault()}
       onMouseDown={e => e.stopPropagation()}
+      // Schon WÄHREND des Tippens in den State spiegeln (nicht erst onBlur).
+      // Sonst lebt eine Eingabe nur im DOM, und eine Aktion, die den aktuellen
+      // quiz-State liest (z. B. der mit/ohne-Gewinner-Umschalter), baut die
+      // Sammlung aus dem alten Stand und überschreibt die noch nicht geblurrte
+      // Eingabe — die manuelle Änderung ginge verloren. Der Fokus-Guard im
+      // Sync-Effekt oben verhindert dabei den Cursor-Sprung.
+      onInput={e => {
+        const live = (e.currentTarget as HTMLSpanElement).innerText || "";
+        if (live !== (value || "")) onChange(live);
+      }}
       onKeyDown={e => {
         // Enter beendet die Eingabe (außer mit Shift für Zeilenumbruch im
         // mehrzeiligen Modus).
