@@ -19,6 +19,8 @@ type Props = {
   onDownloadPresetTiff?: (preset: VerlagsPreset) => void;
   // Mehrere Vorlagen: erzeugt je ein PDF und packt alles in ein ZIP.
   onDownloadPresetsBulk: (presets: VerlagsPreset[]) => Promise<void> | void;
+  // Mehrere Vorlagen: erzeugt je ein verlustfreies TIFF und packt alles in ein ZIP.
+  onDownloadPresetsTiffBulk?: (presets: VerlagsPreset[]) => Promise<void> | void;
   // Mehrere Vorlagen: erzeugt je ein PDF und pusht es an monday.com.
   onPushPresetsMonday: (presets: VerlagsPreset[]) => Promise<void> | void;
   downloadingPresetId: string | null;
@@ -38,7 +40,7 @@ export function parseAdSize(s: string): { w: number; h: number } | null {
   return { w: parseFloat(m[1]), h: parseFloat(m[2]) };
 }
 
-export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
+export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
   const [presets, setPresets] = useState<VerlagsPreset[]>([]);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
@@ -187,8 +189,22 @@ export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloa
           style={{ background: "#0071e3" }}
           onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#0077ed"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "#0071e3"; }}>
-          {bulkProgress ? `PDF ${bulkProgress.current}/${bulkProgress.total} …` : `PDFs (ZIP)`}
+          {bulkProgress ? `${bulkProgress.current}/${bulkProgress.total} …` : `PDFs (ZIP)`}
         </button>
+        {onDownloadPresetsTiffBulk && (
+          <button onClick={() => {
+              const list = allPresets.filter(p => selectedIds.has(p.id));
+              onDownloadPresetsTiffBulk(list);
+            }}
+            disabled={bulkBusy || selectedIds.size === 0}
+            title="Verlustfreie TIFFs (Scale 2) als ZIP — für Druck/InDesign"
+            className="h-8 px-3.5 text-[12.5px] rounded-lg text-white disabled:opacity-40 transition-colors font-medium"
+            style={{ background: "#059669" }}
+            onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#0a7d56"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#059669"; }}>
+            TIFFs (ZIP)
+          </button>
+        )}
         <button onClick={() => {
             const list = allPresets.filter(p => selectedIds.has(p.id));
             onPushPresetsMonday(list);

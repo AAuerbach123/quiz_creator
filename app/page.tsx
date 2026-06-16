@@ -2424,7 +2424,7 @@ function PublishingProgressPanel({ progress }: { progress: { current: number; to
   );
 }
 
-function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages, activeSection, embedded, previewPreset, setPreviewPreset, downloadingPresetId, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, presetBulk, onPushPresetsMonday, mondayBulk, imageStyleMode, setImageStyleMode, onUpdateQuizImage, onRegenerateAllImages, onSetWinners, winnersShown }: {
+function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages, activeSection, embedded, previewPreset, setPreviewPreset, downloadingPresetId, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, presetBulk, onPushPresetsMonday, mondayBulk, imageStyleMode, setImageStyleMode, onUpdateQuizImage, onRegenerateAllImages, onSetWinners, winnersShown }: {
   quiz: Quiz; dispatch: React.Dispatch<Action>; canUndo: boolean; canRedo: boolean;
   onExport: () => void; onExportPdf: () => void; exportingPdf: boolean;
   onImport: React.ChangeEventHandler<HTMLInputElement>; onReset: () => void;
@@ -2450,6 +2450,7 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
   onDownloadPreset?: (p: VerlagsPreset) => void;
   onDownloadPresetTiff?: (p: VerlagsPreset) => void;
   onDownloadPresetsBulk?: (presets: VerlagsPreset[]) => Promise<void> | void;
+  onDownloadPresetsTiffBulk?: (presets: VerlagsPreset[]) => Promise<void> | void;
   presetBulk?: { current: number; total: number; name: string } | null;
   onPushPresetsMonday?: (presets: VerlagsPreset[]) => Promise<void> | void;
   mondayBulk?: { current: number; total: number; name: string; failed: number } | null;
@@ -2883,6 +2884,7 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
           onDownloadPreset={(p) => onDownloadPreset?.(p)}
           onDownloadPresetTiff={(p) => onDownloadPresetTiff?.(p)}
           onDownloadPresetsBulk={(list) => onDownloadPresetsBulk?.(list) || undefined}
+          onDownloadPresetsTiffBulk={(list) => onDownloadPresetsTiffBulk?.(list) || undefined}
           onPushPresetsMonday={(list) => onPushPresetsMonday?.(list) || undefined}
           applyPreset={(preset: VerlagsPreset) => {
             dispatch({ type: "APPLY_STYLE_COMMAND", payload: {
@@ -6610,6 +6612,63 @@ export default function Page() {
     }
   };
 
+  // Wie handleDownloadPresetsBulk, aber verlustfreie TIFFs in einem ZIP.
+  // Scale 2 + Deflate, weil 48 unkomprimierte TIFFs sonst zu viel Speicher
+  // belegen. Für einzelne Höchstauflösung gibt es den TIFF-Knopf pro Zeile (Scale 3).
+  const handleDownloadPresetsTiffBulk = async (presets: VerlagsPreset[]) => {
+    if (!pdfTargetRef.current || !presets.length) return;
+    try {
+      const [{ default: JSZip }, { domToPng }] = await Promise.all([
+        import("jszip"),
+        import("modern-screenshot"),
+      ]);
+      const zip = new JSZip();
+      const safe = (s: string) => s.replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue")
+        .replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss")
+        .replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+      const clip = (s: string, max: number) => s.length <= max ? s : s.slice(0, max).replace(/_+$/, "");
+      const titleForFile = effectiveTitle(quiz) || "quiz";
+      const usedNames = new Set<string>();
+      const d = new Date();
+      const pad2 = (n: number) => n.toString().padStart(2, "0");
+      const tsShort = `${(d.getFullYear()%100).toString().padStart(2,"0")}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`;
+      for (let i = 0; i < presets.length; i++) {
+        const preset = presets[i];
+        setPresetBulk({ current: i + 1, total: presets.length, name: `${preset.verlag} · ${preset.titel}` });
+        const overridden = applyPresetToQuiz(quiz, preset, { preferPresetLogo: true });
+        setPublishingQuiz(overridden);
+        await new Promise(r => setTimeout(r, 120));
+        ensureRenderable(pdfTargetRef.current);
+        await waitForRenderReady(pdfTargetRef.current);
+        const png = await domToPng(pdfTargetRef.current, { scale: 2 });
+        const tiff = await encodeImageToTiff(png);
+        const titelTeil = preset.titelKanonisch && preset.titelKanonisch.trim() && preset.titelKanonisch !== "n/a"
+          ? preset.titelKanonisch
+          : (preset.titel && preset.titel !== "n/a" ? preset.titel : preset.verlag);
+        const base = `${clip(safe(preset.verlag), 20)}_${clip(safe(titelTeil), 35)}`;
+        let candidate = `${base}.tif`;
+        let n = 2;
+        while (usedNames.has(candidate)) { candidate = `${base}_${n}.tif`; n++; }
+        usedNames.add(candidate);
+        zip.file(candidate, tiff);
+      }
+      setPresetBulk({ current: presets.length, total: presets.length, name: "ZIP packen …" });
+      const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${clip(safe(titleForFile), 30)}_${presets.length}_TIFF_${tsShort}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Bulk-TIFF (Verlage) fehlgeschlagen:", e);
+      alert(`Bulk-TIFF fehlgeschlagen: ${(e as Error).message}`);
+    } finally {
+      setPublishingQuiz(null);
+      setPresetBulk(null);
+    }
+  };
+
   const handleDownloadPreset = async (preset: VerlagsPreset) => {
     if (!pdfTargetRef.current) return;
     setDownloadingPresetId(preset.id);
@@ -6934,6 +6993,7 @@ export default function Page() {
               onDownloadPreset={handleDownloadPreset}
               onDownloadPresetTiff={handleDownloadPresetTiff}
               onDownloadPresetsBulk={handleDownloadPresetsBulk}
+              onDownloadPresetsTiffBulk={handleDownloadPresetsTiffBulk}
               presetBulk={presetBulk}
               onPushPresetsMonday={handlePushPresetsToMonday}
               mondayBulk={mondayBulk}
