@@ -1,0 +1,92 @@
+﻿Zeitung (Vorlage);Gruppe;0137 Frage1;0137 Frage5;Status;KORREKTUR (richtige Hotline/0137)
+Augsburger Allgemeine;AUGSBURGER;01378 005561;01378 005565;gekoppelt;
+OTZ;FUNKE;01379 441291;01379 441295;gekoppelt;
+TA;FUNKE;01379 441281;01379 441285;gekoppelt;
+TLZ;FUNKE;01379 441271;01379 441275;gekoppelt;
+Allgemeine Zeitung der Lüneburger Heide;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+AltmarkZeitung;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Fehmarnsches-Tageblatt;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Frankfurter-Neue-Presse;IPPEN;01378 405281;01378 405285;gekoppelt;
+Frankfurter-Rundschau;IPPEN;01378 405281;01378 405285;BITTE PRÜFEN;
+Giessener-Alsfelder;IPPEN;01378 407281;01378 407285;gekoppelt;
+Giessener-Anzeiger;IPPEN;01378 407281;01378 407285;gekoppelt;
+HNA;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Hanauer-Anzeiger;IPPEN;01378 404381;01378 404385;gekoppelt;
+Hersfelder-Zeitung;IPPEN;01378 406281;01378 406285;gekoppelt;
+Isenhagener Kreisblatt;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Karl-Sasse-Verlage;IPPEN;01378 403891;01378 403895;gekoppelt;
+Kreiszeitung-Verlag;IPPEN;01378 403791;01378 403795;gekoppelt;
+Leine-Deister-Zeitung;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Maerkische-Z;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Muenchner-Merkur;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Oberbayerisches-Volksblatt;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Oberhessische-Lauterbacher;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Offenbach-Post;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Soester-Anzeiger;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+TZ;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Usinger-Kreis;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Waldeckische-Landeszeitung;IPPEN;01379 441271;01379 441275;BITTE PRÜFEN;
+Werra-Rundschau;IPPEN;01378 406181;01378 406185;gekoppelt;
+Westfaelischer-Anz;IPPEN;01378 406581;01378 406585;gekoppelt;
+Wetterauer-Butzbacher;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Wildeshauser-Zeitung;IPPEN;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+n/a;Neue-Westfaeische;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Nürnberg;NUERNBERG;01378 220271;01378 220275;gekoppelt;
+n/a;RHEIN-Z;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+PM;SAAR;01378 806371;01378 806375;gekoppelt;
+SZ;SAAR;01378 806171;01378 806175;gekoppelt;
+TV;SAAR;01378 806271;01378 806275;gekoppelt;
+Beig;SHZ;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+NOZ;SHZ;01378 805771;01378 805775;gekoppelt;
+SHZ;SHZ;01378 403881;01378 403885;BITTE PRÜFEN;
+Die Oberbadische, Markgräfler Tagblatt, Weiler Zeitung;SWMH;01378 408171;01378 408175;gekoppelt;
+Frankenpost;SWMH;01378 408271;01378 408275;gekoppelt;
+Neue Presse;SWMH;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+Nordbayerischer Kurier;SWMH;01378 408571;01378 408575;gekoppelt;
+Schwarzwälder Bote, Neckarquelle, Lahrer Zeitung;SWMH;01378 408171;01378 408175;gekoppelt;
+Suhler Verlagsgesellschaft;SWMH;01378 408471;01378 408475;gekoppelt;
+Zeitungsgruppe Stuttgart;SWMH;(Platzhalter);(Platzhalter);OFFEN – manuell zuordnen;
+SWP;SWP;01378 803871;01378 803875;gekoppelt;
+
+--- REFERENZ: alle 0137-Hotlines ---
+Hotline-Verlag;Frage1;Frage5
+Schwarzwälder Bote (Die Oberbadische/Markgräfler Tagblatt laufen unter SB);01378 408171;01378 408175
+Frankenpost;01378 408271;01378 408275
+Neue Presse;01378 408371;01378 408375
+Suhler Verlagsgesellschaft;01378 408471;01378 408475
+Nordbayerischer Kurier;01378 408571;01378 408575
+SWP;01378 803871;01378 803875
+Saarbrücker Zeitung;01378 806171;01378 806175
+Trierischer Volksfreund;01378 806271;01378 806275
+Pfälzischer Merkur;01378 806371;01378 806375
+sh:z;01378 802781;01378 802785
+A.Beig;01378 804771;01378 804775
+NOZ;01378 805771;01378 805775
+Neue Westfälische;01378 608271;01378 608275
+Haller Kreisblatt;01378 608371;01378 608375
+Mittelrhein;01378 803791;01378 803795
+Nürnberg;01378 220271;01378 220275
+Thüringische Landeszeitung;01379 441271;01379 441275
+Thüringer Allgemeine;01379 441281;01379 441285
+Ostthüringer Zeitung;01379 441291;01379 441295
+Augsburger Allgemeine;01378 005561;01378 005565
+C. Beckers Buchdruckerei GmbH & Co. KG;01378 403781;01378 403785
+Zeitungsverlag tz  GmbH & Co. KG;01378 403881;01378 403885
+Münchener Zeitungs-Verlag GmbH & Co. KG;01378 403981;01378 403985
+Pressehaus Bintz-Verlag GmbH & Co. KG;01378 404281;01378 404285
+Hanauer Anzeiger GmbH & Co.KG ;01378 404381;01378 404385
+Kreiszeitung Verlagsgesellschaft mbH & Co. KG;01378 403791;01378 403795
+Karl Sasse GmbH & Co. KG;01378 403891;01378 403895
+Ludwig Löschen GmbH & Co. OHG (Wildeshausener);01378 405181;01378 405185
+Frankfurter Societäts-Medien GmbH;01378 405281;01378 405285
+Frankfurter Rundschau GmbH;01378 405681;01378 405685
+Mittelhessische Druck- und Verlagshaus;01378 405781;01378 405785
+GA Media GmbH & Co. KG (Gießener A.);01378 407281;01378 407285
+Verlag Dierichs GmbH & Co. KG;01378 405881;01378 405885
+Wilhelm Bing, Druckerei und Verlag GmbH;01378 405981;01378 405985
+Werra Verlag Kluthe GmbH & Co. KG;01378 406181;01378 406185
+Hoehl-Druck GmbH + Co. Hersfelder Zeitung KG;01378 406281;01378 406285
+Zeitungsverlag F. Wolff & Sohn KG;01378 406381;01378 406385
+Westfälischer Anzeiger Verlagsgesellschaft mbH & Co. KG;01378 406581;01378 406585
+Jahn Verlag GmbH & CO. KG;01378 406781;01378 406785
+Märkischer Zeitungsverlag GmbH & CO.KG;01378 406881;01378 406885
