@@ -800,8 +800,20 @@ async function generateCardImageForSubject(subject: string, mode: ImageStyleMode
 
 // Liefert (Frage4-Motiv, Frage5-Motiv) für ein Quiz. correctAnswer hat Vorrang,
 // sonst der Fragetext, sonst der fallbackTopic (z. B. der Quiz-Titel).
+// Bildmotive für die beiden Karten-Bilder (Slot „image" = Frage 4, „imageBottom"
+// = Frage 5). Das Motiv leitet sich aus der FRAGE ab (Thema/Szene) — die LÖSUNG
+// soll bewusst NICHT abgebildet werden. So illustriert das Bild die Frage, ohne
+// die Antwort zu verraten. (Früher war das Motiv = die Antwort selbst.)
 function cardImageSubjects(q: Quiz, fallbackTopic: string): [string, string] {
-  const subj = (i: number) => (q.questions[i]?.correctAnswer?.trim() || q.questions[i]?.text?.trim() || fallbackTopic);
+  const subj = (i: number) => {
+    const question = q.questions[i]?.text?.trim();
+    const answer = q.questions[i]?.correctAnswer?.trim();
+    if (!question) return fallbackTopic;
+    const base = `eine stimmungsvolle, gegenständliche Szene zum Thema der Quizfrage „${question}"`;
+    return answer
+      ? `${base} — die Lösung „${answer}" darf dabei NICHT zu sehen sein und nicht verraten werden`
+      : base;
+  };
   return [subj(3), subj(4)];
 }
 
@@ -3439,19 +3451,21 @@ function CardImages({ quiz, dispatch, imageStyleMode, setImageStyleMode }: {
   const topRef = useRef<HTMLInputElement>(null);
   const botRef = useRef<HTMLInputElement>(null);
 
-  const subjectOf = (q?: Question) => (q ? (q.correctAnswer?.trim() || q.text?.trim() || "") : "");
+  // Anzeige-Label = Fragetext (kurz). Das echte Generier-Motiv kommt aus
+  // cardImageSubjects: eine Szene zum Thema der Frage, OHNE die Lösung zu zeigen.
+  const questionLabel = (q?: Question) => (q ? (q.text?.trim() || q.correctAnswer?.trim() || "") : "");
+  const [genSubjTop, genSubjBot] = cardImageSubjects(quiz, quiz.meta.title || "");
 
   const genBoth = async () => {
     setError("");
-    const targets: { key: "image" | "imageBottom"; q?: Question }[] = [
-      { key: "image", q: q4 }, { key: "imageBottom", q: q5 }
+    const targets: { key: "image" | "imageBottom"; subject: string }[] = [
+      { key: "image", subject: genSubjTop }, { key: "imageBottom", subject: genSubjBot }
     ];
     setBusy(true);
     try {
       for (const t of targets) {
-        const subject = subjectOf(t.q);
-        if (!subject) continue;
-        const url = await generateCardImageForSubject(subject, imageStyleMode);
+        if (!t.subject) continue;
+        const url = await generateCardImageForSubject(t.subject, imageStyleMode);
         dispatch({ type: "UPDATE_BACKGROUND", payload: { [t.key]: url } });
       }
       // (generateCardImageForSubject schickt automatisch preferredModel mit)
@@ -3472,7 +3486,7 @@ function CardImages({ quiz, dispatch, imageStyleMode, setImageStyleMode }: {
     src: string | null | undefined, inputRef: React.RefObject<HTMLInputElement | null>) => (
     <div className="border border-stone-200 rounded p-2 space-y-1">
       <div className="text-xs font-medium text-stone-700">{label}</div>
-      <div className="text-[11px] text-stone-500 truncate">Motiv: {subjectOf(q) || "—"}</div>
+      <div className="text-[11px] text-stone-500 truncate">Motiv (Frage, ohne Lösung): {questionLabel(q) || "—"}</div>
       <div className="flex gap-1">
         <button onClick={() => inputRef.current?.click()}
           className="flex-1 px-2 py-1 text-xs border border-stone-300 rounded bg-white hover:bg-stone-50">Hochladen</button>
@@ -3495,7 +3509,7 @@ function CardImages({ quiz, dispatch, imageStyleMode, setImageStyleMode }: {
   return (
     <div className="space-y-2">
       <div className="text-xs text-stone-600">
-        Zwei Bilder — oben aus Frage 4, unten aus Frage 5. Stil-Wahl gilt für alle KI-Generierungen (auch Sammlung, Sammel-Import, „Fehlende Bilder").
+        Zwei Bilder — oben zu Frage 4, unten zu Frage 5. Die Bilder illustrieren das Thema der jeweiligen Frage, ohne die Lösung zu zeigen. Stil-Wahl gilt für alle KI-Generierungen (auch Sammlung, Sammel-Import, „Fehlende Bilder").
       </div>
       <Field label="Bild-Stil">
         <Select value={imageStyleMode}
