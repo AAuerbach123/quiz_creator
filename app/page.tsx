@@ -16,6 +16,9 @@ type Difficulty = "easy" | "medium" | "hard";
 type Question = {
   id: string; text: string; answerType: AnswerType;
   options?: string[]; correctAnswer: string;
+  // Weitere gültige Antworten (Synonyme/Schreibweisen) aus dem Fragenkatalog.
+  // Werden in der Anzeige nicht dargestellt — dienen als Lösungsschlüssel.
+  acceptedAnswers?: string[];
   prizeTierId: string; phoneNumber?: string; timeLimitSeconds?: number;
 };
 type PrizeTier = { id: string; valueCents: number; currency: "EUR" | "CHF"; label?: string | null };

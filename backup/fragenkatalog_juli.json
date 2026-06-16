@@ -1,1 +1,782 @@
-[{"nr": 1, "thema": "Tiere weltweit", "fragen": [{"f": "Welches Tier wird „Wüstenschiff“ genannt?", "a": "Kamel"}, {"f": "Welches Tier baut Dämme aus Holz?", "a": "Biber"}, {"f": "Welches Landtier wechselt zur Tarnung und Kommunikation die Farbe?", "a": "Chamäleon"}, {"f": "Welches Tier hängt oft kopfüber in Höhlen und fliegt nachts?", "a": "Fledermaus"}, {"f": "Welches Tier ist hier zu sehen?", "a": "Kugelfisch"}]}, {"nr": 2, "thema": "Deutschland", "fragen": [{"f": "Welche frühere Bundeshauptstadt liegt am Rhein?", "a": "Bonn"}, {"f": "Welcher Fluss fließt durch Köln?", "a": "Rhein"}, {"f": "Wie heißt Deutschlands höchster Berg?", "a": "Zugspitze"}, {"f": "Welches ist das flächenmäßig größte Bundesland in Deutschland?", "a": "Bayern"}, {"f": "Welches Bundesland umschließt Berlin vollständig?", "a": "Brandenburg"}]}, {"nr": 3, "thema": "Berge und Landschaften", "fragen": [{"f": "Wie nennt man eine dauerhaft gefrorene Eis- und Schneemasse in den Bergen?", "a": "Gletscher"}, {"f": "Welche Blume, die abgebildet ist, gilt als Symbol der Alpen?", "a": "Edelweiß"}, {"f": "Wie nennt man eine sehr trockene Landschaft mit wenig Regen?", "a": "Wüste"}, {"f": "Auf welchem Kontinent befindet sich der Tafelberg?", "a": "Afrika"}, {"f": "Welche Wüste ist Afrikas größte?", "a": "Sahara"}]}, {"nr": 4, "thema": "Weltgeschichte", "fragen": [{"f": "Wer war die erste Bundeskanzlerin Deutschlands?", "a": "Angela Merkel"}, {"f": "Wer malte das berühmte Bild „Mona Lisa“?", "a": "Leonardo da Vinci"}, {"f": "Welche deutsche Stadt wurde 1948/49 durch die Luftbrücke versorgt?", "a": "Berlin"}, {"f": "Welcher Feldherr krönte sich selbst zum Kaiser?", "a": "Napoleon"}, {"f": "Welcher US-Präsident wurde in Dallas ermordet?", "a": "Kennedy"}]}, {"nr": 5, "thema": "Es lebe der Sport", "fragen": [{"f": "Das Runde muss ins…?", "a": "Eckige"}, {"f": "Wie viele Fußballspieler stehen regulär für ein Team auf dem Platz?", "a": "Elf Spieler"}, {"f": "In welche Sportdisziplin war Katarina „Kati“ Witt erfolgreich?", "a": "Eiskunstlauf"}, {"f": "In welcher Sportart gilt Michael Jordan als einer der besten Spieler aller Zeiten?", "a": "Basketball"}, {"f": "In welcher Sportart errang Mark Spitz seine sieben legendären Weltrekorde?", "a": "Schwimmen"}]}, {"nr": 6, "thema": "Küche und Kulinarik", "fragen": [{"f": "Welches Lebensmittel bringt Menschen beim Schneiden oft zum Weinen?", "a": "Zwiebel"}, {"f": "Welches Küchengerät bringt Wasser extrem schnell zum Kochen?", "a": "Wasserkocher"}, {"f": "Welches Küchengerät nutzt Zentrifugalkraft, um gewaschenen Salat zu trocknen?", "a": "Salatschleuder"}, {"f": "Wie nennt man den Vorgang, bei dem Zucker durch starke Hitze braun und bittersüß wird?", "a": "Karamellisieren"}, {"f": "Welcher Pilz gilt wegen seines unterirdischen Wachstums und intensiven Aromas als teuerster Speisepilz?", "a": "Trüffel"}]}, {"nr": 7, "thema": "Inseln und Meere", "fragen": [{"f": "Welche italienische Insel liegt südlich von Korsika?", "a": "Sardinien"}, {"f": "Welche italienische Insel liegt an der Stiefelspitze?", "a": "Sizilien"}, {"f": "Welche große Insel gehört politisch zu Dänemark?", "a": "Grönland"}, {"f": "Zu welchem Land gehört die Ferieninsel Mallorca?", "a": "Spanien"}, {"f": "Welches Meer liegt bei Rostock?", "a": "Ostsee"}]}, {"nr": 8, "thema": "Erfindungen und Entdecker", "fragen": [{"f": "Wer erfand den Buchdruck mit beweglichen Lettern?", "a": "Gutenberg"}, {"f": "Wer gilt offiziell als Erfinder und Patentinhaber des Telefons?", "a": "Bell"}, {"f": "Welcher Seefahrer erreichte 1492 Amerika?", "a": "Christoph Kolumbus"}, {"f": "Wer schaffte den ersten Solo-Nonstopflug über den Atlantik?", "a": "Lindbergh"}, {"f": "Wer formulierte die Relativitätstheorie?", "a": "Albert Einstein"}]}, {"nr": 9, "thema": "Musik international", "fragen": [{"f": "Welcher deutsche Sänger hatte einen riesigen Hit mit dem Lied „Sonderzug nach Pankow“?", "a": "Udo Lindenberg"}, {"f": "Welche Gruppe sang „Waterloo“?", "a": "ABBA"}, {"f": "Wer sang den Klassiker „My Way“?", "a": "Frank Sinatra"}, {"f": "Wer komponierte „Eine kleine Nachtmusik“?", "a": "Mozart"}, {"f": "Welche Band sang den Hit „Yesterday“?", "a": "Beatles"}]}, {"nr": 10, "thema": "Wahrzeichen", "fragen": [{"f": "In welchem Land kann man die Akropolis in Athen besuchen?", "a": "Griechenland"}, {"f": "Wie heißt das weltberühmte Kunstmuseum in Paris, in dem die Mona Lisa hängt?", "a": "Louvre"}, {"f": "Wie heißt das berühmte Schloss von König Ludwig II. in Bayern?", "a": "Schloss Neuschwanstein"}, {"f": "Wie heißt der Amtssitz des amerikanischen Präsidenten in Washington?", "a": "Das Weiße Haus"}, {"f": "In welcher Stadt steht das Gebäude?", "a": "Sydney"}]}, {"nr": 11, "thema": "Literatur weltweit", "fragen": [{"f": "Wer schrieb „Faust“?", "a": "Goethe"}, {"f": "Wer schrieb „Pippi Langstrumpf“?", "a": "Astrid Lindgren"}, {"f": "Wer schrieb „Die Blechtrommel“?", "a": "Günter Grass"}, {"f": "Welcher Autor schrieb „Emil und die Detektive“?", "a": "Erich Kästner"}, {"f": "Wie heißt der Zauberlehrling in der sehr bekannten Romanreihe von J.K. Rowling?", "a": "Harry Potter"}]}, {"nr": 12, "thema": "Gewürze und Getränke", "fragen": [{"f": "Welches bekannte Getränk wird aus Hopfen gebraut?", "a": "Bier"}, {"f": "Welche Frucht steckt in Cidre und Cider?", "a": "Apfel"}, {"f": "Welches Gewürz wird oft auf Milchreis gestreut?", "a": "Zimt"}, {"f": "„Crème Brûlée“ ist ein Dessertklassiker aus welchem Land?", "a": "Frankreich"}, {"f": "Was ist die Hauptzutat von Hummus?", "a": "Kichererbsen"}]}, {"nr": 13, "thema": "Filmklassiker", "fragen": [{"f": "Welcher berühmte Spion bestellt seinen Wodka Martini am liebsten „geschüttelt, nicht gerührt“?", "a": "James Bond"}, {"f": "Welche Westernfigur spielte Pierre Brice?", "a": "Winnetou"}, {"f": "Welche Kaiserin spielte Romy Schneider?", "a": "Sissi"}, {"f": "Welche Westernfigur spielte Lex Barker?", "a": "Old Shatterhand"}, {"f": "Wer führte bei „Psycho“ Regie?", "a": "Hitchcock"}]}, {"nr": 14, "thema": "Europa", "fragen": [{"f": "Welches Land hat die Form eines Stiefels?", "a": "Italien"}, {"f": "Welches Land ist für seine Windmühlen und Tulpen bekannt?", "a": "Die Niederlande"}, {"f": "Welches Land liegt westlich von Spanien?", "a": "Portugal"}, {"f": "Welcher zweitgrößte Fluss Europas fließt durch Wien?", "a": "Donau"}, {"f": "Welche Stadt liegt am Bosporus?", "a": "Istanbul"}]}, {"nr": 15, "thema": "Sport international", "fragen": [{"f": "Welche Sportart spielt man in Wimbledon?", "a": "Tennis"}, {"f": "In welcher Sportart wirft man den Ball in einen Korb?", "a": "Basketball"}, {"f": "Wie heißt das berühmte Radrennen durch Frankreich?", "a": "Tour de France"}, {"f": "In welcher Sportart gibt es den Ryder Cup?", "a": "Golf"}, {"f": "Welche Sportart spielt man mit Puck?", "a": "Eishockey"}]}, {"nr": 16, "thema": "Aktuelles Zeitgeschehen", "fragen": [{"f": "Wie heißt der aktuelle deutsche Bundeskanzler?", "a": "Friedrich Merz"}, {"f": "Wer ist die Bundespräsidentin der Europäischen Kommission?", "a": "Ursula von der Leyen"}, {"f": "Wer ist der Trainer von Deutschland bei der Fußball-WM 2026?", "a": "Julian Nagelsmann"}, {"f": "Wie hieß der gestrandete Wal, der zuletzt für Aufsehen sorgte?", "a": "Timmy"}, {"f": "In welcher Sportart feierte Alexander Zverev einen historischen Sieg und gewann die French Open?", "a": "Tennis"}]}, {"nr": 17, "thema": "Flüsse und Meere", "fragen": [{"f": "Welcher wichtigste Fluss fließt durch Ungarn?", "a": "Donau"}, {"f": "Welcher Fluss fließt durch Kairo?", "a": "Nil"}, {"f": "Welcher große Fluss fließt durch Hamburg?", "a": "Elbe"}, {"f": "Welcher Fluss fließt durch den riesigen Regenwald in Südamerika und führt das meiste Wasser weltweit?", "a": "Amazonas"}, {"f": "Welches Meer liegt zwischen Europa und Afrika?", "a": "Mittelmeer"}]}, {"nr": 18, "thema": "Weltküche", "fragen": [{"f": "Aus welchem Land stammt Pizza ursprünglich?", "a": "Italien"}, {"f": "Wie heißt ein berühmte spanische Reisgericht in der Pfanne?", "a": "Paella"}, {"f": "Aus welchem Land stammt heute die weltbekannte Form des rohen Fisches „Sushi“?", "a": "Japan"}, {"f": "Welches weitverbreitete Gericht stammt aus Ungarn?", "a": "Gulasch"}, {"f": "Welches Land ist weltweit am bekanntesten für das Gericht „Moussaka“?", "a": "Griechenland"}]}, {"nr": 19, "thema": "Deutsche Musik und Schlager", "fragen": [{"f": "Wer sang „Griechischer Wein“?", "a": "Udo Jürgens"}, {"f": "Wer sang „Marmor, Stein und Eisen bricht“?", "a": "Drafi Deutscher"}, {"f": "Welche Sängerin sang „Er gehört zu mir“?", "a": "Marianne Rosenberg"}, {"f": "Welche Sängerin hatte mit „99 Luftballons“ einen Hit?", "a": "Nena"}, {"f": "Welche Sängerin sang „Atemlos durch die Nacht“?", "a": "Helene Fischer"}]}, {"nr": 20, "thema": "Geld und Währungen", "fragen": [{"f": "Welche Währung nutzte Deutschland vor dem Euro?", "a": "Deutsche Mark"}, {"f": "Welches Geldstück hat den höchsten Wert als einzelne Euro-Münze?", "a": "Zwei Euro"}, {"f": "Welche weltbekannte Währung besitzt das Symbol „$“ primär?", "a": "US-Dollar"}, {"f": "Welche Währung nutzt Japan?", "a": "Yen"}, {"f": "Bei den bekannten Börsentieren steht der Bulle/Stier für Optimismus, was ist das Pendant dazu?", "a": "Bär"}]}, {"nr": 21, "thema": "Allgemeinwissen international", "fragen": [{"f": "Welche Zahl hat sechs Nullen?", "a": "Eine Million"}, {"f": "Um welchen Himmelskörper kreist die Erde?", "a": "Sonne"}, {"f": "Zu welchem Kontinent gehört das Land Ägypten?", "a": "Afrika"}, {"f": "Welche Sprache spricht man in Brasilien?", "a": "Portugiesisch"}, {"f": "Welches Element bedeckt den größten Teil der Erdoberfläche?", "a": "Wasser"}]}, {"nr": 22, "thema": "Sehenswürdigkeiten weltweit", "fragen": [{"f": "In welcher Stadt steht der Eiffelturm?", "a": "Paris"}, {"f": "In welchem Land stehen die Pyramiden von Gizeh?", "a": "Ägypten"}, {"f": "In welcher Stadt steht das Kolosseum?", "a": "Rom"}, {"f": "In welchem Land steht der Taj Mahal?", "a": "Indien"}, {"f": "Wie heißt der kleinste Staat der Welt, der mitten in Rom liegt?", "a": "Vatikanstadt"}]}, {"nr": 23, "thema": "Wetter und Naturphänomene", "fragen": [{"f": "Was entsteht, wenn Sonnenlicht und Regentropfen aufeinandertreffen?", "a": "Regenbogen"}, {"f": "Was schützt die Erde vor gefährlicher UV-Strahlung?", "a": "Ozonschicht"}, {"f": "Wie heißt flüssiges Gestein außerhalb des Vulkans?", "a": "Lava"}, {"f": "Wie heißt die Wissenschaft vom Wetter?", "a": "Meteorologie"}, {"f": "Welches Instrument misst den Luftdruck?", "a": "Barometer"}]}, {"nr": 24, "thema": "Olympische Spiele", "fragen": [{"f": "Wie viele Ringe zeigt die olympische Flagge?", "a": "fünf"}, {"f": "Welche deutsche Stadt hat das Olympiastadion mit Zeltdach?", "a": "München"}, {"f": "Wie oft finden Olympische Sommerspiele normalerweise statt?", "a": "Alle vier Jahre"}, {"f": "In welchem Land liegt der Ort Olympia?", "a": "Griechenland"}, {"f": "Welche Spiele starten kurz nach den Olympischen Spielen am selben Ort?", "a": "Paralympics"}]}, {"nr": 25, "thema": "Querbeet", "fragen": [{"f": "Welches Dokument bescheinigt die Fahrerlaubnis für ein Kraftfahrzeug?", "a": "Führerschein"}, {"f": "Welches Vitamin bildet die menschliche Haut durch den Einfluss von Sonnenlicht?", "a": "Vitamin D"}, {"f": "Welches Dokument braucht man zwingend, wenn man in ein Land außerhalb der EU verreisen möchte?", "a": "Reisepass"}, {"f": "Welches flüssige Metall im Haushalts-Fieberthermometer wurde wegen Giftigkeit ersetzt?", "a": "Quecksilber"}, {"f": "Welcher edle Naturstoff wird aus den Kokons der Seidenspinnerraupe gewonnen?", "a": "Seide"}]}, {"nr": 26, "thema": "Körper und Gesundheit", "fragen": [{"f": "Welches Organ pumpt Blut durch den Körper?", "a": "Herz"}, {"f": "Welches Organ steuert viele Körperfunktionen?", "a": "Gehirn"}, {"f": "Welcher Körperteil hält uns aufrecht und besteht aus vielen kleinen Wirbeln?", "a": "Die Wirbelsäule"}, {"f": "Wie nennt man alle Knochen unseres Körpers zusammen?", "a": "Skelett"}, {"f": "Was transportieren die roten Blutkörperchen primär?", "a": "Sauerstoff"}]}, {"nr": 27, "thema": "Weltstädte", "fragen": [{"f": "In welcher deutschen Stadt steht das weltbekannte Brandenburger Tor?", "a": "Berlin"}, {"f": "Welche Stadt nennt man „Ewige Stadt“?", "a": "Rom"}, {"f": "Welche berühmte Stadt liegt an der Seine?", "a": "Paris"}, {"f": "Welche bekannteste Stadt liegt an der Themse?", "a": "London"}, {"f": "In welcher amerikanischen Stadt steht die berühmte Freiheitsstatue?", "a": "New York"}]}]
+[
+ {
+  "nr": 1,
+  "thema": "Tiere weltweit",
+  "fragen": [
+   {
+    "f": "Welches Tier wird „Wüstenschiff“ genannt?",
+    "a": "Kamel",
+    "alts": [
+     "Dromedar"
+    ]
+   },
+   {
+    "f": "Welches Tier baut Dämme aus Holz?",
+    "a": "Biber"
+   },
+   {
+    "f": "Welches Landtier wechselt zur Tarnung und Kommunikation die Farbe?",
+    "a": "Chamäleon"
+   },
+   {
+    "f": "Welches Tier hängt oft kopfüber in Höhlen und fliegt nachts?",
+    "a": "Fledermaus"
+   },
+   {
+    "f": "Welcher bekannter Meeresbewohner pumpt sich auf und ist stachelig?",
+    "a": "Kugelfisch",
+    "alts": [
+     "Igelfisch"
+    ]
+   }
+  ]
+ },
+ {
+  "nr": 2,
+  "thema": "Deutschland",
+  "fragen": [
+   {
+    "f": "Welche frühere Bundeshauptstadt liegt am Rhein?",
+    "a": "Bonn"
+   },
+   {
+    "f": "Welcher Fluss fließt durch Köln?",
+    "a": "Rhein"
+   },
+   {
+    "f": "Wie heißt Deutschlands höchster Berg?",
+    "a": "Zugspitze"
+   },
+   {
+    "f": "Welches ist das flächenmäßig größte Bundesland in Deutschland?",
+    "a": "Bayern"
+   },
+   {
+    "f": "Welches Bundesland umschließt Berlin vollständig?",
+    "a": "Brandenburg"
+   }
+  ]
+ },
+ {
+  "nr": 3,
+  "thema": "Berge und Landschaften",
+  "fragen": [
+   {
+    "f": "Wie nennt man eine dauerhaft gefrorene Eis- und Schneemasse in den Bergen?",
+    "a": "Gletscher"
+   },
+   {
+    "f": "Welche bekannteste weiße, sternförmige Blume gilt als Symbol der Alpen?",
+    "a": "Edelweiß",
+    "alts": [
+     "Alpen-Edelweiß"
+    ]
+   },
+   {
+    "f": "Wie nennt man eine sehr trockene Landschaft mit wenig Regen?",
+    "a": "Wüste"
+   },
+   {
+    "f": "Auf welchem Kontinent befindet sich der Tafelberg?",
+    "a": "Afrika"
+   },
+   {
+    "f": "Welche Wüste ist Afrikas größte?",
+    "a": "Sahara"
+   }
+  ]
+ },
+ {
+  "nr": 4,
+  "thema": "Weltgeschichte",
+  "fragen": [
+   {
+    "f": "Wer war die erste Bundeskanzlerin Deutschlands?",
+    "a": "Angela Merkel",
+    "alts": [
+     "Frau Merkel",
+     "Merkel",
+     "Bundeskanzlerin Merkel",
+     "Bundeskanzlerin Angela Merkel"
+    ]
+   },
+   {
+    "f": "Wer malte das berühmte Bild „Mona Lisa“?",
+    "a": "Leonardo da Vinci"
+   },
+   {
+    "f": "Welche deutsche Stadt wurde 1948/49 durch die Luftbrücke versorgt?",
+    "a": "Berlin"
+   },
+   {
+    "f": "Welcher Feldherr krönte sich selbst zum Kaiser?",
+    "a": "Napoleon",
+    "alts": [
+     "Napoleon Bonaparte",
+     "Napoleon der Erste"
+    ]
+   },
+   {
+    "f": "Welcher US-Präsident wurde in Dallas ermordet?",
+    "a": "Kennedy",
+    "alts": [
+     "John F. Kennedy",
+     "John Fitzgerald Kennedy"
+    ]
+   }
+  ]
+ },
+ {
+  "nr": 5,
+  "thema": "Es lebe der Sport",
+  "fragen": [
+   {
+    "f": "Das Runde muss ins…?",
+    "a": "Eckige"
+   },
+   {
+    "f": "Wie viele Fußballspieler stehen regulär für ein Team auf dem Platz?",
+    "a": "Elf Spieler",
+    "alts": [
+     "Elf"
+    ]
+   },
+   {
+    "f": "In welche Sportdisziplin war Katarina „Kati“ Witt erfolgreich?",
+    "a": "Eiskunstlauf"
+   },
+   {
+    "f": "In welcher Sportart gilt Michael Jordan als einer der besten Spieler aller Zeiten?",
+    "a": "Basketball"
+   },
+   {
+    "f": "In welcher Sportart errang Mark Spitz seine sieben legendären Weltrekorde?",
+    "a": "Schwimmen"
+   }
+  ]
+ },
+ {
+  "nr": 6,
+  "thema": "Küche und Kulinarik",
+  "fragen": [
+   {
+    "f": "Welches Lebensmittel bringt Menschen beim Schneiden oft zum Weinen?",
+    "a": "Zwiebel"
+   },
+   {
+    "f": "Welches Küchengerät bringt Wasser extrem schnell zum Kochen?",
+    "a": "Wasserkocher"
+   },
+   {
+    "f": "Welches Küchengerät nutzt Zentrifugalkraft, um gewaschenen Salat zu trocknen?",
+    "a": "Salatschleuder"
+   },
+   {
+    "f": "Wie nennt man den Vorgang, bei dem Zucker durch starke Hitze braun und bittersüß wird?",
+    "a": "Karamellisieren"
+   },
+   {
+    "f": "Welcher Pilz gilt wegen seines unterirdischen Wachstums und intensiven Aromas als teuerster Speisepilz?",
+    "a": "Trüffel"
+   }
+  ]
+ },
+ {
+  "nr": 7,
+  "thema": "Inseln und Meere",
+  "fragen": [
+   {
+    "f": "Welche italienische Insel liegt südlich von Korsika?",
+    "a": "Sardinien"
+   },
+   {
+    "f": "Welche italienische Insel liegt an der Stiefelspitze?",
+    "a": "Sizilien"
+   },
+   {
+    "f": "Welche große Insel gehört politisch zu Dänemark?",
+    "a": "Grönland"
+   },
+   {
+    "f": "Zu welchem Land gehört die Ferieninsel Mallorca?",
+    "a": "Spanien"
+   },
+   {
+    "f": "Welches Meer liegt bei Rostock?",
+    "a": "Ostsee"
+   }
+  ]
+ },
+ {
+  "nr": 8,
+  "thema": "Erfindungen und Entdecker",
+  "fragen": [
+   {
+    "f": "Wer erfand den Buchdruck mit beweglichen Lettern?",
+    "a": "Gutenberg",
+    "alts": [
+     "Johannes Gutenberg"
+    ]
+   },
+   {
+    "f": "Wer gilt offiziell als Erfinder und Patentinhaber des Telefons?",
+    "a": "Bell",
+    "alts": [
+     "Alexander Graham Bell",
+     "Alexander Bell"
+    ]
+   },
+   {
+    "f": "Welcher Seefahrer erreichte 1492 Amerika?",
+    "a": "Christoph Kolumbus",
+    "alts": [
+     "Kolumbus"
+    ]
+   },
+   {
+    "f": "Wer schaffte den ersten Solo-Nonstopflug über den Atlantik?",
+    "a": "Lindbergh",
+    "alts": [
+     "Charles Lindbergh"
+    ]
+   },
+   {
+    "f": "Wer formulierte die Relativitätstheorie?",
+    "a": "Albert Einstein",
+    "alts": [
+     "Einstein"
+    ]
+   }
+  ]
+ },
+ {
+  "nr": 9,
+  "thema": "Musik international",
+  "fragen": [
+   {
+    "f": "Welcher deutsche Sänger hatte einen riesigen Hit mit dem Lied „Sonderzug nach Pankow“?",
+    "a": "Udo Lindenberg"
+   },
+   {
+    "f": "Welche Gruppe sang „Waterloo“?",
+    "a": "ABBA"
+   },
+   {
+    "f": "Wer sang den Klassiker „My Way“?",
+    "a": "Frank Sinatra"
+   },
+   {
+    "f": "Wer komponierte „Eine kleine Nachtmusik“?",
+    "a": "Mozart",
+    "alts": [
+     "Wolfgang Amadeus Mozart"
+    ]
+   },
+   {
+    "f": "Welche Band sang den Hit „Yesterday“?",
+    "a": "Beatles"
+   }
+  ]
+ },
+ {
+  "nr": 10,
+  "thema": "Wahrzeichen",
+  "fragen": [
+   {
+    "f": "In welchem Land kann man die Akropolis in Athen besuchen?",
+    "a": "Griechenland"
+   },
+   {
+    "f": "Wie heißt das weltberühmte Kunstmuseum in Paris, in dem die Mona Lisa hängt?",
+    "a": "Louvre"
+   },
+   {
+    "f": "Wie heißt das berühmte Schloss von König Ludwig II. in Bayern?",
+    "a": "Schloss Neuschwanstein",
+    "alts": [
+     "Neuschwanstein"
+    ]
+   },
+   {
+    "f": "Wie heißt der Amtssitz des amerikanischen Präsidenten in Washington?",
+    "a": "Das Weiße Haus"
+   },
+   {
+    "f": "In welcher australischen Stadt steht das weltberühmte Opernhaus, mit seiner segelförmigen Dachkonstruktion?",
+    "a": "Sydney"
+   }
+  ]
+ },
+ {
+  "nr": 11,
+  "thema": "Literatur weltweit",
+  "fragen": [
+   {
+    "f": "Wer schrieb „Faust“?",
+    "a": "Goethe",
+    "alts": [
+     "Johann Wolfgang von Goethe",
+     "von Goethe"
+    ]
+   },
+   {
+    "f": "Wer schrieb „Pippi Langstrumpf“?",
+    "a": "Astrid Lindgren"
+   },
+   {
+    "f": "Wer schrieb „Die Blechtrommel“?",
+    "a": "Günter Grass"
+   },
+   {
+    "f": "Welcher Autor schrieb „Emil und die Detektive“?",
+    "a": "Erich Kästner"
+   },
+   {
+    "f": "Wie heißt der Zauberlehrling in der sehr bekannten Romanreihe von J.K. Rowling?",
+    "a": "Harry Potter"
+   }
+  ]
+ },
+ {
+  "nr": 12,
+  "thema": "Gewürze und Getränke",
+  "fragen": [
+   {
+    "f": "Welches bekannte Getränk wird aus Hopfen gebraut?",
+    "a": "Bier"
+   },
+   {
+    "f": "Welche Frucht steckt in Cidre und Cider?",
+    "a": "Apfel"
+   },
+   {
+    "f": "Welches Gewürz wird oft auf Milchreis gestreut?",
+    "a": "Zimt"
+   },
+   {
+    "f": "„Crème Brûlée“ ist ein Dessertklassiker aus welchem Land?",
+    "a": "Frankreich"
+   },
+   {
+    "f": "Was ist die Hauptzutat von Hummus?",
+    "a": "Kichererbsen"
+   }
+  ]
+ },
+ {
+  "nr": 13,
+  "thema": "Filmklassiker",
+  "fragen": [
+   {
+    "f": "Welcher berühmte Spion bestellt seinen Wodka Martini am liebsten „geschüttelt, nicht gerührt“?",
+    "a": "James Bond"
+   },
+   {
+    "f": "Welche Westernfigur spielte Pierre Brice?",
+    "a": "Winnetou"
+   },
+   {
+    "f": "Welche Kaiserin spielte Romy Schneider?",
+    "a": "Sissi",
+    "alts": [
+     "Kaiserin Elisabeth von Österreich-Ungarn",
+     "Sisi"
+    ]
+   },
+   {
+    "f": "Welche Westernfigur spielte Lex Barker?",
+    "a": "Old Shatterhand"
+   },
+   {
+    "f": "Wer führte bei „Psycho“ Regie?",
+    "a": "Hitchcock",
+    "alts": [
+     "Alfred Hitchcock"
+    ]
+   }
+  ]
+ },
+ {
+  "nr": 14,
+  "thema": "Europa",
+  "fragen": [
+   {
+    "f": "Welches Land hat die Form eines Stiefels?",
+    "a": "Italien"
+   },
+   {
+    "f": "Welches Land ist für seine Windmühlen und Tulpen bekannt?",
+    "a": "Die Niederlande",
+    "alts": [
+     "Holland"
+    ]
+   },
+   {
+    "f": "Welches Land liegt westlich von Spanien?",
+    "a": "Portugal"
+   },
+   {
+    "f": "Welcher zweitgrößte Fluss Europas fließt durch Wien?",
+    "a": "Donau"
+   },
+   {
+    "f": "Welche Stadt liegt am Bosporus?",
+    "a": "Istanbul"
+   }
+  ]
+ },
+ {
+  "nr": 15,
+  "thema": "Sport international",
+  "fragen": [
+   {
+    "f": "Welche Sportart spielt man in Wimbledon?",
+    "a": "Tennis"
+   },
+   {
+    "f": "In welcher Sportart wirft man den Ball in einen Korb?",
+    "a": "Basketball"
+   },
+   {
+    "f": "Wie heißt das berühmte Radrennen durch Frankreich?",
+    "a": "Tour de France"
+   },
+   {
+    "f": "In welcher Sportart gibt es den Ryder Cup?",
+    "a": "Golf"
+   },
+   {
+    "f": "Welche Sportart spielt man mit Puck?",
+    "a": "Eishockey"
+   }
+  ]
+ },
+ {
+  "nr": 16,
+  "thema": "Aktuelles Zeitgeschehen",
+  "fragen": [
+   {
+    "f": "Wie heißt der aktuelle deutsche Bundeskanzler?",
+    "a": "Friedrich Merz",
+    "alts": [
+     "Merz"
+    ]
+   },
+   {
+    "f": "Wer ist die Bundespräsidentin der Europäischen Kommission?",
+    "a": "Ursula von der Leyen"
+   },
+   {
+    "f": "Wer ist der Trainer von Deutschland bei der Fußball-WM 2026?",
+    "a": "Julian Nagelsmann"
+   },
+   {
+    "f": "Wie hieß der gestrandete Wal, der zuletzt für Aufsehen sorgte?",
+    "a": "Timmy"
+   },
+   {
+    "f": "In welcher Sportart feierte Alexander Zverev einen historischen Sieg und gewann die French Open?",
+    "a": "Tennis"
+   }
+  ]
+ },
+ {
+  "nr": 17,
+  "thema": "Flüsse und Meere",
+  "fragen": [
+   {
+    "f": "Welcher wichtigste Fluss fließt durch Ungarn?",
+    "a": "Donau"
+   },
+   {
+    "f": "Welcher Fluss fließt durch Kairo?",
+    "a": "Nil"
+   },
+   {
+    "f": "Welcher große Fluss fließt durch Hamburg?",
+    "a": "Elbe"
+   },
+   {
+    "f": "Welcher Fluss fließt durch den riesigen Regenwald in Südamerika und führt das meiste Wasser weltweit?",
+    "a": "Amazonas"
+   },
+   {
+    "f": "Welches Meer liegt zwischen Europa und Afrika?",
+    "a": "Mittelmeer"
+   }
+  ]
+ },
+ {
+  "nr": 18,
+  "thema": "Weltküche",
+  "fragen": [
+   {
+    "f": "Aus welchem Land stammt Pizza ursprünglich?",
+    "a": "Italien"
+   },
+   {
+    "f": "Wie heißt ein berühmte spanische Reisgericht in der Pfanne?",
+    "a": "Paella"
+   },
+   {
+    "f": "Aus welchem Land stammt heute die weltbekannte Form des rohen Fisches „Sushi“?",
+    "a": "Japan"
+   },
+   {
+    "f": "Welches weitverbreitete Gericht stammt aus Ungarn?",
+    "a": "Gulasch"
+   },
+   {
+    "f": "Welches Land ist weltweit am bekanntesten für das Gericht „Moussaka“?",
+    "a": "Griechenland"
+   }
+  ]
+ },
+ {
+  "nr": 19,
+  "thema": "Deutsche Musik und Schlager",
+  "fragen": [
+   {
+    "f": "Wer sang „Griechischer Wein“?",
+    "a": "Udo Jürgens"
+   },
+   {
+    "f": "Wer sang „Marmor, Stein und Eisen bricht“?",
+    "a": "Drafi Deutscher"
+   },
+   {
+    "f": "Welche Sängerin sang „Er gehört zu mir“?",
+    "a": "Marianne Rosenberg"
+   },
+   {
+    "f": "Welche Sängerin hatte mit „99 Luftballons“ einen Hit?",
+    "a": "Nena"
+   },
+   {
+    "f": "Welche Sängerin sang „Atemlos durch die Nacht“?",
+    "a": "Helene Fischer"
+   }
+  ]
+ },
+ {
+  "nr": 20,
+  "thema": "Geld und Währungen",
+  "fragen": [
+   {
+    "f": "Welche Währung nutzte Deutschland vor dem Euro?",
+    "a": "Deutsche Mark",
+    "alts": [
+     "D-Mark",
+     "DM"
+    ]
+   },
+   {
+    "f": "Welches Geldstück hat den höchsten Wert als einzelne Euro-Münze?",
+    "a": "Zwei Euro"
+   },
+   {
+    "f": "Welche weltbekannte Währung besitzt das Symbol „$“ primär?",
+    "a": "US-Dollar",
+    "alts": [
+     "Dollar"
+    ]
+   },
+   {
+    "f": "Welche Währung nutzt Japan?",
+    "a": "Yen"
+   },
+   {
+    "f": "Bei den bekannten Börsentieren steht der Bulle/Stier für Optimismus, was ist das Pendant dazu?",
+    "a": "Bär"
+   }
+  ]
+ },
+ {
+  "nr": 21,
+  "thema": "Allgemeinwissen international",
+  "fragen": [
+   {
+    "f": "Welche Zahl hat sechs Nullen?",
+    "a": "Eine Million"
+   },
+   {
+    "f": "Um welchen Himmelskörper kreist die Erde?",
+    "a": "Sonne"
+   },
+   {
+    "f": "Zu welchem Kontinent gehört das Land Ägypten?",
+    "a": "Afrika",
+    "alts": [
+     "Nordafrika"
+    ]
+   },
+   {
+    "f": "Welche Sprache spricht man in Brasilien?",
+    "a": "Portugiesisch"
+   },
+   {
+    "f": "Welches Element bedeckt den größten Teil der Erdoberfläche?",
+    "a": "Wasser"
+   }
+  ]
+ },
+ {
+  "nr": 22,
+  "thema": "Sehenswürdigkeiten weltweit",
+  "fragen": [
+   {
+    "f": "In welcher Stadt steht der Eiffelturm?",
+    "a": "Paris"
+   },
+   {
+    "f": "In welchem Land stehen die Pyramiden von Gizeh?",
+    "a": "Ägypten"
+   },
+   {
+    "f": "In welcher Stadt steht das Kolosseum?",
+    "a": "Rom"
+   },
+   {
+    "f": "In welchem Land steht der Taj Mahal?",
+    "a": "Indien"
+   },
+   {
+    "f": "Wie heißt der kleinste Staat der Welt, der mitten in Rom liegt?",
+    "a": "Vatikanstadt"
+   }
+  ]
+ },
+ {
+  "nr": 23,
+  "thema": "Wetter und Naturphänomene",
+  "fragen": [
+   {
+    "f": "Was entsteht, wenn Sonnenlicht und Regentropfen aufeinandertreffen?",
+    "a": "Regenbogen"
+   },
+   {
+    "f": "Was schützt die Erde vor gefährlicher UV-Strahlung?",
+    "a": "Ozonschicht"
+   },
+   {
+    "f": "Wie heißt flüssiges Gestein außerhalb des Vulkans?",
+    "a": "Lava"
+   },
+   {
+    "f": "Wie heißt die Wissenschaft vom Wetter?",
+    "a": "Meteorologie"
+   },
+   {
+    "f": "Welches Instrument misst den Luftdruck?",
+    "a": "Barometer"
+   }
+  ]
+ },
+ {
+  "nr": 24,
+  "thema": "Olympische Spiele",
+  "fragen": [
+   {
+    "f": "Wie viele Ringe zeigt die olympische Flagge?",
+    "a": "fünf"
+   },
+   {
+    "f": "Welche deutsche Stadt hat das Olympiastadion mit Zeltdach?",
+    "a": "München"
+   },
+   {
+    "f": "Wie oft finden Olympische Sommerspiele normalerweise statt?",
+    "a": "Alle vier Jahre"
+   },
+   {
+    "f": "In welchem Land liegt der Ort Olympia?",
+    "a": "Griechenland"
+   },
+   {
+    "f": "Welche Spiele starten kurz nach den Olympischen Spielen am selben Ort?",
+    "a": "Paralympics",
+    "alts": [
+     "die Paralympischen Spiele"
+    ]
+   }
+  ]
+ },
+ {
+  "nr": 25,
+  "thema": "Querbeet",
+  "fragen": [
+   {
+    "f": "Welches Dokument bescheinigt die Fahrerlaubnis für ein Kraftfahrzeug?",
+    "a": "Führerschein"
+   },
+   {
+    "f": "Welches Vitamin bildet die menschliche Haut durch den Einfluss von Sonnenlicht?",
+    "a": "Vitamin D"
+   },
+   {
+    "f": "Welches gültige Dokument braucht man zwingend, wenn man in ein Land außerhalb der EU verreisen möchte?",
+    "a": "Reisepass"
+   },
+   {
+    "f": "Welches flüssige Metall im Haushalts-Fieberthermometer wurde wegen Giftigkeit ersetzt?",
+    "a": "Quecksilber"
+   },
+   {
+    "f": "Welcher edle Naturstoff wird aus den Kokons der Seidenspinnerraupe gewonnen?",
+    "a": "Seide"
+   }
+  ]
+ },
+ {
+  "nr": 26,
+  "thema": "Körper und Gesundheit",
+  "fragen": [
+   {
+    "f": "Welches Organ pumpt Blut durch den Körper?",
+    "a": "Herz"
+   },
+   {
+    "f": "Welches Organ steuert viele Körperfunktionen?",
+    "a": "Gehirn"
+   },
+   {
+    "f": "Welcher Körperteil hält uns aufrecht und besteht aus vielen kleinen Wirbeln?",
+    "a": "Die Wirbelsäule"
+   },
+   {
+    "f": "Wie nennt man alle Knochen unseres Körpers zusammen?",
+    "a": "Skelett"
+   },
+   {
+    "f": "Was transportieren die roten Blutkörperchen primär?",
+    "a": "Sauerstoff"
+   }
+  ]
+ },
+ {
+  "nr": 27,
+  "thema": "Weltstädte",
+  "fragen": [
+   {
+    "f": "In welcher deutschen Stadt steht das weltbekannte Brandenburger Tor?",
+    "a": "Berlin"
+   },
+   {
+    "f": "Welche Stadt nennt man „Ewige Stadt“?",
+    "a": "Rom"
+   },
+   {
+    "f": "Welche berühmte Stadt liegt an der Seine?",
+    "a": "Paris"
+   },
+   {
+    "f": "Welche bekannteste Stadt liegt an der Themse?",
+    "a": "London"
+   },
+   {
+    "f": "In welcher amerikanischen Stadt steht die berühmte Freiheitsstatue?",
+    "a": "New York"
+   }
+  ]
+ }
+]
