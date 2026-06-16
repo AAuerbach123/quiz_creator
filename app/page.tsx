@@ -66,6 +66,11 @@ type Quiz = {
     chestId?: number;
     // true = geschlossene Variante (chestNN_closed.png), sonst offen (chestNN.png).
     chestClosed?: boolean;
+    // Zu welcher Frage gehört das obere/untere Karten-Bild (0-basierter Index in
+    // questions[]). Default: oben = Frage 4 (3), unten = Frage 5 (4). Über das
+    // Dropdown in der Bilder-Sektion frei wählbar (Frage 1–5).
+    imageTopQ?: number;
+    imageBottomQ?: number;
   };
   theme: {
     fontFamily: string;
@@ -348,6 +353,8 @@ function applySharedFields(target: Quiz, src: Quiz): Quiz {
       winnersText: src.meta.winnersText,
       winners: src.meta.winners,
       winnerCount: src.meta.winnerCount,
+      imageTopQ: src.meta.imageTopQ,
+      imageBottomQ: src.meta.imageBottomQ,
     },
     layout: { ...target.layout, transforms: src.layout.transforms },
   };
@@ -804,6 +811,14 @@ async function generateCardImageForSubject(subject: string, mode: ImageStyleMode
 // = Frage 5). Das Motiv leitet sich aus der FRAGE ab (Thema/Szene) — die LÖSUNG
 // soll bewusst NICHT abgebildet werden. So illustriert das Bild die Frage, ohne
 // die Antwort zu verraten. (Früher war das Motiv = die Antwort selbst.)
+// Welche Frage (0-basierter Index) gehört zum oberen/unteren Karten-Bild?
+// Frei wählbar über meta.imageTopQ / imageBottomQ; Default Frage 4 (3) & 5 (4).
+function cardImageQuestionIndices(q: Quiz): [number, number] {
+  const clamp = (n: number | undefined, fb: number) =>
+    (typeof n === "number" && n >= 0 && n < 5) ? n : fb;
+  return [clamp(q.meta.imageTopQ, 3), clamp(q.meta.imageBottomQ, 4)];
+}
+
 function cardImageSubjects(q: Quiz, fallbackTopic: string): [string, string] {
   const subj = (i: number) => {
     const question = q.questions[i]?.text?.trim();
@@ -814,7 +829,8 @@ function cardImageSubjects(q: Quiz, fallbackTopic: string): [string, string] {
       ? `${base} — die Lösung „${answer}" darf dabei NICHT zu sehen sein und nicht verraten werden`
       : base;
   };
-  return [subj(3), subj(4)];
+  const [ti, bi] = cardImageQuestionIndices(q);
+  return [subj(ti), subj(bi)];
 }
 
 type QuizCollection = { quizzes: Quiz[]; activeIndex: number; __v?: number };
@@ -2045,7 +2061,8 @@ function ImageGalleryPanel({ collection, imageStyleMode, setImageStyleMode, onUp
         for (const slot of ["image", "imageBottom"] as const) {
           const url = slot === "image" ? q.theme.background?.image : q.theme.background?.imageBottom;
           if (!url) continue;
-          const question = slot === "image" ? q.questions[3] : q.questions[4];
+          const [tIdx, bIdx] = cardImageQuestionIndices(q);
+          const question = slot === "image" ? q.questions[tIdx] : q.questions[bIdx];
           const answer = question?.correctAnswer || question?.text || `Quiz_${i + 1}`;
           const part = slot === "image" ? "Bild_oben" : "Bild_unten";
           const name = `${String(i + 1).padStart(2, "0")}_${safeFilePart(answer)}_${part}.tif`;
@@ -2081,7 +2098,8 @@ function ImageGalleryPanel({ collection, imageStyleMode, setImageStyleMode, onUp
   const slotCell = (index: number, slot: "image" | "imageBottom") => {
     const q = collection.quizzes[index];
     const url = slot === "image" ? q.theme.background?.image : q.theme.background?.imageBottom;
-    const question = slot === "image" ? q.questions[3] : q.questions[4];
+    const [tIdx, bIdx] = cardImageQuestionIndices(q);
+    const question = slot === "image" ? q.questions[tIdx] : q.questions[bIdx];
     const key = `${index}:${slot}`;
     const busy = busyKey === key;
     const [subjTop, subjBot] = cardImageSubjects(q, q.meta.title || `Quiz ${index + 1}`);
@@ -3446,8 +3464,7 @@ function CardImages({ quiz, dispatch, imageStyleMode, setImageStyleMode }: {
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const q4 = quiz.questions[3];
-  const q5 = quiz.questions[4];
+  const [topIdx, botIdx] = cardImageQuestionIndices(quiz);
   const topRef = useRef<HTMLInputElement>(null);
   const botRef = useRef<HTMLInputElement>(null);
 
@@ -3482,22 +3499,36 @@ function CardImages({ quiz, dispatch, imageStyleMode, setImageStyleMode }: {
     dispatch({ type: "UPDATE_BACKGROUND", payload: { [key]: url } });
   };
 
-  const slot = (label: string, q: Question | undefined, key2: "image" | "imageBottom",
-    src: string | null | undefined, inputRef: React.RefObject<HTMLInputElement | null>) => (
+  const slot = (sideLabel: string, slotKey: "image" | "imageBottom",
+    metaKey: "imageTopQ" | "imageBottomQ", qIdx: number,
+    src: string | null | undefined, inputRef: React.RefObject<HTMLInputElement | null>) => {
+    const q = quiz.questions[qIdx];
+    return (
     <div className="border border-stone-200 rounded p-2 space-y-1">
-      <div className="text-xs font-medium text-stone-700">{label}</div>
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-xs font-medium text-stone-700">{sideLabel}</div>
+        <label className="flex items-center gap-1 text-[11px] text-stone-600 shrink-0">
+          Frage
+          <select value={qIdx}
+            onChange={e => dispatch({ type: "UPDATE_META", payload: { [metaKey]: Number(e.target.value) } })}
+            className="border border-stone-300 rounded px-1 py-0.5 text-[11px] bg-white">
+            {[0, 1, 2, 3, 4].map(i => <option key={i} value={i}>{i + 1}</option>)}
+          </select>
+        </label>
+      </div>
       <div className="text-[11px] text-stone-500 truncate">Motiv (Frage, ohne Lösung): {questionLabel(q) || "—"}</div>
       <div className="flex gap-1">
         <button onClick={() => inputRef.current?.click()}
           className="flex-1 px-2 py-1 text-xs border border-stone-300 rounded bg-white hover:bg-stone-50">Hochladen</button>
         {src && (
-          <button onClick={() => dispatch({ type: "UPDATE_BACKGROUND", payload: { [key2]: null } })}
+          <button onClick={() => dispatch({ type: "UPDATE_BACKGROUND", payload: { [slotKey]: null } })}
             className="px-2 py-1 text-xs border border-red-300 text-red-700 rounded hover:bg-red-50">Entfernen</button>
         )}
       </div>
-      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={upload(key2)} />
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={upload(slotKey)} />
     </div>
-  );
+    );
+  };
 
   const logoRef = useRef<HTMLInputElement>(null);
   const uploadLogo: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
@@ -3509,7 +3540,7 @@ function CardImages({ quiz, dispatch, imageStyleMode, setImageStyleMode }: {
   return (
     <div className="space-y-2">
       <div className="text-xs text-stone-600">
-        Zwei Bilder — oben zu Frage 4, unten zu Frage 5. Die Bilder illustrieren das Thema der jeweiligen Frage, ohne die Lösung zu zeigen. Stil-Wahl gilt für alle KI-Generierungen (auch Sammlung, Sammel-Import, „Fehlende Bilder").
+        Zwei Bilder. Oben und unten kannst du je wählen, zu welcher Frage (1–5) das Bild gehört (Standard: Frage 4 oben, Frage 5 unten). Die Bilder illustrieren das Thema der gewählten Frage, ohne die Lösung zu zeigen. Stil-Wahl gilt für alle KI-Generierungen (auch Sammlung, Sammel-Import, „Fehlende Bilder").
       </div>
       <Field label="Bild-Stil">
         <Select value={imageStyleMode}
@@ -3520,8 +3551,8 @@ function CardImages({ quiz, dispatch, imageStyleMode, setImageStyleMode }: {
         className="w-full px-2 py-1.5 text-xs border border-blue-300 rounded bg-blue-50 text-blue-900 hover:bg-blue-100 disabled:opacity-50">
         {busy ? "Erzeuge Bilder …" : `Beide Bilder erzeugen (${IMAGE_STYLE_PRESETS[imageStyleMode].label})`}
       </button>
-      {slot("Bild oben — Frage 4", q4, "image", quiz.theme.background?.image, topRef)}
-      {slot("Bild unten — Frage 5", q5, "imageBottom", quiz.theme.background?.imageBottom, botRef)}
+      {slot("Bild oben", "image", "imageTopQ", topIdx, quiz.theme.background?.image, topRef)}
+      {slot("Bild unten", "imageBottom", "imageBottomQ", botIdx, quiz.theme.background?.imageBottom, botRef)}
 
       {/* Zeitungslogo (unten rechts im Footer) */}
       <div className="border border-stone-200 rounded p-2 space-y-1">
