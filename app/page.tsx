@@ -329,6 +329,30 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
   };
 }
 
+// Felder, die über ALLE "Zeitungen" (Quizze der Sammlung) identisch sein sollen:
+// die Feldgrößen/-positionen (layout.transforms), die gemeinsamen Standardtexte
+// und die Gewinner. Bewusst NICHT geteilt (bleiben pro Thema individuell):
+// Fragen, Bilder, Titel, Fragen-Überschrift, Lösungswörter des Vortags — sowie
+// die verlagsspezifische CI (Farben/Schrift/Logo/Rufnummern), die ohnehin erst
+// beim Vorschauen/Export pro Verlag via applyPresetToQuiz aufgesetzt wird.
+function applySharedFields(target: Quiz, src: Quiz): Quiz {
+  return {
+    ...target,
+    meta: {
+      ...target.meta,
+      subtitle: src.meta.subtitle,
+      howToText: src.meta.howToText,
+      termsText: src.meta.termsText,
+      phoneTermsText: src.meta.phoneTermsText,
+      stoererText: src.meta.stoererText,
+      winnersText: src.meta.winnersText,
+      winners: src.meta.winners,
+      winnerCount: src.meta.winnerCount,
+    },
+    layout: { ...target.layout, transforms: src.layout.transforms },
+  };
+}
+
 // Liefert die effektive Anzeigengröße in mm: bevorzugt das vom Layout
 // explizit gesetzte customSize (z. B. Verlags-Vorlage), sonst die named
 // FORMATS-Vorlage. Orientierung wird respektiert (w/h ggf. getauscht).
@@ -6018,15 +6042,38 @@ export default function Page() {
     };
   }, [collection]);
 
-  // Hält collection.quizzes[activeIndex] mit dem laufenden Editor-State (history.present)
-  // in Sync — sonst gingen Edits beim Wechsel des aktiven Quiz verloren.
+  // Master-Sync: Alle "Zeitungen" (Quizze der Sammlung) sollen identisch sein —
+  // gleiche Inhalte, gleiche Feldgrößen (layout.transforms) und gleiche Gewinner.
+  // Die verlagsspezifische CI (Farben/Schrift/Logo/Rufnummern) wird ohnehin erst
+  // beim Vorschauen/Export pro Verlag via applyPresetToQuiz aufgesetzt.
+  //
+  // Logik: Eine echte BEARBEITUNG des aktiven Quiz (activeIndex unverändert,
+  // aber neuer Editor-Stand) wird auf ALLE Einträge gespiegelt. Ein reiner
+  // Quiz-WECHSEL oder der Initial-Load (activeIndex ändert sich) propagiert
+  // NICHT — sonst würde schon beim Seitenaufruf die ganze Sammlung
+  // vereinheitlicht, bevor der Nutzer überhaupt etwas geändert hat.
+  const prevActiveIndexRef = useRef<number | null>(null);
   useEffect(() => {
     if (!collection) return;
-    if (collection.quizzes[collection.activeIndex] === quiz) return;
-    setCollection({
-      ...collection,
-      quizzes: collection.quizzes.map((q, i) => i === collection.activeIndex ? quiz : q),
-    });
+    const ai = collection.activeIndex;
+    const switched = prevActiveIndexRef.current !== ai;
+    prevActiveIndexRef.current = ai;
+    if (collection.quizzes[ai] === quiz) return; // kein neuer Editor-Stand
+    if (switched) {
+      // Wechsel/Initial-Load: nur den aktiven Slot angleichen, NICHT propagieren.
+      setCollection({
+        ...collection,
+        quizzes: collection.quizzes.map((q, i) => i === ai ? quiz : q),
+      });
+    } else {
+      // Echte Bearbeitung -> die GETEILTEN Felder (Layout, gemeinsame Texte,
+      // Gewinner) auf alle anderen Zeitungen übertragen; deren individuelle
+      // Fragen/Bilder/Titel bleiben erhalten.
+      setCollection({
+        ...collection,
+        quizzes: collection.quizzes.map((q, i) => i === ai ? quiz : applySharedFields(q, quiz)),
+      });
+    }
   }, [quiz, collection]);
 
   const handleSwitchQuiz = (newIndex: number) => {
