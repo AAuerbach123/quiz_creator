@@ -136,7 +136,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_2_C._Beckers_Buchdruckerei_GmbH_Co._KG_Allgemeine-Zeitung-der-Lueneburger-Heide.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 403781",
+   "01378 403782",
+   "01378 403783",
+   "01378 403784",
+   "01378 403785"
+  ]
  },
  {
   "id": "Ippen__AltmarkZeitung",
@@ -159,7 +165,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_2_C._Beckers_Buchdruckerei_GmbH_Co._KG_Altmark-Zeitung.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 403781",
+   "01378 403782",
+   "01378 403783",
+   "01378 403784",
+   "01378 403785"
+  ]
  },
  {
   "id": "Ippen__Fehmarnsches-Tageblatt",
@@ -321,7 +333,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_14_Verlag_Dierichs_GmbH_Co._KG_HNA.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 405881",
+   "01378 405882",
+   "01378 405883",
+   "01378 405884",
+   "01378 405885"
+  ]
  },
  {
   "id": "Ippen__Hanauer-Anzeiger",
@@ -402,7 +420,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_2_C._Beckers_Buchdruckerei_GmbH_Co._KG_Isenhagener-Kreisblatt.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 403781",
+   "01378 403782",
+   "01378 403783",
+   "01378 403784",
+   "01378 403785"
+  ]
  },
  {
   "id": "Ippen__Karl-Sasse-Verlage",
@@ -483,7 +507,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_18_Zeitungsverlag_F._Wolff_Sohn_KG_LDZ_Logo.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 406381",
+   "01378 406382",
+   "01378 406383",
+   "01378 406384",
+   "01378 406385"
+  ]
  },
  {
   "id": "Ippen__Maerkische-Z",
@@ -506,7 +536,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_21_Ma_rkischer_Zeitungsverlag_GmbH_CO.KG_MZV-Block_untereinander_blau_2017.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 406881",
+   "01378 406882",
+   "01378 406883",
+   "01378 406884",
+   "01378 406885"
+  ]
  },
  {
   "id": "Ippen__Muenchner-Merkur",
@@ -529,7 +565,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_4_Mu_nchener_Zeitungs-Verlag_GmbH_Co._KG_Muenchener-Merkur.jpg",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 403981",
+   "01378 403982",
+   "01378 403983",
+   "01378 403984",
+   "01378 403985"
+  ]
  },
  {
   "id": "Ippen__Oberbayerisches-Volksblatt",
@@ -575,7 +617,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_LA_OZ_Kombi_Logo.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 407281",
+   "01378 407282",
+   "01378 407283",
+   "01378 407284",
+   "01378 407285"
+  ]
  },
  {
   "id": "Ippen__Offenbach-Post",
@@ -598,7 +646,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_5_Pressehaus_Bintz-Verlag_GmbH_Co._KG_Offenbach-Post.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 404281",
+   "01378 404282",
+   "01378 404283",
+   "01378 404284",
+   "01378 404285"
+  ]
  },
  {
   "id": "Ippen__Soester-Anzeiger",
@@ -621,7 +675,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_20_Jahn_Verlag_GmbH_CO._KG_Soester-Anzeiger.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 406781",
+   "01378 406782",
+   "01378 406783",
+   "01378 406784",
+   "01378 406785"
+  ]
  },
  {
   "id": "Ippen__TZ",
@@ -644,7 +704,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_3_Zeitungsverlag_tz_GmbH_Co._KG_TZ.jpg",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 403881",
+   "01378 403882",
+   "01378 403883",
+   "01378 403884",
+   "01378 403885"
+  ]
  },
  {
   "id": "Ippen__Usinger-Kreis",
@@ -667,7 +733,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_KA_UA_Kombi.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 407281",
+   "01378 407282",
+   "01378 407283",
+   "01378 407284",
+   "01378 407285"
+  ]
  },
  {
   "id": "Ippen__Waldeckische-Landeszeitung",
@@ -777,7 +849,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_Kombi_LOGO_WZ-BZ.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 407281",
+   "01378 407282",
+   "01378 407283",
+   "01378 407284",
+   "01378 407285"
+  ]
  },
  {
   "id": "Ippen__Wildeshauser-Zeitung",
@@ -800,7 +878,13 @@
   "format": "282,5x215",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_9_Karl_Sasse_GmbH_Co._KG_Wildeshauser-Zeitung.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 405181",
+   "01378 405182",
+   "01378 405183",
+   "01378 405184",
+   "01378 405185"
+  ]
  },
  {
   "id": "Neue-Westfaeische__n/a",
@@ -985,7 +1069,13 @@
   "format": "278x190",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/SHZ_Material_Logos_shz_Logo_CMYK_dunkelblau.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 804771",
+   "01378 804772",
+   "01378 804773",
+   "01378 804774",
+   "01378 804775"
+  ]
  },
  {
   "id": "SHZ__NOZ",
@@ -1124,7 +1214,13 @@
   "format": "315x220",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/SWMH_Material_Logoe02_Neue_Presse_05_Neue_Presse.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 408371",
+   "01378 408372",
+   "01378 408373",
+   "01378 408374",
+   "01378 408375"
+  ]
  },
  {
   "id": "SWMH__Nordbayerischer Kurier",
