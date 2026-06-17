@@ -4738,6 +4738,219 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const hiddenIds = rhein ? [] : Object.entries(quiz.layout.transforms || {})
     .filter(([, v]) => v.hidden).map(([k]) => k);
 
+  // Die im Layout vorhandenen Bilder (1 oder 2), als breite Querformat-Bilder
+  // gestapelt — wie in der Rhein-Zeitung-Vorlage.
+  const rheinImgs = [imgTop, imgBottom].filter(Boolean) as string[];
+
+  // ===================================================================
+  // RHEIN-ZEITUNG-VARIANTE: eigenes Zwei-Spalten-Layout nach Vorlage.
+  // LINKS: Headline, Einleitung, "viel Glück", Gewinnerreihe unten.
+  // RECHTS: große Querformat-Bilder oben, Fragen-Überschrift, 5 Fragen
+  // (Preis links · Frage · Telefon rechts, Telemedia unter jeder Nummer),
+  // Störer oben über dem Bild, Verlagslogo unten rechts.
+  // ===================================================================
+  if (rhein) {
+    return (
+      <div onClick={() => onSelectBlock(null)}
+        style={{ width, height, position: "relative", background: "#FFFFFF", color: "#1A1A1A",
+          fontFamily: theme.fontFamily, overflow: "hidden", boxSizing: "border-box",
+          display: "flex", flexDirection: "column", padding: pad }}>
+
+        {wrap("anzeige",
+          <><span>ANZEIGE</span><span>ANZEIGE</span></>,
+          { display: "flex", justifyContent: "space-between",
+            fontSize: px(8), fontWeight: 700, letterSpacing: 2, color: "#1A1A1A" })}
+
+        {/* ZWEI SPALTEN */}
+        <div style={{ flex: 1, display: "flex", gap: px(20), marginTop: px(8), minHeight: 0 }}>
+
+          {/* LINKE SPALTE: Texte + Gewinner unten */}
+          <div style={{ flex: "0 0 41%", display: "flex", flexDirection: "column", minWidth: 0, minHeight: 0 }}>
+            {wrap("title",
+              <div style={{ color: cTitle, fontWeight: 700, fontSize: px(30), lineHeight: 1.06 }}>
+                {edit
+                  ? <InlineEditable value={effectiveTitle(quiz)} placeholder="Titel der Aktion"
+                      onChange={v => setMeta({ title: v, titleAuto: false })} />
+                  : (effectiveTitle(quiz) || "Titel der Aktion")}
+              </div>,
+              { flexShrink: 0 })}
+            {wrap("intro",
+              <div style={{ color: cPrize, fontSize: px(15), fontWeight: 700, lineHeight: 1.2, marginTop: px(10) }}>
+                {ed(meta.subtitle, v => setMeta({ subtitle: v }), { multiline: true, placeholder: "Untertitel" })}
+              </div>,
+              { flexShrink: 0 })}
+            {wrap("howto",
+              <div style={{ color: cIntro, fontSize: px(11.5), lineHeight: 1.4, marginTop: px(8),
+                whiteSpace: "pre-line", textAlign: "justify",
+                hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
+                {ed(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO, v => setMeta({ howToText: v }), { multiline: true, placeholder: "Story-Text" })}
+              </div>,
+              { flex: "0 1 auto", minHeight: px(20) })}
+            <div style={{ flex: "1 0 0", minHeight: px(4) }} />
+            {showWinners && (
+              <div style={{ flexShrink: 0 }}>
+                {wrap("winnersHeadline",
+                  <div style={{ color: cPrize, fontSize: px(12), fontWeight: 700, marginBottom: px(4) }}>
+                    {ed(meta.winnersText || "Unsere neuen Gewinner:", v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
+                  </div>,
+                  { marginBottom: px(2) })}
+                {wrap("winners",
+                  <div style={{ display: "flex", gap: px(6) }}>
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const w = winners[i]; const prize = prizes[i];
+                      return (
+                        <div key={w?.id || i} style={{ flex: 1, display: "flex", flexDirection: "column",
+                          alignItems: "center", gap: px(2), minWidth: 0 }}>
+                          <div style={{ width: "100%", height: px(50), background: "#D7DBE0", borderRadius: px(2),
+                            overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            {w?.photo
+                              ? <img src={w.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              : <span style={{ color: "#A3AAB3", fontSize: px(7) }}>Foto</span>}
+                          </div>
+                          <div style={{ color: cPrize, fontSize: px(11), fontWeight: 800, lineHeight: 1.1 }}>
+                            {prize ? getPrizeLabel(prize) : ""}
+                          </div>
+                          <div style={{ color: "#333", fontSize: px(8.5), fontWeight: 600, lineHeight: 1.1,
+                            textAlign: "center", overflow: "hidden", width: "100%" }}>
+                            {edit && w
+                              ? <InlineEditable value={w.text} placeholder="Vorname"
+                                  onChange={v => dispatch!({ type: "UPDATE_WINNER", id: w.id, payload: { text: v } })} />
+                              : (w?.text || "Vorname Nachname")}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>,
+                  { flexShrink: 0 }, true)}
+              </div>
+            )}
+          </div>
+
+          {/* RECHTE SPALTE: Bilder oben, Fragen darunter, Störer + Logo */}
+          <div style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column",
+            minWidth: 0, minHeight: 0 }}>
+
+            {/* Störer oben über der linken Bildecke */}
+            {wrap("stoerer",
+              <div style={{ width: stoererD, height: stoererD, borderRadius: "50%",
+                background: cPrize, color: "#FFFFFF", display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center", textAlign: "center",
+                padding: stoererD * 0.08, boxShadow: "0 2px 8px rgba(0,0,0,0.18)" }}>
+                <div style={{ transform: "rotate(-8deg)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  {badgeLines.map((l, i) => (
+                    <span key={i} style={{
+                      fontSize: badgeLines.length > 1 && i === 1 ? stoererD * 0.21 : stoererD * 0.135,
+                      fontWeight: 700, lineHeight: 1.12, whiteSpace: "nowrap" }}>
+                      {edit
+                        ? <InlineEditable value={l} onChange={v => {
+                            const ls = [...badgeLines]; ls[i] = v;
+                            setMeta({ stoererText: ls.filter(Boolean).join("\n") });
+                          }} />
+                        : l}
+                    </span>
+                  ))}
+                </div>
+              </div>,
+              { position: "absolute", top: px(2), left: px(2), zIndex: 3 })}
+
+            {/* Bilder: ein oder zwei breite Querformat-Bilder, gestapelt */}
+            <div style={{ flex: "0 0 44%", display: "flex", flexDirection: "column", gap: px(8), minHeight: 0 }}>
+              {rheinImgs.length === 0 ? (
+                wrap("img_top",
+                  <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3),
+                    display: "flex", alignItems: "center", justifyContent: "center", color: "#A89F93", fontSize: px(11) }}>
+                    Bilder zu den Fragen
+                  </div>,
+                  { flex: 1, minHeight: 0 }, true)
+              ) : (
+                rheinImgs.map((src, i) => (
+                  wrap(i === 0 ? "img_top" : "img_bottom",
+                    <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
+                      <img src={src} alt="" draggable={false}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    </div>,
+                    { flex: 1, minHeight: 0 }, true)
+                ))
+              )}
+            </div>
+
+            {/* Fragen-Überschrift */}
+            {wrap("questionsHeadline",
+              <div style={{ color: cPrize, fontSize: px(15), fontWeight: 700, lineHeight: 1.15, marginTop: px(10) }}>
+                {ed(meta.questionsHeadline ?? "", v => setMeta({ questionsHeadline: v }),
+                  { placeholder: DEFAULT_QUESTIONS_HEADLINE }) }
+                {!edit && !meta.questionsHeadline && DEFAULT_QUESTIONS_HEADLINE}
+              </div>,
+              { marginBottom: px(4), flexShrink: 0 })}
+
+            {/* Fragenzeilen: Preis links · Frage · Telefon rechts */}
+            <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
+              justifyContent: "space-between", gap: px(3) }}>
+              {questions.map((q) => {
+                const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];
+                if (!(q.text || q.phoneNumber) && !edit) return null;
+                return (
+                  <Fragment key={q.id}>
+                    {wrap(`question_${q.id}`,
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ display: "flex", gap: px(10), alignItems: "baseline" }}>
+                          <span style={{ color: cPrize, fontSize: px(13.5), fontWeight: 800, flex: "0 0 auto",
+                            minWidth: px(54), lineHeight: 1.2 }}>
+                            {prize ? getPrizeLabel(prize) : ""}
+                          </span>
+                          <div style={{ flex: 1, minWidth: 0, color: cQuestion, fontSize: px(12.5),
+                            fontWeight: 700, lineHeight: 1.2 }}>
+                            {edit
+                              ? <InlineEditable value={q.text} placeholder="Frage eingeben"
+                                  onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { text: v } })} />
+                              : q.text}
+                          </div>
+                          <div style={{ flex: "0 0 auto", color: cPhone, fontSize: px(13.5), fontWeight: 700,
+                            whiteSpace: "nowrap", letterSpacing: 0.3 }}>
+                            {edit
+                              ? <InlineEditable value={q.phoneNumber ?? ""} placeholder="Telefon"
+                                  onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } })} />
+                              : q.phoneNumber}
+                          </div>
+                        </div>
+                        {meta.phoneTermsText && (
+                          <div style={{ color: cTerms, fontSize: px(9), lineHeight: 1.2, marginTop: px(1),
+                            paddingLeft: px(64), textAlign: "right" }}>
+                            {cleanPhoneTerms(meta.phoneTermsText)}
+                          </div>
+                        )}
+                      </div>,
+                      { minWidth: 0, minHeight: 0 })}
+                  </Fragment>
+                );
+              })}
+            </div>
+
+            {/* Verlagslogo unten rechts */}
+            {wrap("publisherLogo",
+              theme.publisherLogo
+                ? <img key={theme.publisherLogo} onLoad={onLogoLoad} src={theme.publisherLogo} alt=""
+                    style={{ width: logoDim ? `${logoDim.w}px` : `${Math.round(Math.sqrt(targetLogoArea))}px`,
+                      height: logoDim ? `${logoDim.h}px` : "auto", objectFit: "contain", display: "block" }} />
+                : <span style={{ display: "inline-block", border: `1px dashed ${cPrize}`, color: cPrize,
+                    fontSize: px(9), fontWeight: 700, padding: px(5), borderRadius: px(3),
+                    textTransform: "uppercase", letterSpacing: 0.5 }}>Logo fehlt</span>,
+              { marginTop: px(6), flexShrink: 0, alignSelf: "flex-end" })}
+          </div>
+        </div>
+
+        {/* FUSSZEILE: Teilnahmebedingungen über volle Breite */}
+        {(meta.termsText || edit) && wrap("terms",
+          <div style={{ color: cTerms, fontSize: px(6), lineHeight: 1.25,
+            borderTop: "1px solid #D8D2C8", paddingTop: px(4),
+            textAlign: "justify", hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
+            {ed(meta.termsText, v => setMeta({ termsText: v }), { multiline: true, placeholder: "Teilnahmebedingungen" })}
+          </div>,
+          { marginTop: px(6), flexShrink: 0 })}
+      </div>
+    );
+  }
+
   return (
     <div onClick={() => onSelectBlock(null)}
       style={{ width, height, position: "relative", background: "#FFFFFF", color: "#1A1A1A",
