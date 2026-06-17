@@ -4776,8 +4776,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               ))}
             </div>
           </div>,
-          { flex: "0 0 auto", marginTop: px(2) })}
-        <div style={{ flex: 1, textAlign: "center", minWidth: 0 }}>
+          { flex: "0 0 auto", marginTop: px(2), order: rhein ? 2 : 0 })}
+        <div style={{ flex: 1, textAlign: rhein ? "left" : "center", minWidth: 0, order: rhein ? 1 : 0 }}>
           {wrap("title",
             <div style={{ color: cTitle, fontWeight: 700, fontSize: px(34), lineHeight: 1.05 }}>
               {edit
@@ -4790,8 +4790,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               {ed(meta.subtitle, v => setMeta({ subtitle: v }), { multiline: true, placeholder: "Untertitel" })}
             </div>)}
         </div>
-        {/* Symmetrie-Platzhalter rechts in Störer-Breite, damit der Titel mittig sitzt */}
-        <div style={{ flex: "0 0 auto", width: stoererD, visibility: "hidden" }} />
+        {/* Symmetrie-Platzhalter rechts in Störer-Breite, damit der Titel mittig sitzt (nur Augsburger) */}
+        <div style={{ flex: "0 0 auto", width: stoererD, visibility: "hidden", display: rhein ? "none" : "block" }} />
       </div>
 
       {/* HAUPTBEREICH: vier Spalten */}
@@ -4893,6 +4893,25 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               return (
                 <Fragment key={q.id}>
                   {wrap(`question_${q.id}`,
+                    rhein ? (
+                      <div style={{ display: "flex", gap: px(10), alignItems: "flex-start", minWidth: 0 }}>
+                        <span style={{ color: cPrize, fontSize: px(15), fontWeight: 800, flex: "0 0 auto", minWidth: px(46), lineHeight: 1.25 }}>
+                          {prize ? getPrizeLabel(prize) : ""}
+                        </span>
+                        <div style={{ flex: 1, minWidth: 0, color: cQuestion, fontSize: px(13.5), fontWeight: 700, lineHeight: 1.2 }}>
+                          {edit
+                            ? <InlineEditable value={q.text} placeholder="Frage eingeben"
+                                onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { text: v } })} />
+                            : q.text}
+                        </div>
+                        <div style={{ flex: "0 0 auto", color: cPhone, fontSize: px(14), fontWeight: 700, whiteSpace: "nowrap", letterSpacing: 0.3 }}>
+                          {edit
+                            ? <InlineEditable value={q.phoneNumber ?? ""} placeholder="Telefon"
+                                onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } })} />
+                            : q.phoneNumber}
+                        </div>
+                      </div>
+                    ) : (
                     <div style={{ minWidth: 0 }}>
                       {/* Betrag-Oval FREIGESTELLT: absolut rechts neben der
                           Frage verankert, aus dem Textfluss gelöst — einzeln
@@ -4929,12 +4948,18 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                           {cleanPhoneTerms(meta.phoneTermsText)}
                         </div>
                       )}
-                    </div>,
+                    </div>
+                    ),
                     { minWidth: 0, minHeight: 0 })}
                 </Fragment>
               );
             })}
           </div>
+          {rhein && meta.phoneTermsText && (
+            <div style={{ color: cTerms, fontSize: px(10), lineHeight: 1.25, marginTop: px(4) }}>
+              {cleanPhoneTerms(meta.phoneTermsText)}
+            </div>
+          )}
         </div>
 
         {/* SPALTE 4: Gewinner-Boxen — nur wenn Gewinner vorhanden (winnerCount>0).
