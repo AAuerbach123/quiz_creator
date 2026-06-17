@@ -4780,13 +4780,13 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               </div>,
               { flexShrink: 0 })}
             {wrap("howto",
-              <div style={{ color: cIntro, fontSize: px(16), lineHeight: 1.55, marginTop: px(12),
-                whiteSpace: "pre-line", textAlign: "justify",
+              <div style={{ color: cIntro, fontSize: px(16.5), lineHeight: 1.55, marginTop: px(12),
+                whiteSpace: "pre-line", textAlign: "justify", textAlignLast: "left",
                 hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
                 {ed(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO, v => setMeta({ howToText: v }), { multiline: true, placeholder: "Story-Text" })}
               </div>,
-              { flex: "0 1 auto", minHeight: px(20) })}
-            <div style={{ flex: "1 0 0", minHeight: px(4) }} />
+              { flex: "1 1 auto", minHeight: px(20) })}
+            <div style={{ flex: "0 0 0", minHeight: px(4) }} />
             {showWinners && (
               <div style={{ flexShrink: 0 }}>
                 {wrap("winnersHeadline",
@@ -4853,12 +4853,12 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               </div>,
               { position: "absolute", top: px(2), left: px(2), zIndex: 3 })}
 
-            {/* Bilder: ein oder zwei Bilder ÜBEREINANDER gestapelt (wie Vorlage).
-                Bei zwei 1,25-Bildern in voller Breite ist ein Beschnitt oben/unten
-                unvermeidlich; daher bekommt der Bildbereich viel Höhe (großer
-                Streifen) und das Motiv wird mittig gehalten, damit das Wesentliche
-                sichtbar bleibt. */}
-            <div style={{ display: "flex", flexDirection: "column", gap: px(8), flex: "0 0 47%", minHeight: 0 }}>
+            {/* Bilder: ein oder zwei Bilder ÜBEREINANDER gestapelt (wie Vorlage),
+                VOLLSTÄNDIG ohne Beschnitt: jede Bild-Box hat exakt das Bild-
+                Seitenverhältnis (1280/1024) und wird mittig so groß wie möglich
+                in ihren Höhen-Slot gelegt. Schmale weiße Ränder seitlich sind der
+                Preis dafür, dass das ganze Bild sichtbar bleibt. */}
+            <div style={{ display: "flex", flexDirection: "column", gap: px(8), flex: "0 0 50%", minHeight: 0 }}>
               {rheinImgs.length === 0 ? (
                 wrap("img_top",
                   <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3),
@@ -4870,9 +4870,12 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 rheinImgs.map((src, i) => (
                   <Fragment key={i === 0 ? "img_top" : "img_bottom"}>
                     {wrap(i === 0 ? "img_top" : "img_bottom",
-                      <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
-                        <img src={src} alt="" draggable={false}
-                          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
+                      <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ height: "100%", aspectRatio: "1280 / 1024", maxWidth: "100%",
+                          overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
+                          <img src={src} alt="" draggable={false}
+                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                        </div>
                       </div>,
                       { flex: 1, minHeight: 0 }, true)}
                   </Fragment>
