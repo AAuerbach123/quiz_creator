@@ -844,8 +844,8 @@
   "id": "Neue-Westfaeische__n/a",
   "gruppe": "Neue-Westfaeische",
   "verlag": "Neue-Westfaeische",
-  "titel": "n/a",
-  "titelKanonisch": "",
+  "titel": "Neue Westfälische",
+  "titelKanonisch": "Neue Westfälische",
   "fontFamily": "'Myriad Pro', sans-serif",
   "fontAvailable": true,
   "fontRaw": "Myriad Pro – Bold",
@@ -861,7 +861,42 @@
   "format": "315x220",
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/NW_Logo.png",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 608271",
+   "01378 608272",
+   "01378 608273",
+   "01378 608274",
+   "01378 608275"
+  ]
+ },
+ {
+  "gruppe": "Neue-Westfaeische",
+  "verlag": "Neue-Westfaeische",
+  "fontFamily": "'Myriad Pro', sans-serif",
+  "fontAvailable": true,
+  "fontRaw": "Myriad Pro – Bold",
+  "colors": {
+   "title": "#000000",
+   "question": "#000000",
+   "intro": "#000000",
+   "prize": "#000000",
+   "phone": "#000000",
+   "winners": "#000000",
+   "terms": "#000000"
+  },
+  "format": "315x220",
+  "logoPosition": "rechts unten",
+  "id": "Neue-Westfaeische__Haller Kreisblatt",
+  "titel": "Haller Kreisblatt",
+  "titelKanonisch": "Haller Kreisblatt",
+  "logoUrl": null,
+  "phoneNumbers": [
+   "01378 608371",
+   "01378 608372",
+   "01378 608373",
+   "01378 608374",
+   "01378 608375"
+  ]
  },
  {
   "id": "Nürnberg__Nürnberg",
@@ -890,35 +925,6 @@
    "01378 220273",
    "01378 220274",
    "01378 220275"
-  ]
- },
- {
-  "id": "Rhein Zeitung__n/a",
-  "gruppe": "RHEIN-Z",
-  "verlag": "Rhein Zeitung",
-  "titel": "n/a",
-  "titelKanonisch": "",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
-  },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "",
-  "phoneNumbers": [
-   "01378 803791",
-   "01378 803792",
-   "01378 803793",
-   "01378 803794",
-   "01378 803795"
   ]
  },
  {
