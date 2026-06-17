@@ -4893,10 +4893,13 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                   { placeholder: DEFAULT_QUESTIONS_HEADLINE }) }
                 {!edit && !meta.questionsHeadline && DEFAULT_QUESTIONS_HEADLINE}
               </div>,
-              { marginBottom: px(34), flexShrink: 0 })}
+              { flexShrink: 0 })}
 
-            {/* Fragenzeilen: Preis links · Frage · Telefon rechts */}
-            <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
+            {/* Fragenzeilen: Preis links · Frage · Telefon rechts.
+                Abstand zur Überschrift als marginTop HIER (nicht als marginBottom
+                der Überschrift) — der Adjustable-Wrapper würde ein marginBottom
+                bei nicht skalierten Elementen wieder löschen. */}
+            <div style={{ flex: 1, minHeight: 0, marginTop: px(34), display: "flex", flexDirection: "column",
               justifyContent: "space-between", gap: px(4) }}>
               {questions.map((q) => {
                 const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];
