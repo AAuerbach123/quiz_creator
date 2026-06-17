@@ -4780,7 +4780,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               </div>,
               { flexShrink: 0 })}
             {wrap("howto",
-              <div style={{ color: cIntro, fontSize: px(16.5), lineHeight: 1.55, marginTop: px(12),
+              <div style={{ color: cIntro, fontSize: px(17.5), lineHeight: 1.6, marginTop: px(12),
                 whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
                 hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
                 {edit
