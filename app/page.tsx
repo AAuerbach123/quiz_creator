@@ -359,7 +359,7 @@ function applySharedFields(target: Quiz, src: Quiz): Quiz {
       imageTopQ: src.meta.imageTopQ,
       imageBottomQ: src.meta.imageBottomQ,
     },
-    layout: { ...target.layout, transforms: src.layout.transforms },
+    layout: { ...target.layout, transforms: src.layout.transforms, variant: src.layout.variant },
   };
 }
 
