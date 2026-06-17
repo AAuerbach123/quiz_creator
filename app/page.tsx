@@ -4762,7 +4762,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             fontSize: px(8), fontWeight: 700, letterSpacing: 2, color: "#1A1A1A" })}
 
         {/* ZWEI SPALTEN */}
-        <div style={{ flex: 1, display: "flex", gap: px(20), marginTop: px(8), minHeight: 0 }}>
+        <div style={{ flex: 1, display: "flex", gap: px(20), marginTop: px(2), minHeight: 0 }}>
 
           {/* LINKE SPALTE: Texte + Gewinner unten */}
           <div style={{ flex: "0 0 41%", display: "flex", flexDirection: "column", minWidth: 0, minHeight: 0 }}>
@@ -4864,7 +4864,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 Bildern (1,25:1) ist ein Zuschnitt oben/unten nötig; der Bildbereich
                 ist daher so hoch wie möglich gewählt, damit der Beschnitt gering
                 bleibt, und das Motiv wird mittig gehalten. */}
-            <div style={{ display: "flex", flexDirection: "column", gap: px(8), flex: "0 0 47%", minHeight: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: px(8), flex: "0 0 44%", minHeight: 0 }}>
               {rheinImgs.length === 0 ? (
                 wrap("img_top",
                   <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3),
@@ -4899,7 +4899,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 Abstand zur Überschrift als marginTop HIER (nicht als marginBottom
                 der Überschrift) — der Adjustable-Wrapper würde ein marginBottom
                 bei nicht skalierten Elementen wieder löschen. */}
-            <div style={{ flex: 1, minHeight: 0, marginTop: px(20), display: "flex", flexDirection: "column",
+            <div style={{ flex: 1, minHeight: 0, marginTop: px(12), marginBottom: px(12), display: "flex", flexDirection: "column",
               justifyContent: "space-between", gap: px(4) }}>
               {questions.map((q) => {
                 const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];

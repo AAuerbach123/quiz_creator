@@ -67,11 +67,11 @@
   "fontAvailable": true,
   "fontRaw": "Utopia Std - Black Headline",
   "colors": {
-   "title": "#00CC00",
-   "question": "#00CC00",
-   "intro": "#00CC00",
-   "prize": "#00CC00",
-   "phone": "#00CC00",
+   "title": "#0058B2",
+   "question": "#0058B2",
+   "intro": "#0058B2",
+   "prize": "#0058B2",
+   "phone": "#0058B2",
    "winners": "#000000",
    "terms": "#000000"
   },
