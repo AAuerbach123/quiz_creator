@@ -4893,7 +4893,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                   { placeholder: DEFAULT_QUESTIONS_HEADLINE }) }
                 {!edit && !meta.questionsHeadline && DEFAULT_QUESTIONS_HEADLINE}
               </div>,
-              { marginBottom: px(14), flexShrink: 0 })}
+              { marginBottom: px(34), flexShrink: 0 })}
 
             {/* Fragenzeilen: Preis links · Frage · Telefon rechts */}
             <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
