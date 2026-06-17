@@ -4759,14 +4759,17 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   // anpassbar (verschieben, skalieren, ausblenden); ed macht Texte inline
   // editierbar (nur im Editor — PDF rendert statisch).
   const setMeta = (payload: Record<string, unknown>) => { if (dispatch) dispatch({ type: "UPDATE_META", payload }); };
-  // Im Rhein-Modus die für das Augsburger-Layout gespeicherten Freiform-
-  // Positionen IGNORIEREN (sonst verschieben sie die anders angeordneten
-  // Rhein-Blöcke und es überlappt). Rhein ist eine feste Anordnung; Freiform-
-  // Verschieben ist dort deaktiviert, Inline-Textbearbeitung bleibt erhalten.
-  const wrapTransforms = rhein ? {} : quiz.layout.transforms;
+  // Gespeicherte Freiform-Positionen/-Breiten IGNORIEREN bei: Rhein UND der
+  // 3-spaltigen Variante (ohne Gewinner, wide=true). Grund: Die im 4-spaltigen
+  // Layout gesetzten festen Breiten (Bilder 27,5 %, Fragen 24,3 %) würden in der
+  // 3-spaltigen Variante nicht die freie Breite füllen → große Lücken. Ohne
+  // Transforms füllen Bilder und Fragen ihre Flex-Spalten über die volle Breite.
+  // Das 4-spaltige Layout (mit Gewinner) behält seine Freiform-Positionierung.
+  const ignoreTransforms = rhein || wide;
+  const wrapTransforms = ignoreTransforms ? {} : quiz.layout.transforms;
   const wrap = (id: string, node: React.ReactNode, block?: React.CSSProperties, box?: boolean) => (
-    <Adjustable id={id} transforms={wrapTransforms} dispatch={rhein ? undefined : dispatch}
-      editable={rhein ? false : editable} width={width} height={height}
+    <Adjustable id={id} transforms={wrapTransforms} dispatch={ignoreTransforms ? undefined : dispatch}
+      editable={ignoreTransforms ? false : editable} width={width} height={height}
       selectedBlockId={selectedBlockId} onSelectBlock={onSelectBlock} block={block} box={box}>
       {node}
     </Adjustable>
@@ -4777,7 +4780,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
       : <>{value}</>;
 
   // Ausgeblendete ("gelöschte") Elemente — als Chips wieder einblendbar.
-  const hiddenIds = rhein ? [] : Object.entries(quiz.layout.transforms || {})
+  const hiddenIds = ignoreTransforms ? [] : Object.entries(quiz.layout.transforms || {})
     .filter(([, v]) => v.hidden).map(([k]) => k);
 
   // Die im Layout vorhandenen Bilder (1 oder 2), als breite Querformat-Bilder
