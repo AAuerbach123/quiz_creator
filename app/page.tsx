@@ -4780,7 +4780,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               </div>,
               { flexShrink: 0 })}
             {wrap("howto",
-              <div style={{ color: cIntro, fontSize: px(11.5), lineHeight: 1.4, marginTop: px(8),
+              <div style={{ color: cIntro, fontSize: px(16), lineHeight: 1.55, marginTop: px(12),
                 whiteSpace: "pre-line", textAlign: "justify",
                 hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
                 {ed(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO, v => setMeta({ howToText: v }), { multiline: true, placeholder: "Story-Text" })}
@@ -4801,10 +4801,10 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                       return (
                         <div key={w?.id || i} style={{ flex: 1, display: "flex", flexDirection: "column",
                           alignItems: "center", gap: px(3), minWidth: 0 }}>
-                          <div style={{ width: "100%", aspectRatio: "1 / 1", background: "#D7DBE0", borderRadius: px(2),
+                          <div style={{ width: "100%", aspectRatio: "4 / 5", background: "#D7DBE0", borderRadius: px(2),
                             overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             {w?.photo
-                              ? <img src={w.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              ? <img src={w.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 25%" }} />
                               : <span style={{ color: "#A3AAB3", fontSize: px(8) }}>Foto</span>}
                           </div>
                           <div style={{ color: cPrize, fontSize: px(15), fontWeight: 800, lineHeight: 1.1 }}>
@@ -4853,24 +4853,28 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               </div>,
               { position: "absolute", top: px(2), left: px(2), zIndex: 3 })}
 
-            {/* Bilder: ein oder zwei Bilder im Originalformat (1280×1024 = 1,25),
-                nebeneinander und VOLLSTÄNDIG sichtbar (Box-Seitenverhältnis = Bild-
-                Seitenverhältnis, daher kein Beschnitt trotz object-fit:cover). */}
-            <div style={{ display: "flex", gap: px(8), justifyContent: "center", flexShrink: 0 }}>
+            {/* Bilder: ein oder zwei Bilder ÜBEREINANDER gestapelt (wie Vorlage).
+                Bei zwei 1,25-Bildern in voller Breite ist ein Beschnitt oben/unten
+                unvermeidlich; daher bekommt der Bildbereich viel Höhe (großer
+                Streifen) und das Motiv wird mittig gehalten, damit das Wesentliche
+                sichtbar bleibt. */}
+            <div style={{ display: "flex", flexDirection: "column", gap: px(8), flex: "0 0 47%", minHeight: 0 }}>
               {rheinImgs.length === 0 ? (
-                <div style={{ flex: "0 1 58%", aspectRatio: "1280 / 1024", background: "#EFE9E2",
-                  borderRadius: px(3), display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#A89F93", fontSize: px(11) }}>Bilder zu den Fragen</div>
+                wrap("img_top",
+                  <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3),
+                    display: "flex", alignItems: "center", justifyContent: "center", color: "#A89F93", fontSize: px(11) }}>
+                    Bilder zu den Fragen
+                  </div>,
+                  { flex: 1, minHeight: 0 }, true)
               ) : (
                 rheinImgs.map((src, i) => (
                   <Fragment key={i === 0 ? "img_top" : "img_bottom"}>
                     {wrap(i === 0 ? "img_top" : "img_bottom",
-                      <div style={{ width: "100%", aspectRatio: "1280 / 1024", overflow: "hidden",
-                        background: "#EFE9E2", borderRadius: px(3) }}>
+                      <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
                         <img src={src} alt="" draggable={false}
-                          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
                       </div>,
-                      { flex: rheinImgs.length >= 2 ? 1 : "0 1 58%", minWidth: 0 }, true)}
+                      { flex: 1, minHeight: 0 }, true)}
                   </Fragment>
                 ))
               )}
