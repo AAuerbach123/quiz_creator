@@ -4899,7 +4899,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 Abstand zur Überschrift als marginTop HIER (nicht als marginBottom
                 der Überschrift) — der Adjustable-Wrapper würde ein marginBottom
                 bei nicht skalierten Elementen wieder löschen. */}
-            <div style={{ flex: 1, minHeight: 0, marginTop: px(34), display: "flex", flexDirection: "column",
+            <div style={{ flex: 1, minHeight: 0, marginTop: px(20), display: "flex", flexDirection: "column",
               justifyContent: "space-between", gap: px(4) }}>
               {questions.map((q) => {
                 const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];
