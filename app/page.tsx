@@ -98,7 +98,7 @@ type Quiz = {
   layout: {
     format: string; orientation: string;
     customSize?: { w: number; h: number };
-    variant?: "beilage" | "querformat" | "redaktionell";
+    variant?: "beilage" | "querformat" | "redaktionell" | "rhein";
     // Freie Element-Anpassungen (Redaktionell-Layout): Versatz in Anteilen
     // der Anzeigenbreite/-höhe (auflösungsunabhängig), Skalierung und
     // Ausblenden ("Löschen") pro Element-ID. Gilt in Vorschau UND PDF.
@@ -332,7 +332,7 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
       ...(size ? { customSize: size } : {}),
       // Alle Zeitungen nutzen das Augsburger-Layout: ohne explizite Vorgabe
       // wird "redaktionell" verwendet (statt des alten Defaults "beilage").
-      variant: preset.layoutVariant || "redaktionell"
+      variant: preset.layoutVariant || (q.layout.variant === "rhein" ? "rhein" : "redaktionell")
     }
   };
 }
@@ -1196,7 +1196,7 @@ type Action = { type: string; [k: string]: unknown };
 type LayoutTemplate = {
   id: string;
   name: string;
-  variant: "beilage" | "querformat" | "redaktionell";
+  variant: "beilage" | "querformat" | "redaktionell" | "rhein";
   transforms: Record<string, ElementTransform>;
   createdAt: number;
 };
@@ -2281,7 +2281,7 @@ function LayoutTemplatesPanel({ quiz, dispatch }: { quiz: Quiz; dispatch: React.
   const update = (list: LayoutTemplate[]) => { setTemplates(list); persistLayoutTemplates(list); };
 
   const variantLabel = (v: string) =>
-    v === "querformat" ? "Querformat" : v === "redaktionell" ? "Redaktionell" : "Beilage";
+    v === "querformat" ? "Querformat" : v === "redaktionell" ? "Redaktionell" : v === "rhein" ? "Rhein-Zeitung" : "Beilage";
 
   const handleSave = () => {
     const suggestion = `${variantLabel(quiz.layout.variant || "beilage")} ${new Date().toLocaleDateString("de-DE")}`;
@@ -2851,7 +2851,8 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
             options={[
               { value: "beilage", label: "Beilage (Standard)" },
               { value: "querformat", label: "Querformat-Story (2 Spalten)" },
-              { value: "redaktionell", label: "Redaktionell (Augsburger Stil, 4 Spalten)" }
+              { value: "redaktionell", label: "Redaktionell (Augsburger Stil, 4 Spalten)" },
+              { value: "rhein", label: "Rhein-Zeitung (kleinere Bilder, Gewinner unten)" }
             ]} />
         </Field>
         )}
@@ -3663,7 +3664,7 @@ function PreviewRenderer(props: RendererProps) {
   if (props.quiz.layout.variant === "querformat") {
     return <QuerformatRenderer {...props} />;
   }
-  if (props.quiz.layout.variant === "redaktionell") {
+  if (props.quiz.layout.variant === "redaktionell" || props.quiz.layout.variant === "rhein") {
     return <RedaktionellRenderer {...props} />;
   }
   return <BeilageRenderer {...props} />;
@@ -4672,7 +4673,15 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   // "ohne Gewinner"-Variante: keine Gewinner -> Spalte 4 entfällt. Damit kein
   // Weißraum entsteht, werden Spalten und Schriftgrößen vergrößert (wide=true).
   const showWinners = winners.length > 0;
-  const wide = !showWinners;
+  // "rhein" = Layout-Variante nach der Rhein-Zeitung: kleinere Bilder, Gewinner
+  // als Reihe unten links (statt rechter Spalte), Logo unten rechts, Fragen
+  // dadurch breiter und weniger Weißraum.
+  const rhein = quiz.layout.variant === "rhein";
+  // Gewinner als 4. Spalte rechts nur im Augsburger-Layout; bei rhein als Reihe unten.
+  const winnersCol = showWinners && !rhein;
+  const wide = rhein ? true : !showWinners;
+  const col1Flex = rhein ? "0 0 26%" : (wide ? "0 0 21%" : "0 0 17%");
+  const imgFlex = rhein ? "0 0 22%" : (wide ? "0 0 40%" : "0 0 30%");
   const imgTop = theme.background?.image || null;
   const imgBottom = theme.background?.imageBottom || null;
   const topPrize = prizes.length ? getPrizeLabel(prizes.reduce((a, b) => (b.valueCents > a.valueCents ? b : a))) : "1000€";
@@ -4708,9 +4717,14 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   // anpassbar (verschieben, skalieren, ausblenden); ed macht Texte inline
   // editierbar (nur im Editor — PDF rendert statisch).
   const setMeta = (payload: Record<string, unknown>) => { if (dispatch) dispatch({ type: "UPDATE_META", payload }); };
+  // Im Rhein-Modus die für das Augsburger-Layout gespeicherten Freiform-
+  // Positionen IGNORIEREN (sonst verschieben sie die anders angeordneten
+  // Rhein-Blöcke und es überlappt). Rhein ist eine feste Anordnung; Freiform-
+  // Verschieben ist dort deaktiviert, Inline-Textbearbeitung bleibt erhalten.
+  const wrapTransforms = rhein ? {} : quiz.layout.transforms;
   const wrap = (id: string, node: React.ReactNode, block?: React.CSSProperties, box?: boolean) => (
-    <Adjustable id={id} transforms={quiz.layout.transforms} dispatch={dispatch}
-      editable={editable} width={width} height={height}
+    <Adjustable id={id} transforms={wrapTransforms} dispatch={rhein ? undefined : dispatch}
+      editable={rhein ? false : editable} width={width} height={height}
       selectedBlockId={selectedBlockId} onSelectBlock={onSelectBlock} block={block} box={box}>
       {node}
     </Adjustable>
@@ -4721,7 +4735,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
       : <>{value}</>;
 
   // Ausgeblendete ("gelöschte") Elemente — als Chips wieder einblendbar.
-  const hiddenIds = Object.entries(quiz.layout.transforms || {})
+  const hiddenIds = rhein ? [] : Object.entries(quiz.layout.transforms || {})
     .filter(([, v]) => v.hidden).map(([k]) => k);
 
   return (
@@ -4787,7 +4801,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             Bewusst OHNE overflow:hidden — der Freiform-Editor erlaubt es,
             Elemente über die Spaltengrenze hinaus zu ziehen; Clipping würde
             sie abschneiden. */}
-        <div style={{ flex: wide ? "0 0 21%" : "0 0 17%", display: "flex", flexDirection: "column",
+        <div style={{ flex: col1Flex, display: "flex", flexDirection: "column",
           minWidth: 0, minHeight: 0 }}>
           {wrap("howto",
             <div style={{ color: cIntro, fontSize: px(wide ? 12.5 : 9.5),
@@ -4817,7 +4831,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           <div style={{ flex: "1 0 0", minHeight: px(4) }} />
           {/* Kostenhinweis (Telemedia) steht jetzt unter jeder Telefonnummer
               in der Fragenspalte — hier links entfällt er. */}
-          {wrap("publisherLogo",
+          {!rhein && wrap("publisherLogo",
             theme.publisherLogo
               ? <img key={theme.publisherLogo} onLoad={onLogoLoad}
                   src={theme.publisherLogo} alt=""
@@ -4834,7 +4848,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         </div>
 
         {/* SPALTE 2: zwei gestapelte Bilder */}
-        <div style={{ flex: wide ? "0 0 40%" : "0 0 30%", display: "flex", flexDirection: "column", gap: px(8), minWidth: 0 }}>
+        <div style={{ flex: imgFlex, display: "flex", flexDirection: "column", gap: px(8), minWidth: 0 }}>
           {/* Bilder werden auf Datenebene passend zugeschnitten (fitCardImage);
               objectFit:cover gleicht Rest-Differenzen aus. */}
           {wrap("img_top",
@@ -4926,7 +4940,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         {/* SPALTE 4: Gewinner-Boxen — nur wenn Gewinner vorhanden (winnerCount>0).
             Bei "ohne Gewinner" entfällt die Spalte; Spalte 3 (Fragen) dehnt sich
             dadurch automatisch aus. Bewusst OHNE overflow:hidden. */}
-        {showWinners && (
+        {winnersCol && (
         <div style={{ flex: "0 0 24%", display: "flex", flexDirection: "column",
           minWidth: 0, minHeight: 0 }}>
           {/* Gewinner-Überschrift als EIGENER Block: separat verschieb-,
@@ -4977,6 +4991,59 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         </div>
         )}
       </div>
+
+      {/* RHEIN-VARIANTE: Gewinner als Reihe unten links, Logo unten rechts */}
+      {rhein && (
+        <div style={{ display: "flex", alignItems: "flex-end", gap: px(12), marginTop: px(8), flexShrink: 0 }}>
+          {showWinners && (
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {wrap("winnersHeadline",
+                <div style={{ color: cPrize, fontSize: px(12), fontWeight: 700, marginBottom: px(3) }}>
+                  {ed(meta.winnersText || "Unsere neuen Gewinner:", v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
+                </div>,
+                { marginBottom: px(2) })}
+              {wrap("winners",
+                <div style={{ display: "flex", gap: px(6) }}>
+                  {Array.from({ length: 5 }).map((_, i) => {
+                    const w = winners[i]; const prize = prizes[i];
+                    return (
+                      <div key={w?.id || i} style={{ flex: 1, background: "#EDEFF2", borderRadius: px(3),
+                        padding: px(5), display: "flex", flexDirection: "column", alignItems: "center",
+                        gap: px(2), minWidth: 0 }}>
+                        <div style={{ width: "100%", height: px(46), background: "#D7DBE0", borderRadius: px(2),
+                          overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          {w?.photo
+                            ? <img src={w.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            : <span style={{ color: "#A3AAB3", fontSize: px(7) }}>Foto</span>}
+                        </div>
+                        <div style={{ color: cPrize, fontSize: px(15), fontWeight: 800, lineHeight: 1 }}>
+                          {prize ? getPrizeLabel(prize) : ""}
+                        </div>
+                        <div style={{ color: "#333", fontSize: px(9), fontWeight: 700, lineHeight: 1.1,
+                          textAlign: "center", overflow: "hidden", width: "100%" }}>
+                          {edit && w
+                            ? <InlineEditable value={w.text} placeholder="Vorname"
+                                onChange={v => dispatch!({ type: "UPDATE_WINNER", id: w.id, payload: { text: v } })} />
+                            : (w?.text || "Vorname Nachname")}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>,
+                { flex: 1 }, true)}
+            </div>
+          )}
+          {wrap("publisherLogo",
+            theme.publisherLogo
+              ? <img key={theme.publisherLogo} onLoad={onLogoLoad} src={theme.publisherLogo} alt=""
+                  style={{ width: logoDim ? `${logoDim.w}px` : `${Math.round(Math.sqrt(targetLogoArea))}px`,
+                    height: logoDim ? `${logoDim.h}px` : "auto", objectFit: "contain", display: "block" }} />
+              : <span style={{ display: "inline-block", border: `1px dashed ${cPrize}`, color: cPrize,
+                  fontSize: px(9), fontWeight: 700, padding: px(5), borderRadius: px(3),
+                  textTransform: "uppercase", letterSpacing: 0.5 }}>Logo fehlt</span>,
+            { flex: "0 0 auto" })}
+        </div>
+      )}
 
       {/* FUSSZEILE: lange Teilnahmebedingungen über volle Breite (sehr klein) */}
       {(meta.termsText || edit) && wrap("terms",
