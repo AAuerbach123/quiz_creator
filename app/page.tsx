@@ -4790,27 +4790,27 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             {showWinners && (
               <div style={{ flexShrink: 0 }}>
                 {wrap("winnersHeadline",
-                  <div style={{ color: cPrize, fontSize: px(12), fontWeight: 700, marginBottom: px(4) }}>
+                  <div style={{ color: cPrize, fontSize: px(14), fontWeight: 700, marginBottom: px(5) }}>
                     {ed(meta.winnersText || "Unsere neuen Gewinner:", v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
                   </div>,
                   { marginBottom: px(2) })}
                 {wrap("winners",
-                  <div style={{ display: "flex", gap: px(6) }}>
+                  <div style={{ display: "flex", gap: px(7) }}>
                     {Array.from({ length: 5 }).map((_, i) => {
                       const w = winners[i]; const prize = prizes[i];
                       return (
                         <div key={w?.id || i} style={{ flex: 1, display: "flex", flexDirection: "column",
-                          alignItems: "center", gap: px(2), minWidth: 0 }}>
-                          <div style={{ width: "100%", height: px(50), background: "#D7DBE0", borderRadius: px(2),
+                          alignItems: "center", gap: px(3), minWidth: 0 }}>
+                          <div style={{ width: "100%", aspectRatio: "1 / 1", background: "#D7DBE0", borderRadius: px(2),
                             overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             {w?.photo
                               ? <img src={w.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                              : <span style={{ color: "#A3AAB3", fontSize: px(7) }}>Foto</span>}
+                              : <span style={{ color: "#A3AAB3", fontSize: px(8) }}>Foto</span>}
                           </div>
-                          <div style={{ color: cPrize, fontSize: px(11), fontWeight: 800, lineHeight: 1.1 }}>
+                          <div style={{ color: cPrize, fontSize: px(15), fontWeight: 800, lineHeight: 1.1 }}>
                             {prize ? getPrizeLabel(prize) : ""}
                           </div>
-                          <div style={{ color: "#333", fontSize: px(8.5), fontWeight: 600, lineHeight: 1.1,
+                          <div style={{ color: "#333", fontSize: px(10), fontWeight: 600, lineHeight: 1.15,
                             textAlign: "center", overflow: "hidden", width: "100%" }}>
                             {edit && w
                               ? <InlineEditable value={w.text} placeholder="Vorname"
@@ -4853,39 +4853,41 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               </div>,
               { position: "absolute", top: px(2), left: px(2), zIndex: 3 })}
 
-            {/* Bilder: ein oder zwei breite Querformat-Bilder, gestapelt */}
-            <div style={{ flex: "0 0 44%", display: "flex", flexDirection: "column", gap: px(8), minHeight: 0 }}>
+            {/* Bilder: ein oder zwei Bilder im Originalformat (1280×1024 = 1,25),
+                nebeneinander und VOLLSTÄNDIG sichtbar (Box-Seitenverhältnis = Bild-
+                Seitenverhältnis, daher kein Beschnitt trotz object-fit:cover). */}
+            <div style={{ display: "flex", gap: px(8), justifyContent: "center", flexShrink: 0 }}>
               {rheinImgs.length === 0 ? (
-                wrap("img_top",
-                  <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3),
-                    display: "flex", alignItems: "center", justifyContent: "center", color: "#A89F93", fontSize: px(11) }}>
-                    Bilder zu den Fragen
-                  </div>,
-                  { flex: 1, minHeight: 0 }, true)
+                <div style={{ flex: "0 1 58%", aspectRatio: "1280 / 1024", background: "#EFE9E2",
+                  borderRadius: px(3), display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "#A89F93", fontSize: px(11) }}>Bilder zu den Fragen</div>
               ) : (
                 rheinImgs.map((src, i) => (
-                  wrap(i === 0 ? "img_top" : "img_bottom",
-                    <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
-                      <img src={src} alt="" draggable={false}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                    </div>,
-                    { flex: 1, minHeight: 0 }, true)
+                  <Fragment key={i === 0 ? "img_top" : "img_bottom"}>
+                    {wrap(i === 0 ? "img_top" : "img_bottom",
+                      <div style={{ width: "100%", aspectRatio: "1280 / 1024", overflow: "hidden",
+                        background: "#EFE9E2", borderRadius: px(3) }}>
+                        <img src={src} alt="" draggable={false}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      </div>,
+                      { flex: rheinImgs.length >= 2 ? 1 : "0 1 58%", minWidth: 0 }, true)}
+                  </Fragment>
                 ))
               )}
             </div>
 
             {/* Fragen-Überschrift */}
             {wrap("questionsHeadline",
-              <div style={{ color: cPrize, fontSize: px(15), fontWeight: 700, lineHeight: 1.15, marginTop: px(10) }}>
+              <div style={{ color: cPrize, fontSize: px(17), fontWeight: 700, lineHeight: 1.15, marginTop: px(12) }}>
                 {ed(meta.questionsHeadline ?? "", v => setMeta({ questionsHeadline: v }),
                   { placeholder: DEFAULT_QUESTIONS_HEADLINE }) }
                 {!edit && !meta.questionsHeadline && DEFAULT_QUESTIONS_HEADLINE}
               </div>,
-              { marginBottom: px(4), flexShrink: 0 })}
+              { marginBottom: px(6), flexShrink: 0 })}
 
             {/* Fragenzeilen: Preis links · Frage · Telefon rechts */}
             <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
-              justifyContent: "space-between", gap: px(3) }}>
+              justifyContent: "space-between", gap: px(4) }}>
               {questions.map((q) => {
                 const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];
                 if (!(q.text || q.phoneNumber) && !edit) return null;
@@ -4893,19 +4895,19 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                   <Fragment key={q.id}>
                     {wrap(`question_${q.id}`,
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ display: "flex", gap: px(10), alignItems: "baseline" }}>
-                          <span style={{ color: cPrize, fontSize: px(13.5), fontWeight: 800, flex: "0 0 auto",
-                            minWidth: px(54), lineHeight: 1.2 }}>
+                        <div style={{ display: "flex", gap: px(12), alignItems: "baseline" }}>
+                          <span style={{ color: cPrize, fontSize: px(17), fontWeight: 800, flex: "0 0 auto",
+                            minWidth: px(60), lineHeight: 1.2 }}>
                             {prize ? getPrizeLabel(prize) : ""}
                           </span>
-                          <div style={{ flex: 1, minWidth: 0, color: cQuestion, fontSize: px(12.5),
+                          <div style={{ flex: 1, minWidth: 0, color: cQuestion, fontSize: px(15),
                             fontWeight: 700, lineHeight: 1.2 }}>
                             {edit
                               ? <InlineEditable value={q.text} placeholder="Frage eingeben"
                                   onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { text: v } })} />
                               : q.text}
                           </div>
-                          <div style={{ flex: "0 0 auto", color: cPhone, fontSize: px(13.5), fontWeight: 700,
+                          <div style={{ flex: "0 0 auto", color: cPhone, fontSize: px(16.5), fontWeight: 700,
                             whiteSpace: "nowrap", letterSpacing: 0.3 }}>
                             {edit
                               ? <InlineEditable value={q.phoneNumber ?? ""} placeholder="Telefon"
@@ -4914,8 +4916,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                           </div>
                         </div>
                         {meta.phoneTermsText && (
-                          <div style={{ color: cTerms, fontSize: px(9), lineHeight: 1.2, marginTop: px(1),
-                            paddingLeft: px(64), textAlign: "right" }}>
+                          <div style={{ color: cTerms, fontSize: px(10.5), lineHeight: 1.2, marginTop: px(2),
+                            paddingLeft: px(72), textAlign: "right" }}>
                             {cleanPhoneTerms(meta.phoneTermsText)}
                           </div>
                         )}
