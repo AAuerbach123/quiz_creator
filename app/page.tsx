@@ -4781,7 +4781,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               { flexShrink: 0 })}
             {wrap("howto",
               <div style={{ color: cIntro, fontSize: px(16.5), lineHeight: 1.55, marginTop: px(12),
-                whiteSpace: "pre-line", textAlign: "justify", textAlignLast: "left",
+                whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
                 hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
                 {ed(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO, v => setMeta({ howToText: v }), { multiline: true, placeholder: "Story-Text" })}
               </div>,
@@ -4853,11 +4853,11 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               </div>,
               { position: "absolute", top: px(2), left: px(2), zIndex: 3 })}
 
-            {/* Bilder: ein oder zwei Bilder ÜBEREINANDER gestapelt (wie Vorlage),
-                VOLLSTÄNDIG ohne Beschnitt: jede Bild-Box hat exakt das Bild-
-                Seitenverhältnis (1280/1024) und wird mittig so groß wie möglich
-                in ihren Höhen-Slot gelegt. Schmale weiße Ränder seitlich sind der
-                Preis dafür, dass das ganze Bild sichtbar bleibt. */}
+            {/* Bilder: ein oder zwei Bilder ÜBEREINANDER gestapelt, über die VOLLE
+                Spaltenbreite (kein seitlicher Weißraum). Bei fast quadratischen
+                Bildern (1,25:1) ist ein Zuschnitt oben/unten nötig; der Bildbereich
+                ist daher so hoch wie möglich gewählt, damit der Beschnitt gering
+                bleibt, und das Motiv wird mittig gehalten. */}
             <div style={{ display: "flex", flexDirection: "column", gap: px(8), flex: "0 0 50%", minHeight: 0 }}>
               {rheinImgs.length === 0 ? (
                 wrap("img_top",
@@ -4870,12 +4870,9 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 rheinImgs.map((src, i) => (
                   <Fragment key={i === 0 ? "img_top" : "img_bottom"}>
                     {wrap(i === 0 ? "img_top" : "img_bottom",
-                      <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <div style={{ height: "100%", aspectRatio: "1280 / 1024", maxWidth: "100%",
-                          overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
-                          <img src={src} alt="" draggable={false}
-                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                        </div>
+                      <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
+                        <img src={src} alt="" draggable={false}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
                       </div>,
                       { flex: 1, minHeight: 0 }, true)}
                   </Fragment>
@@ -4923,7 +4920,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                           </div>
                         </div>
                         {meta.phoneTermsText && (
-                          <div style={{ color: cTerms, fontSize: px(10.5), lineHeight: 1.2, marginTop: px(2),
+                          <div style={{ color: cTerms, fontSize: px(9), lineHeight: 1.15, marginTop: px(1),
                             paddingLeft: px(72), textAlign: "right" }}>
                             {cleanPhoneTerms(meta.phoneTermsText)}
                           </div>
