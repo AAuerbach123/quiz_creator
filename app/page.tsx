@@ -5082,8 +5082,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             // gestreckt → große Lücken). Natürliche Höhe (kein flex-grow), damit
             // die "Auflösung" direkt unter dem Text sitzt; overflow:hidden begrenzt
             // sehr langen Text auf die Spalte (kein Überlauf ins Logo).
-            <div style={{ color: cIntro, fontSize: px(wide ? 16.5 : 13),
-              lineHeight: 1.5, whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
+            <div style={{ color: cIntro, fontSize: px(wide ? 16.5 : 13.75),
+              lineHeight: 1.38, whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
               overflow: "hidden",
               hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
               {edit
@@ -5095,25 +5095,28 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 : (meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
             </div>,
             { flex: "0 1 auto", minHeight: 0, overflow: "hidden" })}
-          {(solutionLines.length > 0 || edit) && wrap("solution",
+          {/* Auflösung der letzten Ausgabe (Lösung 1–5) NUR im 4-spaltigen Layout
+              mit Gewinnern (= !wide). In der 3-spaltigen Variante (ohne Gewinner)
+              entfällt der Block, damit der Story-Text die Spalte füllt. */}
+          {!wide && (solutionLines.length > 0 || edit) && wrap("solution",
             <div>
-              <div style={{ color: cPrize, fontSize: px(10), fontWeight: 700, marginBottom: px(2) }}>
+              <div style={{ color: cPrize, fontSize: px(9), fontWeight: 700, marginBottom: px(1) }}>
                 Auflösung der letzten Ausgabe:
               </div>
               {edit
-                ? <div style={{ color: cPrize, fontSize: px(9.5), fontWeight: 700, lineHeight: 1.4 }}>
+                ? <div style={{ color: cPrize, fontSize: px(8.5), fontWeight: 700, lineHeight: 1.25 }}>
                     <InlineEditable multiline placeholder="Lösungswörter (eine pro Zeile)"
                       value={solutionLines.join("\n")}
                       onChange={v => setMeta({ solutionWords: v })} />
                   </div>
                 : solutionLines.map((s, i) => (
-                    <div key={i} style={{ color: cPrize, fontSize: px(9.5), fontWeight: 700, lineHeight: 1.4 }}>
+                    <div key={i} style={{ color: cPrize, fontSize: px(8.5), fontWeight: 700, lineHeight: 1.25 }}>
                       {s}
                     </div>
                   ))}
             </div>,
             // Kleiner Abstand zum Blocksatz; "Auflösung" sitzt direkt darunter.
-            { marginTop: px(5), flexShrink: 0 })}
+            { marginTop: px(4), flexShrink: 0 })}
           {/* Spacer schiebt das Logo an die Spaltenunterkante (über die Fußzeile). */}
           <div style={{ flex: "1 1 0", minHeight: px(4) }} />
           {/* Kostenhinweis (Telemedia) steht unter jeder Telefonnummer in der
