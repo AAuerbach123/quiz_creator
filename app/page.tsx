@@ -164,60 +164,78 @@ const LOGO_REF_AREA_MM2 = 0.045 * 315 * 220;   // ≈ 3119 mm²
 const LOGO_REF_MAX_W_MM = 0.32 * 315;          // ≈ 100,8 mm
 const LOGO_REF_MAX_H_MM = 0.10 * 220;          // ≈ 22 mm
 
-// === DEUTSCHER GENITIV FÜR ZEITUNGSNAMEN ====================================
-// Title-Template: "Das große Wissensquiz <genitive>". Heuristik anhand der
-// Endung des letzten Worts; Sonderfälle per Override-Tabelle.
-const GENITIVE_OVERRIDES: Record<string, string> = {
-  // Verlag::Titel (matched gegen preset.verlag + preset.titel)
-  "Ippen::HNA": "der HNA",
-  "Ippen::TZ": "der tz",
-  "SAAR::PM": "des Pfälzischen Merkurs",
-  "SAAR::SZ": "der Saarbrücker Zeitung",
-  "SAAR::TV": "des Trierischen Volksfreunds",
-  "SHZ::shz": "der shz",
-  "SHZ::Beig": "des Bremer Eishockey-Internet-Gazette",
-  "SHZ::NOZ": "der Neuen Osnabrücker Zeitung",
-  "Ippen::Westfaelischer-Anz": "des Westfälischen Anzeigers",
-  "Ippen::Schwarzwälder Bote, Neckarquelle, Lahrer Zeitung": "des Schwarzwälder Boten",
-  "SWMH::Schwarzwälder Bote, Neckarquelle, Lahrer Zeitung": "des Schwarzwälder Boten",
-  "Augsburger Allgemeinen::Augsburger Allgemeine": "der Augsburger Allgemeinen",
+// === DEUTSCHER DATIV FÜR ZEITUNGSNAMEN =====================================
+// Title-Template: "Das große Wissensquiz <dativ>" mit Präposition "in".
+// Pro Verlag fest hinterlegt (Schlüssel = preset.id), weil die deutsche
+// Adjektiv-Deklination (z. B. "der Thüringischen Landeszeitung") sich nicht
+// zuverlässig heuristisch erzeugen lässt. Fallback: germanDativeFallback().
+const DATIVE_BY_ID: Record<string, string> = {
+  "Augsburger Allgemeinen__n/a": "in der Augsburger Allgemeinen",
+  "Funke__OTZ": "in der Ostthüringer Zeitung",
+  "Funke__TA": "in der Thüringer Allgemeinen",
+  "Funke__TLZ": "in der Thüringischen Landeszeitung",
+  "Ippen__Allgemeine Zeitung der Lüneburger Heide": "in der Allgemeinen Zeitung der Lüneburger Heide",
+  "Ippen__AltmarkZeitung": "in der AltmarkZeitung",
+  "Ippen__Frankfurter-Neue-Presse": "in der Frankfurter Neuen Presse",
+  "Ippen__Frankfurter-Rundschau": "in der Frankfurter Rundschau",
+  "Ippen__Giessener-Alsfelder": "in der Gießener und Alsfelder Allgemeinen",
+  "Ippen__Giessener-Anzeiger": "im Gießener Anzeiger",
+  "Ippen__HNA": "in der HNA",
+  "Ippen__Hanauer-Anzeiger": "im Hanauer Anzeiger",
+  "Ippen__Hersfelder-Zeitung": "in der Hersfelder Zeitung",
+  "Ippen__Isenhagener Kreisblatt": "im Isenhagener Kreisblatt",
+  "Ippen__Karl-Sasse-Verlage": "in den Karl-Sasse-Verlagen",
+  "Ippen__Kreiszeitung-Verlag": "in der Kreiszeitung",
+  "Ippen__Leine-Deister-Zeitung": "in der Leine-Deister-Zeitung",
+  "Ippen__Maerkische-Z": "in der Märkischen Allgemeinen",
+  "Ippen__Muenchner-Merkur": "im Münchner Merkur",
+  "Ippen__Oberhessische-Lauterbacher": "im Lauterbacher Anzeiger",
+  "Ippen__Offenbach-Post": "in der Offenbach-Post",
+  "Ippen__Soester-Anzeiger": "im Soester Anzeiger",
+  "Ippen__TZ": "in der tz",
+  "Ippen__Usinger-Kreis": "im Usinger Anzeiger",
+  "Ippen__Waldeckische-Landeszeitung": "in der Waldeckischen Landeszeitung",
+  "Ippen__Werra-Rundschau": "in der Werra-Rundschau",
+  "Ippen__Westfaelischer-Anz": "im Westfälischen Anzeiger",
+  "Ippen__Wetterauer-Butzbacher": "in der Wetterauer Zeitung",
+  "Ippen__Wildeshauser-Zeitung": "in der Wildeshauser Zeitung",
+  "Neue-Westfaeische__n/a": "in der Neuen Westfälischen",
+  "Neue-Westfaeische__Haller Kreisblatt": "im Haller Kreisblatt",
+  "Nürnberg__Nürnberg": "in den Nürnberger Nachrichten",
+  "SAAR__PM": "im Pfälzischen Merkur",
+  "SAAR__SZ": "in der Saarbrücker Zeitung",
+  "SAAR__TV": "im Trierischen Volksfreund",
+  "SHZ__Beig": "in der BEIG",
+  "SHZ__NOZ": "in der Neuen Osnabrücker Zeitung",
+  "SHZ__SHZ": "in der shz",
+  "SWMH__Die Oberbadische, Markgräfler Tagblatt, Weiler Zeitung": "in der Oberbadischen",
+  "SWMH__Frankenpost": "in der Frankenpost",
+  "SWMH__Neue Presse": "in der Neuen Presse",
+  "SWMH__Nordbayerischer Kurier": "im Nordbayerischen Kurier",
+  "SWMH__Schwarzwälder Bote, Neckarquelle, Lahrer Zeitung": "im Schwarzwälder Boten",
+  "SWMH__Suhler Verlagsgesellschaft": "in der Suhler Verlagsgesellschaft",
+  "SWP__SWP": "in der Südwest Presse",
 };
-function germanGenitive(rawName: string): string {
+function germanDativeFallback(rawName: string): string {
   const name = (rawName || "").trim();
-  if (!name) return "";
-  const words = name.split(/\s+/);
-  const lastLow = (words[words.length - 1] || "").toLowerCase();
-  // Neutrum (Genitiv: des … -s)
-  if (/(blatt|wort|jahrgang|volksblatt|tageblatt)$/.test(lastLow)) {
-    return "des " + name + "s";
-  }
-  // Maskulin auf -e (n-Deklination: des Boten)
-  if (/(bote)$/.test(lastLow)) {
-    return "des " + name.replace(/Bote$/, "Boten");
-  }
-  // Feminin substantiviertes Adjektiv (schwache Deklination):
-  // die Allgemeine → der Allgemeinen, die Neue → der Neuen.
-  if (/(allgemeine|neue|rundschau)$/.test(lastLow)) {
-    return /(allgemeine|neue)$/.test(lastLow) ? "der " + name + "n" : "der " + name;
-  }
-  // Maskulin (Genitiv: des -s, Adjektiv-Endung -en)
-  if (/(anzeiger|merkur|kurier)$/.test(lastLow)) {
-    // Adjektive vor dem letzten Wort: -er → -en (sehr heuristisch)
-    const declined = words.map((w, i) =>
-      i < words.length - 1 && /^[A-ZÄÖÜ].+er$/.test(w) ? w.slice(0, -2) + "en" : w
-    );
-    declined[declined.length - 1] = declined[declined.length - 1] + "s";
-    return "des " + declined.join(" ");
-  }
-  // Feminin (Genitiv: der …) — Default für Zeitungen, Posten etc.
-  return "der " + name;
+  if (!name) return "in Ihrer Zeitung";
+  const lastLow = (name.split(/\s+/).pop() || "").toLowerCase();
+  // Neutrum: im … (Blatt, Tageblatt, Kreisblatt)
+  if (/(blatt|tageblatt|kreisblatt|wort)$/.test(lastLow)) return "im " + name;
+  // Maskulin auf -e (n-Deklination): im Boten
+  if (/(bote)$/.test(lastLow)) return "im " + name.replace(/Bote$/, "Boten");
+  // Feminin substantiviertes Adjektiv: in der Allgemeinen/Neuen
+  if (/(allgemeine|neue)$/.test(lastLow)) return "in der " + name + "n";
+  // Maskulin: im … (Anzeiger/Merkur/Kurier/Volksfreund)
+  if (/(anzeiger|merkur|kurier|volksfreund)$/.test(lastLow)) return "im " + name;
+  // Feminin (Default für Zeitung, Presse, Post, Rundschau)
+  return "in der " + name;
 }
 function buildPublisherTitle(preset: VerlagsPreset | null, publisherName?: string): string {
   if (!preset && !publisherName) return "";
-  const key = preset ? `${preset.verlag}::${preset.titel}` : "";
-  const genitive = (key && GENITIVE_OVERRIDES[key])
-    || germanGenitive(publisherName || preset?.titelKanonisch || preset?.titel || preset?.verlag || "");
-  return `Das große Wissensquiz ${genitive}`;
+  const dat = (preset && DATIVE_BY_ID[preset.id])
+    || germanDativeFallback(publisherName || preset?.titelKanonisch || preset?.titel || preset?.verlag || "");
+  return `Das große Wissensquiz ${dat}`;
 }
 function presetWantsBigFooterLogo(p: VerlagsPreset): boolean {
   const hay = `${p.verlag} ${p.titel} ${p.titelKanonisch || ""}`;
@@ -284,13 +302,12 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
   // Hotline-Hinweis hängen wir hinten an den Bedingungstext.
   const tv = CACHED_TERMS?.[termsVariantForPreset(preset)];
   const newTerms = tv ? buildFullTerms(tv) : q.meta.termsText;
-  // Titel mit Verlagsnamen im deutschen Genitiv — überschreibt einen
-  // alten verlagsspezifischen Auto-Titel, lässt aber individuell ge-
-  // setzte Titel unverändert (Heuristik: Titel beginnt mit
-  // "Das große Wissensquiz" → Auto-Titel, sonst Manuell).
+  // Anzeigentitel kommt IMMER aus dem Verlag: "Das große Wissensquiz <Dativ
+  // mit Zeitungsname>". Der gespeicherte (themenspezifische) Quiz-Titel bleibt
+  // für die Editor-Navigation erhalten und wird nur hier für die Anzeige durch
+  // den Verlagstitel ersetzt. Fallback: vorhandener Quiz-Titel.
   const autoTitle = buildPublisherTitle(preset, pubName);
-  const isPrevAutoTitle = !q.meta.title || /^Das große Wissensquiz/i.test(q.meta.title);
-  const newTitle = isPrevAutoTitle && autoTitle ? autoTitle : q.meta.title;
+  const newTitle = autoTitle || q.meta.title;
   // Optionale Vorlagen-Texte (aus KI-Analyse) — NUR als Lückenfüller: ein vom
   // Nutzer gesetzter (nicht leerer) Quiz-Text bleibt IMMER erhalten, die Vorlage
   // überschreibt ihn nie. So gehen manuelle Änderungen (z. B. ein eigener
@@ -317,7 +334,7 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
   return {
     ...q,
     questions: newQuestions,
-    meta: { ...q.meta, ...presetMeta, termsText: finalTerms, title: newTitle, titleAuto: isPrevAutoTitle,
+    meta: { ...q.meta, ...presetMeta, termsText: finalTerms, title: newTitle, titleAuto: !!autoTitle,
       ...(preset.hideWinners ? { winnerCount: 0 } : {}) },
     theme: {
       ...q.theme,
@@ -5032,8 +5049,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         <div style={{ flex: col1Flex, display: "flex", flexDirection: "column",
           minWidth: 0, minHeight: 0 }}>
           {wrap("howto",
-            <div style={{ color: cIntro, fontSize: px(wide ? 12.5 : 9.5),
-              lineHeight: 1.45, whiteSpace: "pre-line", textAlign: "justify",
+            <div style={{ color: cIntro, fontSize: px(wide ? 15 : 13),
+              lineHeight: 1.5, whiteSpace: "pre-line", textAlign: "justify",
               height: "100%", overflow: "hidden",
               hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
               {ed(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO, v => setMeta({ howToText: v }), { multiline: true, placeholder: "Story-Text" })}
@@ -5313,9 +5330,11 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         </div>,
         { marginTop: px(6), flexShrink: 0 })}
 
-      {/* GITTER-OVERLAY (nur Editor): feine Linien alle 2,5 %, kräftigere alle
-          10 % — passend zum Einrasten beim Verschieben. Im PDF unsichtbar. */}
-      {edit && (
+      {/* GITTER-OVERLAY (nur Editor, und nur während ein Element AUSGEWÄHLT ist):
+          feine Linien alle 2,5 %, kräftigere alle 10 % — passend zum Einrasten
+          beim Verschieben. So bleibt die normale Vorschau frei vom blauen Raster
+          (das sonst z. B. über dem Logo als „Flimmern" lag). Im PDF unsichtbar. */}
+      {edit && selectedBlockId && (
         <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 4,
           backgroundImage: [
             "linear-gradient(to right, rgba(59,130,246,0.10) 1px, transparent 1px)",
