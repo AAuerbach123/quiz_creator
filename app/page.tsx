@@ -5034,10 +5034,13 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           {wrap("howto",
             <div style={{ color: cIntro, fontSize: px(wide ? 12.5 : 9.5),
               lineHeight: 1.45, whiteSpace: "pre-line", textAlign: "justify",
+              height: "100%", overflow: "hidden",
               hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
               {ed(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO, v => setMeta({ howToText: v }), { multiline: true, placeholder: "Story-Text" })}
             </div>,
-            { flex: "0 1 auto", minHeight: px(24) })}
+            // flex:1 + overflow:hidden begrenzt den Text auf die Spaltenhöhe, damit
+            // er das Logo NICHT nach unten in die Teilnahmebedingungen schiebt.
+            { flex: "1 1 0", minHeight: 0, overflow: "hidden" })}
           {(solutionLines.length > 0 || edit) && wrap("solution",
             <div>
               <div style={{ color: cPrize, fontSize: px(10), fontWeight: 700, marginBottom: px(2) }}>
@@ -5056,9 +5059,10 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                   ))}
             </div>,
             { marginTop: px(8), flexShrink: 0 })}
-          <div style={{ flex: "1 0 0", minHeight: px(4) }} />
           {/* Kostenhinweis (Telemedia) steht jetzt unter jeder Telefonnummer
-              in der Fragenspalte — hier links entfällt er. */}
+              in der Fragenspalte — hier links entfällt er. Der frühere Spacer
+              entfällt: der howto-Block (flex:1) füllt jetzt den Platz und hält
+              das Logo unten in der Spalte. */}
           {!rhein && wrap("publisherLogo",
             theme.publisherLogo
               ? <img key={theme.publisherLogo} onLoad={onLogoLoad}
