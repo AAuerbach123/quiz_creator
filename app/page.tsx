@@ -5079,7 +5079,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             // gestreckt → große Lücken). Natürliche Höhe (kein flex-grow), damit
             // die "Auflösung" direkt unter dem Text sitzt; overflow:hidden begrenzt
             // sehr langen Text auf die Spalte (kein Überlauf ins Logo).
-            <div style={{ color: cIntro, fontSize: px(wide ? 15 : 13),
+            <div style={{ color: cIntro, fontSize: px(wide ? 16.5 : 13),
               lineHeight: 1.5, whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
               overflow: "hidden",
               hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
