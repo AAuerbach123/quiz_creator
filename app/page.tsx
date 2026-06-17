@@ -4894,22 +4894,29 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 <Fragment key={q.id}>
                   {wrap(`question_${q.id}`,
                     rhein ? (
-                      <div style={{ display: "flex", gap: px(10), alignItems: "flex-start", minWidth: 0 }}>
-                        <span style={{ color: cPrize, fontSize: px(15), fontWeight: 800, flex: "0 0 auto", minWidth: px(46), lineHeight: 1.25 }}>
-                          {prize ? getPrizeLabel(prize) : ""}
-                        </span>
-                        <div style={{ flex: 1, minWidth: 0, color: cQuestion, fontSize: px(13.5), fontWeight: 700, lineHeight: 1.2 }}>
-                          {edit
-                            ? <InlineEditable value={q.text} placeholder="Frage eingeben"
-                                onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { text: v } })} />
-                            : q.text}
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ display: "flex", gap: px(10), alignItems: "flex-start" }}>
+                          <span style={{ color: cPrize, fontSize: px(15), fontWeight: 800, flex: "0 0 auto", minWidth: px(46), lineHeight: 1.25 }}>
+                            {prize ? getPrizeLabel(prize) : ""}
+                          </span>
+                          <div style={{ flex: 1, minWidth: 0, color: cQuestion, fontSize: px(13.5), fontWeight: 700, lineHeight: 1.2 }}>
+                            {edit
+                              ? <InlineEditable value={q.text} placeholder="Frage eingeben"
+                                  onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { text: v } })} />
+                              : q.text}
+                          </div>
+                          <div style={{ flex: "0 0 auto", color: cPhone, fontSize: px(14), fontWeight: 700, whiteSpace: "nowrap", letterSpacing: 0.3 }}>
+                            {edit
+                              ? <InlineEditable value={q.phoneNumber ?? ""} placeholder="Telefon"
+                                  onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } })} />
+                              : q.phoneNumber}
+                          </div>
                         </div>
-                        <div style={{ flex: "0 0 auto", color: cPhone, fontSize: px(14), fontWeight: 700, whiteSpace: "nowrap", letterSpacing: 0.3 }}>
-                          {edit
-                            ? <InlineEditable value={q.phoneNumber ?? ""} placeholder="Telefon"
-                                onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } })} />
-                            : q.phoneNumber}
-                        </div>
+                        {meta.phoneTermsText && (
+                          <div style={{ color: cTerms, fontSize: px(10), lineHeight: 1.2, marginTop: px(1) }}>
+                            {cleanPhoneTerms(meta.phoneTermsText)}
+                          </div>
+                        )}
                       </div>
                     ) : (
                     <div style={{ minWidth: 0 }}>
@@ -4955,11 +4962,6 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               );
             })}
           </div>
-          {rhein && meta.phoneTermsText && (
-            <div style={{ color: cTerms, fontSize: px(10), lineHeight: 1.25, marginTop: px(4) }}>
-              {cleanPhoneTerms(meta.phoneTermsText)}
-            </div>
-          )}
         </div>
 
         {/* SPALTE 4: Gewinner-Boxen — nur wenn Gewinner vorhanden (winnerCount>0).
