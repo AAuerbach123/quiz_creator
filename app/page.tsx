@@ -334,7 +334,7 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
   return {
     ...q,
     questions: newQuestions,
-    meta: { ...q.meta, ...presetMeta, termsText: finalTerms, title: newTitle, titleAuto: !!autoTitle,
+    meta: { ...q.meta, ...presetMeta, termsText: finalTerms, title: newTitle, titleAuto: autoTitle ? false : (q.meta.titleAuto ?? false),
       ...(preset.hideWinners ? { winnerCount: 0 } : {}) },
     theme: {
       ...q.theme,
@@ -2863,13 +2863,33 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
       <Section title="Format & Layout" tabKey="layout">
         {!isGeldregen && (
         <Field label="Layout-Variante">
-          <Select value={quiz.layout.variant || "beilage"}
-            onChange={e => dispatch({ type: "UPDATE_LAYOUT", payload: { variant: e.target.value } })}
+          <Select
+            // "3-spaltig" und "4-spaltig" sind beide das Augsburger-Layout
+            // (redaktionell); der Unterschied ist nur die Gewinner-Spalte.
+            // Daher steuert die Auswahl Variante UND Gewinneranzahl zusammen.
+            value={
+              quiz.layout.variant === "redaktionell"
+                ? ((quiz.meta.winnerCount ?? 0) > 0 ? "vier" : "drei")
+                : (quiz.layout.variant || "beilage")
+            }
+            onChange={e => {
+              const v = e.target.value;
+              if (v === "vier") {
+                dispatch({ type: "UPDATE_LAYOUT", payload: { variant: "redaktionell" } });
+                if ((quiz.meta.winnerCount ?? 0) === 0) dispatch({ type: "UPDATE_META", payload: { winnerCount: 5 } });
+              } else if (v === "drei") {
+                dispatch({ type: "UPDATE_LAYOUT", payload: { variant: "redaktionell" } });
+                dispatch({ type: "UPDATE_META", payload: { winnerCount: 0 } });
+              } else {
+                dispatch({ type: "UPDATE_LAYOUT", payload: { variant: v } });
+              }
+            }}
             options={[
+              { value: "vier", label: "4-spaltig (Augsburger, mit Gewinnern)" },
+              { value: "drei", label: "3-spaltig (Augsburger, ohne Gewinner)" },
+              { value: "rhein", label: "Rhein-Zeitung" },
               { value: "beilage", label: "Beilage (Standard)" },
-              { value: "querformat", label: "Querformat-Story (2 Spalten)" },
-              { value: "redaktionell", label: "Redaktionell (Augsburger Stil, 4 Spalten)" },
-              { value: "rhein", label: "Rhein-Zeitung (kleinere Bilder, Gewinner unten)" }
+              { value: "querformat", label: "Querformat (2 Spalten)" },
             ]} />
         </Field>
         )}
@@ -3691,7 +3711,7 @@ function PreviewRenderer(props: RendererProps) {
 // contentEditable-Span — so bleiben Schriftart, Farbe und Layout des
 // gerenderten Textes 1:1 erhalten. Speichern beim Verlassen oder Enter.
 function InlineEditable({
-  value, onChange, style, multiline, placeholder,
+  value, onChange, style, multiline, placeholder, block,
 }: {
   value: string;
   onChange: (next: string) => void;
@@ -3700,6 +3720,10 @@ function InlineEditable({
   // Wird angezeigt, wenn der Wert leer ist — damit das Feld auch sichtbar
   // bleibt und angeklickt werden kann.
   placeholder?: string;
+  // block=true: äußerer Wrapper als Block über volle Breite (statt inline-block
+  // shrink-to-fit). Nötig für Blocksatz-Absätze — sonst schrumpft der Wrapper
+  // auf eine schmale Breite und der Text bricht falsch um.
+  block?: boolean;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   // DOM-Inhalt synchronisieren, aber NICHT während der Nutzer tippt, sonst
@@ -3713,7 +3737,8 @@ function InlineEditable({
   }, [value]);
   const showPlaceholder = !value;
   return (
-    <span style={{ position: "relative", display: "inline-block", minWidth: "1ch" }}
+    <span style={{ position: "relative", display: block ? "block" : "inline-block",
+      width: block ? "100%" : undefined, minWidth: "1ch" }}
       onClick={e => e.stopPropagation()}>
       {showPlaceholder && placeholder && (
         <span aria-hidden style={{
@@ -4801,7 +4826,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
                 hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
                 {edit
-                  ? <InlineEditable
+                  ? <InlineEditable block
                       value={(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
                       onChange={v => setMeta({ howToText: v.replace(/\s*\n\s*/g, " ").trim() })}
                       multiline placeholder="Story-Text"
@@ -5049,15 +5074,24 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         <div style={{ flex: col1Flex, display: "flex", flexDirection: "column",
           minWidth: 0, minHeight: 0 }}>
           {wrap("howto",
+            // ECHTER BLOCKSATZ: feste Zeilenumbrüche aus dem geteilten howToText
+            // entfernen (sonst gilt jede Zeile als "letzte Zeile" und wird nicht
+            // gestreckt → große Lücken). Natürliche Höhe (kein flex-grow), damit
+            // die "Auflösung" direkt unter dem Text sitzt; overflow:hidden begrenzt
+            // sehr langen Text auf die Spalte (kein Überlauf ins Logo).
             <div style={{ color: cIntro, fontSize: px(wide ? 15 : 13),
-              lineHeight: 1.5, whiteSpace: "pre-line", textAlign: "justify",
-              height: "100%", overflow: "hidden",
+              lineHeight: 1.5, whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
+              overflow: "hidden",
               hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
-              {ed(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO, v => setMeta({ howToText: v }), { multiline: true, placeholder: "Story-Text" })}
+              {edit
+                ? <InlineEditable block
+                    value={(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
+                    onChange={v => setMeta({ howToText: v.replace(/\s*\n\s*/g, " ").trim() })}
+                    multiline placeholder="Story-Text"
+                    style={{ whiteSpace: "normal", textAlign: "justify", display: "block" }} />
+                : (meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
             </div>,
-            // flex:1 + overflow:hidden begrenzt den Text auf die Spaltenhöhe, damit
-            // er das Logo NICHT nach unten in die Teilnahmebedingungen schiebt.
-            { flex: "1 1 0", minHeight: 0, overflow: "hidden" })}
+            { flex: "0 1 auto", minHeight: 0, overflow: "hidden" })}
           {(solutionLines.length > 0 || edit) && wrap("solution",
             <div>
               <div style={{ color: cPrize, fontSize: px(10), fontWeight: 700, marginBottom: px(2) }}>
@@ -5075,11 +5109,12 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                     </div>
                   ))}
             </div>,
-            { marginTop: px(8), flexShrink: 0 })}
-          {/* Kostenhinweis (Telemedia) steht jetzt unter jeder Telefonnummer
-              in der Fragenspalte — hier links entfällt er. Der frühere Spacer
-              entfällt: der howto-Block (flex:1) füllt jetzt den Platz und hält
-              das Logo unten in der Spalte. */}
+            // Kleiner Abstand zum Blocksatz; "Auflösung" sitzt direkt darunter.
+            { marginTop: px(5), flexShrink: 0 })}
+          {/* Spacer schiebt das Logo an die Spaltenunterkante (über die Fußzeile). */}
+          <div style={{ flex: "1 1 0", minHeight: px(4) }} />
+          {/* Kostenhinweis (Telemedia) steht unter jeder Telefonnummer in der
+              Fragenspalte — hier links entfällt er. */}
           {!rhein && wrap("publisherLogo",
             theme.publisherLogo
               ? <img key={theme.publisherLogo} onLoad={onLogoLoad}
