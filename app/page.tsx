@@ -4783,7 +4783,13 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               <div style={{ color: cIntro, fontSize: px(16.5), lineHeight: 1.55, marginTop: px(12),
                 whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
                 hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
-                {ed(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO, v => setMeta({ howToText: v }), { multiline: true, placeholder: "Story-Text" })}
+                {edit
+                  ? <InlineEditable
+                      value={(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
+                      onChange={v => setMeta({ howToText: v.replace(/\s*\n\s*/g, " ").trim() })}
+                      multiline placeholder="Story-Text"
+                      style={{ whiteSpace: "normal", textAlign: "justify", display: "block" }} />
+                  : (meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
               </div>,
               { flex: "1 1 auto", minHeight: px(20) })}
             <div style={{ flex: "0 0 0", minHeight: px(4) }} />
@@ -4858,7 +4864,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 Bildern (1,25:1) ist ein Zuschnitt oben/unten nötig; der Bildbereich
                 ist daher so hoch wie möglich gewählt, damit der Beschnitt gering
                 bleibt, und das Motiv wird mittig gehalten. */}
-            <div style={{ display: "flex", flexDirection: "column", gap: px(8), flex: "0 0 50%", minHeight: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: px(8), flex: "0 0 47%", minHeight: 0 }}>
               {rheinImgs.length === 0 ? (
                 wrap("img_top",
                   <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3),
@@ -4882,12 +4888,12 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
 
             {/* Fragen-Überschrift */}
             {wrap("questionsHeadline",
-              <div style={{ color: cPrize, fontSize: px(17), fontWeight: 700, lineHeight: 1.15, marginTop: px(12) }}>
+              <div style={{ color: cPrize, fontSize: px(17), fontWeight: 700, lineHeight: 1.15, marginTop: px(18) }}>
                 {ed(meta.questionsHeadline ?? "", v => setMeta({ questionsHeadline: v }),
                   { placeholder: DEFAULT_QUESTIONS_HEADLINE }) }
                 {!edit && !meta.questionsHeadline && DEFAULT_QUESTIONS_HEADLINE}
               </div>,
-              { marginBottom: px(6), flexShrink: 0 })}
+              { marginBottom: px(14), flexShrink: 0 })}
 
             {/* Fragenzeilen: Preis links · Frage · Telefon rechts */}
             <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
