@@ -174,29 +174,6 @@
   ]
  },
  {
-  "id": "Ippen__Fehmarnsches-Tageblatt",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Fehmarnsches-Tageblatt",
-  "titelKanonisch": "Fehmarnsches Tageblatt",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Proxima Nova",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
-  },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_1_Burg-Verlag_GmbH_Co._KG_Fehmarnsches_Tageblatt.png",
-  "phoneNumbers": null
- },
- {
   "id": "Ippen__Frankfurter-Neue-Presse",
   "gruppe": "IPPEN",
   "verlag": "Ippen",
@@ -218,11 +195,11 @@
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_10_Frankfurter_Societaets-Medien_GmbH_Frankfurter-Neue-Presse.png",
   "phoneNumbers": [
-   "01378 405281",
-   "01378 405282",
-   "01378 405283",
-   "01378 405284",
-   "01378 405285"
+   "01378 405681",
+   "01378 405682",
+   "01378 405683",
+   "01378 405684",
+   "01378 405685"
   ]
  },
  {
@@ -574,29 +551,6 @@
   ]
  },
  {
-  "id": "Ippen__Oberbayerisches-Volksblatt",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Oberbayerisches-Volksblatt",
-  "titelKanonisch": "Oberbayerisches Volksblatt",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Proxima Nova",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
-  },
-  "format": "324x229",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_22_OVB_GmbH_Co._KG_OVB_Logo.png",
-  "phoneNumbers": null
- },
- {
   "id": "Ippen__Oberhessische-Lauterbacher",
   "gruppe": "IPPEN",
   "verlag": "Ippen",
@@ -618,11 +572,11 @@
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_LA_OZ_Kombi_Logo.png",
   "phoneNumbers": [
-   "01378 407281",
-   "01378 407282",
-   "01378 407283",
-   "01378 407284",
-   "01378 407285"
+   "01378 405781",
+   "01378 405782",
+   "01378 405783",
+   "01378 405784",
+   "01378 405785"
   ]
  },
  {
@@ -705,11 +659,11 @@
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_3_Zeitungsverlag_tz_GmbH_Co._KG_TZ.jpg",
   "phoneNumbers": [
-   "01378 403881",
-   "01378 403882",
-   "01378 403883",
-   "01378 403884",
-   "01378 403885"
+   "01378 802781",
+   "01378 802782",
+   "01378 802783",
+   "01378 802784",
+   "01378 802785"
   ]
  },
  {
@@ -734,11 +688,11 @@
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_KA_UA_Kombi.png",
   "phoneNumbers": [
-   "01378 407281",
-   "01378 407282",
-   "01378 407283",
-   "01378 407284",
-   "01378 407285"
+   "01378 405781",
+   "01378 405782",
+   "01378 405783",
+   "01378 405784",
+   "01378 405785"
   ]
  },
  {
@@ -850,11 +804,11 @@
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_Kombi_LOGO_WZ-BZ.png",
   "phoneNumbers": [
-   "01378 407281",
-   "01378 407282",
-   "01378 407283",
-   "01378 407284",
-   "01378 407285"
+   "01378 405781",
+   "01378 405782",
+   "01378 405783",
+   "01378 405784",
+   "01378 405785"
   ]
  },
  {
@@ -959,7 +913,13 @@
   "format": "315x220",
   "logoPosition": "rechts unten",
   "logoUrl": "",
-  "phoneNumbers": null
+  "phoneNumbers": [
+   "01378 803791",
+   "01378 803792",
+   "01378 803793",
+   "01378 803794",
+   "01378 803795"
+  ]
  },
  {
   "id": "SAAR__PM",
@@ -1308,29 +1268,6 @@
    "01378 408474",
    "01378 408475"
   ]
- },
- {
-  "id": "SWMH__Zeitungsgruppe Stuttgart",
-  "gruppe": "SWMH",
-  "verlag": "SWMH",
-  "titel": "Zeitungsgruppe Stuttgart",
-  "titelKanonisch": "",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
-  },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SWMH_Material_Logo_07_ZGS_CZ.png",
-  "phoneNumbers": null
  },
  {
   "id": "SWP__SWP",
