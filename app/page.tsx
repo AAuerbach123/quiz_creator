@@ -2,7 +2,7 @@
 
 import { useState, useReducer, useEffect, useRef, useLayoutEffect, useContext, Fragment, createContext } from "react";
 import { createPortal } from "react-dom";
-import { Plus, Trash2, Undo2, Redo2, Download, Upload, ChevronDown, ChevronRight, Sparkles, Loader2, X, Wand2, Settings, RotateCcw, Eye, Lightbulb, FileText, HelpCircle, Coins, Trophy, Image as ImageIcon, Layers, Palette, Building2, Receipt, Package, ExternalLink } from "lucide-react";
+import { Plus, Trash2, Undo2, Redo2, Download, Upload, ChevronDown, ChevronRight, Sparkles, Loader2, X, Wand2, Settings, RotateCcw, Eye, Lightbulb, FileText, HelpCircle, Coins, Trophy, Image as ImageIcon, Layers, Palette, Building2, Receipt, Package, ExternalLink, Inbox } from "lucide-react";
 import type { ParsedQuiz } from "./api/import-quiz-document/parsers/types";
 import VerlagsVorlage, { parseAdSize } from "./components/VerlagsVorlage";
 import type { VerlagsPreset } from "./lib/verlage";
@@ -6342,6 +6342,143 @@ function PreviewPopout({ win, title, onClose, children }: { win: Window; title: 
   return createPortal(children, container);
 }
 
+// ── Änderungswünsche aus dem Korrekturportal ───────────────────────────────
+// Holt die Live-Anmerkungen (serverseitig über /api/portal-comments, kein CORS)
+// und zeigt sie als Button mit Badge + Panel. „NEU" = seit letztem Ansehen.
+type PortalComment = { paper?: string; variant?: string; winner?: string; kategorie?: string; status?: string; text?: string; autor?: string; ts?: number };
+function PortalChanges() {
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState<PortalComment[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const [showOk, setShowOk] = useState(false);
+  const [lastSeen, setLastSeen] = useState<number>(0);
+  const [seenAtOpen, setSeenAtOpen] = useState<number>(0);
+
+  useEffect(() => {
+    try { setLastSeen(Number(localStorage.getItem("portalChangesLastSeen") || 0)); } catch {}
+  }, []);
+
+  async function load() {
+    setLoading(true); setErr("");
+    try {
+      const r = await fetch("/api/portal-comments", { cache: "no-store" });
+      const j = await r.json();
+      const cs: PortalComment[] = (j.comments || []).slice().sort((a: PortalComment, b: PortalComment) => (b.ts || 0) - (a.ts || 0));
+      setItems(cs);
+      if (j.error) setErr("Portal nicht erreichbar");
+    } catch { setErr("Portal nicht erreichbar"); }
+    finally { setLoading(false); }
+  }
+
+  useEffect(() => { load(); const t = setInterval(load, 60000); return () => clearInterval(t); }, []);
+
+  const changes = items.filter(c => (c.status || "") === "change");
+  const newCount = changes.filter(c => (c.ts || 0) > lastSeen).length;
+  const shown = (showOk ? items : changes);
+
+  function openPanel() {
+    setSeenAtOpen(lastSeen);
+    setOpen(true);
+    load();
+    const maxTs = items.reduce((m, c) => Math.max(m, c.ts || 0), 0);
+    if (maxTs) { try { localStorage.setItem("portalChangesLastSeen", String(maxTs)); } catch {}; setLastSeen(maxTs); }
+  }
+  function fmt(ts?: number) {
+    if (!ts) return "";
+    try { return new Date(ts).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }); } catch { return ""; }
+  }
+  const katColor: Record<string, string> = { Text: "#0ea5e9", Logo: "#8b5cf6", Farbe: "#f59e0b", Bild: "#10b981", Layout: "#ef4444", Sonstiges: "#6b7280" };
+
+  return (
+    <>
+      <button onClick={openPanel} title="Änderungswünsche aus dem Korrekturportal anzeigen"
+        className="relative h-8 px-3 text-[13px] rounded-lg flex items-center gap-1.5 transition-colors font-medium text-white"
+        style={{ background: "#d97706" }}
+        onMouseEnter={e => (e.currentTarget.style.background = "#b45309")}
+        onMouseLeave={e => (e.currentTarget.style.background = "#d97706")}>
+        <Inbox className="w-3.5 h-3.5" /> Änderungswünsche
+        {newCount > 0 && (
+          <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[11px] font-bold flex items-center justify-center">
+            {newCount}
+          </span>
+        )}
+      </button>
+
+      {open && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center" style={{ background: "rgba(0,0,0,0.35)" }}
+          onClick={() => setOpen(false)}>
+          <div className="mt-16 w-[640px] max-w-[94vw] max-h-[80vh] flex flex-col rounded-2xl bg-white shadow-2xl overflow-hidden"
+            onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-2 px-5 py-3 border-b border-stone-200">
+              <Inbox className="w-4 h-4 text-amber-600" />
+              <span className="text-[15px] font-semibold text-stone-900">Änderungswünsche</span>
+              <span className="text-[12px] text-stone-400">
+                {changes.length} offen{showOk ? ` · ${items.length} gesamt` : ""}
+              </span>
+              <div className="flex-1" />
+              <button onClick={load} title="Aktualisieren" className="h-7 px-2 rounded-md hover:bg-stone-100 text-stone-500">
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+              </button>
+              <a href="https://quiz-review.pages.dev/alle/" target="_blank" rel="noreferrer"
+                title="Portal-Gesamtübersicht öffnen" className="h-7 px-2 rounded-md hover:bg-stone-100 text-stone-500 flex items-center">
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <button onClick={() => setOpen(false)} className="h-7 px-2 rounded-md hover:bg-stone-100 text-stone-500"><X className="w-4 h-4" /></button>
+            </div>
+
+            <div className="flex items-center gap-3 px-5 py-2 border-b border-stone-100 text-[12px] text-stone-500">
+              <label className="flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" checked={showOk} onChange={e => setShowOk(e.target.checked)} />
+                auch Freigaben („ok") zeigen
+              </label>
+            </div>
+
+            <div className="overflow-y-auto px-3 py-2">
+              {err && <div className="px-3 py-4 text-[13px] text-rose-600">{err}</div>}
+              {!err && shown.length === 0 && (
+                <div className="px-3 py-8 text-center text-[13px] text-stone-400">
+                  {loading ? "Lade …" : "Keine offenen Änderungswünsche."}
+                </div>
+              )}
+              {shown.map((c, i) => {
+                const isNew = (c.ts || 0) > seenAtOpen;
+                const isChange = (c.status || "") === "change";
+                return (
+                  <div key={i} className={`px-3 py-2.5 my-1 rounded-lg ${isNew ? "bg-amber-50" : "bg-stone-50"}`}>
+                    <div className="flex items-center gap-2 flex-wrap text-[12px]">
+                      {isNew && <span className="text-[10px] font-bold text-white bg-rose-600 px-1.5 py-0.5 rounded">NEU</span>}
+                      <span className="font-semibold text-stone-800">{c.autor || "—"}</span>
+                      <span className="text-stone-400">·</span>
+                      <span className="text-stone-700">{c.paper || "—"}</span>
+                      <span className="text-stone-400">·</span>
+                      <span className="text-stone-500">V{c.variant || "1"} {c.winner === "mit" ? "mit Gewinner" : c.winner === "ohne" ? "ohne Gewinner" : ""}</span>
+                      <div className="flex-1" />
+                      <span className="text-stone-400">{fmt(c.ts)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      {c.kategorie && (
+                        <span className="text-[10px] font-medium text-white px-1.5 py-0.5 rounded" style={{ background: katColor[c.kategorie] || "#6b7280" }}>
+                          {c.kategorie}
+                        </span>
+                      )}
+                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${isChange ? "bg-rose-100 text-rose-700" : "bg-emerald-100 text-emerald-700"}`}>
+                        {isChange ? "Änderungswunsch" : "Freigabe"}
+                      </span>
+                    </div>
+                    {c.text && <div className="mt-1.5 text-[13px] text-stone-800 whitespace-pre-wrap">{c.text}</div>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
+  );
+}
+
 export default function Page() {
   const [history, dispatch] = useReducer(historyReducer, { past: [], present: defaultQuiz, future: [] });
   const quiz = history.present;
@@ -7536,6 +7673,7 @@ export default function Page() {
             accept=".docx,.xlsx,.xlsm,.xls,.csv,.tsv,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,text/tab-separated-values"
             className="hidden" onChange={handleQuestionnaireImport} disabled={importingDocx} />
         </label>
+        <PortalChanges />
         {collection && (
           <button onClick={handlePublish} disabled={!!publishing || !!bulkProgress}
             className="h-8 px-3.5 text-[13px] rounded-lg text-white disabled:opacity-40 flex items-center gap-1.5 transition-colors font-medium"
