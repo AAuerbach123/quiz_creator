@@ -2498,7 +2498,7 @@ function PublishingProgressPanel({ progress }: { progress: { current: number; to
   );
 }
 
-function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages, activeSection, embedded, previewPreset, setPreviewPreset, downloadingPresetId, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, presetBulk, onPushPresetsMonday, mondayBulk, imageStyleMode, setImageStyleMode, onUpdateQuizImage, onRegenerateAllImages, onSetWinners, winnersShown }: {
+function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages, activeSection, embedded, previewPreset, setPreviewPreset, downloadingPresetId, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onDownloadGroupAllZips, presetBulk, onPushPresetsMonday, mondayBulk, imageStyleMode, setImageStyleMode, onUpdateQuizImage, onRegenerateAllImages, onSetWinners, winnersShown }: {
   quiz: Quiz; dispatch: React.Dispatch<Action>; canUndo: boolean; canRedo: boolean;
   onExport: () => void; onExportPdf: () => void; exportingPdf: boolean;
   onImport: React.ChangeEventHandler<HTMLInputElement>; onReset: () => void;
@@ -2525,6 +2525,7 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
   onDownloadPresetTiff?: (p: VerlagsPreset) => void;
   onDownloadPresetsBulk?: (presets: VerlagsPreset[]) => Promise<void> | void;
   onDownloadPresetsTiffBulk?: (presets: VerlagsPreset[]) => Promise<void> | void;
+  onDownloadGroupAllZips?: (presets: VerlagsPreset[]) => Promise<void> | void;
   presetBulk?: { current: number; total: number; name: string } | null;
   onPushPresetsMonday?: (presets: VerlagsPreset[]) => Promise<void> | void;
   mondayBulk?: { current: number; total: number; name: string; failed: number } | null;
@@ -2980,6 +2981,7 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
           onDownloadPresetTiff={(p) => onDownloadPresetTiff?.(p)}
           onDownloadPresetsBulk={(list) => onDownloadPresetsBulk?.(list) || undefined}
           onDownloadPresetsTiffBulk={(list) => onDownloadPresetsTiffBulk?.(list) || undefined}
+          onDownloadGroupAllZips={(list) => onDownloadGroupAllZips?.(list) || undefined}
           onPushPresetsMonday={(list) => onPushPresetsMonday?.(list) || undefined}
           applyPreset={(preset: VerlagsPreset) => {
             dispatch({ type: "APPLY_STYLE_COMMAND", payload: {
@@ -7030,8 +7032,13 @@ export default function Page() {
     }
   };
 
-  const handleDownloadPresetsBulk = async (presets: VerlagsPreset[]) => {
+  const handleDownloadPresetsBulk = async (presets: VerlagsPreset[], opts?: { winnerOverride?: boolean; namePart?: string }) => {
     if (!pdfTargetRef.current || !presets.length) return;
+    // Für Gruppen-Export „Alle 4 ZIPs": Gewinner-Spalte je Durchgang erzwingen
+    // (5 = mit, 0 = ohne), ohne den echten Quiz-Zustand zu ändern.
+    const baseQuiz = opts?.winnerOverride === undefined
+      ? quiz
+      : { ...quiz, meta: { ...quiz.meta, winnerCount: opts.winnerOverride ? 5 : 0 } };
     try {
       const [{ default: JSZip }, { domToJpeg }, { default: jsPDF }] = await Promise.all([
         import("jszip"),
@@ -7057,8 +7064,8 @@ export default function Page() {
       const tsShort = `${(d.getFullYear()%100).toString().padStart(2,"0")}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`;
       for (let i = 0; i < presets.length; i++) {
         const preset = presets[i];
-        setPresetBulk({ current: i + 1, total: presets.length, name: `${preset.verlag} · ${preset.titel}` });
-        const overridden = applyPresetToQuiz(quiz, preset, { preferPresetLogo: true });
+        setPresetBulk({ current: i + 1, total: presets.length, name: `${preset.verlag} · ${preset.titel}${opts?.namePart ? ` (${opts.namePart})` : ""}` });
+        const overridden = applyPresetToQuiz(baseQuiz, preset, { preferPresetLogo: true });
         setPublishingQuiz(overridden);
         // Auf Re-Render + Font/Logo-Load warten.
         await new Promise(r => setTimeout(r, 120));
@@ -7090,8 +7097,8 @@ export default function Page() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      // ZIP-Name kompakt: max 30 Zeichen Quiz-Titel + Anzahl + 6-stelliges Datum.
-      a.download = `${clip(safe(titleForFile), 30)}_${presets.length}_${tsShort}.zip`;
+      // ZIP-Name kompakt: max 30 Zeichen Quiz-Titel + (mit/ohne Gewinner) + Anzahl + 6-stelliges Datum.
+      a.download = `${clip(safe(titleForFile), 30)}${opts?.namePart ? `_${opts.namePart}` : ""}_${presets.length}_${tsShort}.zip`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
@@ -7106,8 +7113,11 @@ export default function Page() {
   // Wie handleDownloadPresetsBulk, aber verlustfreie TIFFs in einem ZIP.
   // Scale 2 + Deflate, weil 48 unkomprimierte TIFFs sonst zu viel Speicher
   // belegen. Für einzelne Höchstauflösung gibt es den TIFF-Knopf pro Zeile (Scale 3).
-  const handleDownloadPresetsTiffBulk = async (presets: VerlagsPreset[]) => {
+  const handleDownloadPresetsTiffBulk = async (presets: VerlagsPreset[], opts?: { winnerOverride?: boolean; namePart?: string }) => {
     if (!pdfTargetRef.current || !presets.length) return;
+    const baseQuiz = opts?.winnerOverride === undefined
+      ? quiz
+      : { ...quiz, meta: { ...quiz.meta, winnerCount: opts.winnerOverride ? 5 : 0 } };
     try {
       const [{ default: JSZip }, { domToPng }] = await Promise.all([
         import("jszip"),
@@ -7125,8 +7135,8 @@ export default function Page() {
       const tsShort = `${(d.getFullYear()%100).toString().padStart(2,"0")}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`;
       for (let i = 0; i < presets.length; i++) {
         const preset = presets[i];
-        setPresetBulk({ current: i + 1, total: presets.length, name: `${preset.verlag} · ${preset.titel}` });
-        const overridden = applyPresetToQuiz(quiz, preset, { preferPresetLogo: true });
+        setPresetBulk({ current: i + 1, total: presets.length, name: `${preset.verlag} · ${preset.titel}${opts?.namePart ? ` (${opts.namePart})` : ""}` });
+        const overridden = applyPresetToQuiz(baseQuiz, preset, { preferPresetLogo: true });
         setPublishingQuiz(overridden);
         await new Promise(r => setTimeout(r, 120));
         ensureRenderable(pdfTargetRef.current);
@@ -7148,7 +7158,7 @@ export default function Page() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${clip(safe(titleForFile), 30)}_${presets.length}_TIFF_${tsShort}.zip`;
+      a.download = `${clip(safe(titleForFile), 30)}${opts?.namePart ? `_${opts.namePart}` : ""}_${presets.length}_TIFF_${tsShort}.zip`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
@@ -7158,6 +7168,17 @@ export default function Page() {
       setPublishingQuiz(null);
       setPresetBulk(null);
     }
+  };
+
+  // Gruppen-Export „Alle 4 ZIPs": PDF + TIFF, jeweils mit UND ohne Gewinner —
+  // vier ZIP-Downloads nacheinander für alle Zeitungen der Gruppe. Ändert den
+  // echten Quiz-Zustand NICHT (Gewinner wird pro Durchgang nur intern erzwungen).
+  const handleDownloadGroupAllZips = async (presets: VerlagsPreset[]) => {
+    if (!presets.length) return;
+    await handleDownloadPresetsBulk(presets, { winnerOverride: true, namePart: "mit-Gewinner" });
+    await handleDownloadPresetsBulk(presets, { winnerOverride: false, namePart: "ohne-Gewinner" });
+    await handleDownloadPresetsTiffBulk(presets, { winnerOverride: true, namePart: "mit-Gewinner" });
+    await handleDownloadPresetsTiffBulk(presets, { winnerOverride: false, namePart: "ohne-Gewinner" });
   };
 
   const handleDownloadPreset = async (preset: VerlagsPreset) => {
@@ -7485,6 +7506,7 @@ export default function Page() {
               onDownloadPresetTiff={handleDownloadPresetTiff}
               onDownloadPresetsBulk={handleDownloadPresetsBulk}
               onDownloadPresetsTiffBulk={handleDownloadPresetsTiffBulk}
+              onDownloadGroupAllZips={handleDownloadGroupAllZips}
               presetBulk={presetBulk}
               onPushPresetsMonday={handlePushPresetsToMonday}
               mondayBulk={mondayBulk}

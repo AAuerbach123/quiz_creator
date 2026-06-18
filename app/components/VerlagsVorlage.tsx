@@ -21,6 +21,8 @@ type Props = {
   onDownloadPresetsBulk: (presets: VerlagsPreset[]) => Promise<void> | void;
   // Mehrere Vorlagen: erzeugt je ein verlustfreies TIFF und packt alles in ein ZIP.
   onDownloadPresetsTiffBulk?: (presets: VerlagsPreset[]) => Promise<void> | void;
+  // Gruppen-Export: PDF + TIFF, jeweils mit UND ohne Gewinner (4 ZIPs).
+  onDownloadGroupAllZips?: (presets: VerlagsPreset[]) => Promise<void> | void;
   // Mehrere Vorlagen: erzeugt je ein PDF und pusht es an monday.com.
   onPushPresetsMonday: (presets: VerlagsPreset[]) => Promise<void> | void;
   downloadingPresetId: string | null;
@@ -40,7 +42,12 @@ export function parseAdSize(s: string): { w: number; h: number } | null {
   return { w: parseFloat(m[1]), h: parseFloat(m[2]) };
 }
 
-export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
+// Verlagsgruppen, die ihre Anzeige SELBST gestalten und von uns nur Bilder/
+// Vorlagen bekommen (laut Mails von Yasmina/Robert). Für diese gibt es keinen
+// Layout-Export (PDF/TIFF) — sie werden im Kopf entsprechend markiert.
+const SELF_DESIGN_GROUPS = new Set(["SWP", "SWMH", "Neue-Westfaeische", "Neue Westfälische", "Rhein", "Rhein-Zeitung", "Mittelrhein"]);
+
+export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onDownloadGroupAllZips, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
   const [presets, setPresets] = useState<VerlagsPreset[]>([]);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
@@ -266,6 +273,34 @@ export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloa
                     entfernen
                   </button>
                 </>
+              )}
+              {/* Gruppen-Export rechts. Self-Design-Gruppen liefern selbst → kein Layout-Export. */}
+              {SELF_DESIGN_GROUPS.has(verlagName) ? (
+                <span className="ml-auto normal-case tracking-normal font-medium text-[10px] text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded"
+                  title="Diese Gruppe gestaltet ihre Anzeige selbst und bekommt von uns nur Bilder/Vorlagen. Kein Layout-Export.">
+                  liefert selbst – nur Bilder
+                </span>
+              ) : (
+                <span className="ml-auto flex items-center gap-1">
+                  <button type="button" disabled={bulkBusy}
+                    onClick={() => onDownloadGroupAllZips?.(allPresets.filter(p => (p.verlag || p.gruppe || "Sonstige") === verlagName))}
+                    title="PDF + TIFF, jeweils mit UND ohne Gewinner – 4 ZIPs für alle Zeitungen dieser Gruppe."
+                    className="normal-case tracking-normal font-semibold text-[10.5px] text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-40 px-2 py-1 rounded">
+                    Alle 4 ZIPs
+                  </button>
+                  <button type="button" disabled={bulkBusy}
+                    onClick={() => onDownloadPresetsBulk?.(allPresets.filter(p => (p.verlag || p.gruppe || "Sonstige") === verlagName))}
+                    title={`PDF-ZIP der ganzen Gruppe – aktueller Schalter: ${winnersShown ? "mit Gewinner" : "ohne Gewinner"}.`}
+                    className="normal-case tracking-normal text-[10.5px] text-sky-700 hover:bg-sky-50 disabled:opacity-40 px-1.5 py-1 rounded border border-sky-200">
+                    PDF-ZIP
+                  </button>
+                  <button type="button" disabled={bulkBusy}
+                    onClick={() => onDownloadPresetsTiffBulk?.(allPresets.filter(p => (p.verlag || p.gruppe || "Sonstige") === verlagName))}
+                    title={`TIFF-ZIP der ganzen Gruppe – aktueller Schalter: ${winnersShown ? "mit Gewinner" : "ohne Gewinner"}.`}
+                    className="normal-case tracking-normal text-[10.5px] text-emerald-700 hover:bg-emerald-50 disabled:opacity-40 px-1.5 py-1 rounded border border-emerald-200">
+                    TIFF-ZIP
+                  </button>
+                </span>
               )}
             </div>
             <div>
