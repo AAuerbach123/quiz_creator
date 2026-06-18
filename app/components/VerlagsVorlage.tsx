@@ -21,8 +21,9 @@ type Props = {
   onDownloadPresetsBulk: (presets: VerlagsPreset[]) => Promise<void> | void;
   // Mehrere Vorlagen: erzeugt je ein verlustfreies TIFF und packt alles in ein ZIP.
   onDownloadPresetsTiffBulk?: (presets: VerlagsPreset[]) => Promise<void> | void;
-  // Gruppen-Export: PDF + TIFF, jeweils mit UND ohne Gewinner (4 ZIPs).
-  onDownloadGroupAllZips?: (presets: VerlagsPreset[]) => Promise<void> | void;
+  // Strukturierter Export: EIN ZIP (PDF oder TIFF) mit Ordner pro Gruppe; darin
+  // pro Zeitung Variante 1/2 × mit/ohne Gewinner. Eine oder mehrere Gruppen.
+  onDownloadStructuredZip?: (groups: { name: string; presets: VerlagsPreset[] }[], zipBaseName: string, format: "pdf" | "tiff") => Promise<void> | void;
   // Mehrere Vorlagen: erzeugt je ein PDF und pusht es an monday.com.
   onPushPresetsMonday: (presets: VerlagsPreset[]) => Promise<void> | void;
   downloadingPresetId: string | null;
@@ -47,7 +48,7 @@ export function parseAdSize(s: string): { w: number; h: number } | null {
 // Layout-Export (PDF/TIFF) — sie werden im Kopf entsprechend markiert.
 const SELF_DESIGN_GROUPS = new Set(["SWP", "SWMH", "Neue-Westfaeische", "Neue Westfälische", "Rhein", "Rhein-Zeitung", "Mittelrhein"]);
 
-export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onDownloadGroupAllZips, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
+export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onDownloadStructuredZip, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
   const [presets, setPresets] = useState<VerlagsPreset[]>([]);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
@@ -117,6 +118,18 @@ export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloa
     return [...m.entries()].sort(([a], [b]) => a.localeCompare(b));
   }, [filtered]);
 
+  // Alle Gruppen, die unser Layout nehmen (Self-Design-Gruppen ausgenommen) —
+  // für den globalen „Alle Layout-Gruppen"-Export. Unabhängig von der Suche.
+  const layoutGroups = useMemo(() => {
+    const m = new Map<string, VerlagsPreset[]>();
+    for (const p of allPresets) {
+      const key = p.verlag || p.gruppe || "Sonstige";
+      if (SELF_DESIGN_GROUPS.has(key)) continue;
+      (m.get(key) || m.set(key, []).get(key)!).push(p);
+    }
+    return [...m.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([name, presets]) => ({ name, presets }));
+  }, [allPresets]);
+
   const handleUpload: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
     const file = e.target.files?.[0];
     if (fileRef.current) fileRef.current.value = "";
@@ -172,6 +185,28 @@ export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloa
         placeholder="Zeitung oder Verlag suchen …"
         className="w-full px-3 py-2 text-[13.5px] rounded-lg bg-white text-stone-900 focus:outline-none"
         style={{ boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.12)" }} />
+
+      {/* Globaler Export: ALLE Layout-Gruppen in ein ZIP (Ordner pro Gruppe;
+          je Zeitung Variante 1 & 2, mit/ohne Gewinner). Self-Design-Gruppen außen vor. */}
+      {onDownloadStructuredZip && (
+        <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-sky-50"
+          style={{ boxShadow: "inset 0 0 0 1px rgba(14,165,233,0.22)" }}>
+          <span className="text-[12px] font-medium text-stone-700 leading-tight">
+            Alle Layout-Gruppen<br /><span className="text-[10.5px] font-normal text-stone-500">je Ordner = Gruppe · Datei = Zeitung × Variante 1/2 × mit/ohne</span>
+          </span>
+          <div className="flex-1" />
+          <button type="button" disabled={bulkBusy}
+            onClick={() => onDownloadStructuredZip(layoutGroups, "Alle-Gruppen", "pdf")}
+            className="h-8 px-3 text-[12.5px] rounded-lg text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-40 font-medium">
+            PDF-ZIP
+          </button>
+          <button type="button" disabled={bulkBusy}
+            onClick={() => onDownloadStructuredZip(layoutGroups, "Alle-Gruppen", "tiff")}
+            className="h-8 px-3 text-[12.5px] rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 font-medium">
+            TIFF-ZIP
+          </button>
+        </div>
+      )}
 
       {/* Auswahl-Aktionsleiste */}
       <div className="flex items-center gap-2 px-1">
@@ -282,24 +317,24 @@ export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloa
                 </span>
               ) : (
                 <span className="ml-auto flex items-center gap-1">
-                  <button type="button" disabled={bulkBusy}
-                    onClick={() => onDownloadGroupAllZips?.(allPresets.filter(p => (p.verlag || p.gruppe || "Sonstige") === verlagName))}
-                    title="PDF + TIFF, jeweils mit UND ohne Gewinner – 4 ZIPs für alle Zeitungen dieser Gruppe."
-                    className="normal-case tracking-normal font-semibold text-[10.5px] text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-40 px-2 py-1 rounded">
-                    Alle 4 ZIPs
-                  </button>
-                  <button type="button" disabled={bulkBusy}
-                    onClick={() => onDownloadPresetsBulk?.(allPresets.filter(p => (p.verlag || p.gruppe || "Sonstige") === verlagName))}
-                    title={`PDF-ZIP der ganzen Gruppe – aktueller Schalter: ${winnersShown ? "mit Gewinner" : "ohne Gewinner"}.`}
-                    className="normal-case tracking-normal text-[10.5px] text-sky-700 hover:bg-sky-50 disabled:opacity-40 px-1.5 py-1 rounded border border-sky-200">
-                    PDF-ZIP
-                  </button>
-                  <button type="button" disabled={bulkBusy}
-                    onClick={() => onDownloadPresetsTiffBulk?.(allPresets.filter(p => (p.verlag || p.gruppe || "Sonstige") === verlagName))}
-                    title={`TIFF-ZIP der ganzen Gruppe – aktueller Schalter: ${winnersShown ? "mit Gewinner" : "ohne Gewinner"}.`}
-                    className="normal-case tracking-normal text-[10.5px] text-emerald-700 hover:bg-emerald-50 disabled:opacity-40 px-1.5 py-1 rounded border border-emerald-200">
-                    TIFF-ZIP
-                  </button>
+                  {(() => {
+                    const groupPresets = allPresets.filter(p => (p.verlag || p.gruppe || "Sonstige") === verlagName);
+                    const grp = [{ name: verlagName, presets: groupPresets }];
+                    return (<>
+                      <button type="button" disabled={bulkBusy}
+                        onClick={() => onDownloadStructuredZip?.(grp, verlagName, "pdf")}
+                        title={`PDF-ZIP: Ordner „${verlagName}" mit je Zeitung Variante 1 & 2, mit und ohne Gewinner.`}
+                        className="normal-case tracking-normal font-semibold text-[10.5px] text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-40 px-2 py-1 rounded">
+                        PDF-ZIP
+                      </button>
+                      <button type="button" disabled={bulkBusy}
+                        onClick={() => onDownloadStructuredZip?.(grp, verlagName, "tiff")}
+                        title={`TIFF-ZIP: Ordner „${verlagName}" mit je Zeitung Variante 1 & 2, mit und ohne Gewinner.`}
+                        className="normal-case tracking-normal font-semibold text-[10.5px] text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 px-2 py-1 rounded">
+                        TIFF-ZIP
+                      </button>
+                    </>);
+                  })()}
                 </span>
               )}
             </div>

@@ -2498,7 +2498,7 @@ function PublishingProgressPanel({ progress }: { progress: { current: number; to
   );
 }
 
-function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages, activeSection, embedded, previewPreset, setPreviewPreset, downloadingPresetId, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onDownloadGroupAllZips, presetBulk, onPushPresetsMonday, mondayBulk, imageStyleMode, setImageStyleMode, onUpdateQuizImage, onRegenerateAllImages, onSetWinners, winnersShown }: {
+function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, exportingPdf, onImport, onReset, styleProps, difficulty, setDifficulty, collection, bulkProgress, onSwitchQuiz, onBulkImport, onClearCollection, onRepairCollection, onPublish, publishing, onGenerateMissingImages, activeSection, embedded, previewPreset, setPreviewPreset, downloadingPresetId, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onDownloadStructuredZip, presetBulk, onPushPresetsMonday, mondayBulk, imageStyleMode, setImageStyleMode, onUpdateQuizImage, onRegenerateAllImages, onSetWinners, winnersShown }: {
   quiz: Quiz; dispatch: React.Dispatch<Action>; canUndo: boolean; canRedo: boolean;
   onExport: () => void; onExportPdf: () => void; exportingPdf: boolean;
   onImport: React.ChangeEventHandler<HTMLInputElement>; onReset: () => void;
@@ -2525,7 +2525,7 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
   onDownloadPresetTiff?: (p: VerlagsPreset) => void;
   onDownloadPresetsBulk?: (presets: VerlagsPreset[]) => Promise<void> | void;
   onDownloadPresetsTiffBulk?: (presets: VerlagsPreset[]) => Promise<void> | void;
-  onDownloadGroupAllZips?: (presets: VerlagsPreset[]) => Promise<void> | void;
+  onDownloadStructuredZip?: (groups: { name: string; presets: VerlagsPreset[] }[], zipBaseName: string, format: "pdf" | "tiff") => Promise<void> | void;
   presetBulk?: { current: number; total: number; name: string } | null;
   onPushPresetsMonday?: (presets: VerlagsPreset[]) => Promise<void> | void;
   mondayBulk?: { current: number; total: number; name: string; failed: number } | null;
@@ -2864,33 +2864,15 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
       <Section title="Format & Layout" tabKey="layout">
         {!isGeldregen && (
         <Field label="Layout-Variante">
+          {/* Nur zwei Varianten: 1 = Augsburger-Layout (redaktionell), 2 = Rhein-
+              Layout. Mit/ohne Gewinner ist ein SEPARATER Schalter (links unter
+              „Gewinner"), kein Teil der Variante. */}
           <Select
-            // "3-spaltig" und "4-spaltig" sind beide das Augsburger-Layout
-            // (redaktionell); der Unterschied ist nur die Gewinner-Spalte.
-            // Daher steuert die Auswahl Variante UND Gewinneranzahl zusammen.
-            value={
-              quiz.layout.variant === "redaktionell"
-                ? ((quiz.meta.winnerCount ?? 0) > 0 ? "vier" : "drei")
-                : (quiz.layout.variant || "beilage")
-            }
-            onChange={e => {
-              const v = e.target.value;
-              if (v === "vier") {
-                dispatch({ type: "UPDATE_LAYOUT", payload: { variant: "redaktionell" } });
-                if ((quiz.meta.winnerCount ?? 0) === 0) dispatch({ type: "UPDATE_META", payload: { winnerCount: 5 } });
-              } else if (v === "drei") {
-                dispatch({ type: "UPDATE_LAYOUT", payload: { variant: "redaktionell" } });
-                dispatch({ type: "UPDATE_META", payload: { winnerCount: 0 } });
-              } else {
-                dispatch({ type: "UPDATE_LAYOUT", payload: { variant: v } });
-              }
-            }}
+            value={quiz.layout.variant === "rhein" ? "rhein" : "redaktionell"}
+            onChange={e => dispatch({ type: "UPDATE_LAYOUT", payload: { variant: e.target.value } })}
             options={[
-              { value: "vier", label: "4-spaltig (Augsburger, mit Gewinnern)" },
-              { value: "drei", label: "3-spaltig (Augsburger, ohne Gewinner)" },
-              { value: "rhein", label: "Rhein-Zeitung" },
-              { value: "beilage", label: "Beilage (Standard)" },
-              { value: "querformat", label: "Querformat (2 Spalten)" },
+              { value: "redaktionell", label: "Variante 1" },
+              { value: "rhein", label: "Variante 2" },
             ]} />
         </Field>
         )}
@@ -2981,7 +2963,7 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
           onDownloadPresetTiff={(p) => onDownloadPresetTiff?.(p)}
           onDownloadPresetsBulk={(list) => onDownloadPresetsBulk?.(list) || undefined}
           onDownloadPresetsTiffBulk={(list) => onDownloadPresetsTiffBulk?.(list) || undefined}
-          onDownloadGroupAllZips={(list) => onDownloadGroupAllZips?.(list) || undefined}
+          onDownloadStructuredZip={(groups, zipBaseName, format) => onDownloadStructuredZip?.(groups, zipBaseName, format) || undefined}
           onPushPresetsMonday={(list) => onPushPresetsMonday?.(list) || undefined}
           applyPreset={(preset: VerlagsPreset) => {
             dispatch({ type: "APPLY_STYLE_COMMAND", payload: {
@@ -7170,15 +7152,92 @@ export default function Page() {
     }
   };
 
-  // Gruppen-Export „Alle 4 ZIPs": PDF + TIFF, jeweils mit UND ohne Gewinner —
-  // vier ZIP-Downloads nacheinander für alle Zeitungen der Gruppe. Ändert den
-  // echten Quiz-Zustand NICHT (Gewinner wird pro Durchgang nur intern erzwungen).
-  const handleDownloadGroupAllZips = async (presets: VerlagsPreset[]) => {
-    if (!presets.length) return;
-    await handleDownloadPresetsBulk(presets, { winnerOverride: true, namePart: "mit-Gewinner" });
-    await handleDownloadPresetsBulk(presets, { winnerOverride: false, namePart: "ohne-Gewinner" });
-    await handleDownloadPresetsTiffBulk(presets, { winnerOverride: true, namePart: "mit-Gewinner" });
-    await handleDownloadPresetsTiffBulk(presets, { winnerOverride: false, namePart: "ohne-Gewinner" });
+  // Strukturierter Gruppen-Export: EIN ZIP (PDF oder TIFF) mit einem ORDNER pro
+  // Verlagsgruppe; darin pro Zeitung vier Dateien — Variante 1/2 × mit/ohne
+  // Gewinner. Windows-tauglich (ASCII-Dateinamen, kurze Pfade). Ändert den
+  // echten Quiz-Zustand NICHT (Variante + Gewinner werden pro Render nur intern
+  // erzwungen). `groups` erlaubt eine einzelne Gruppe ODER alle auf einmal.
+  const handleDownloadStructuredZip = async (
+    groups: { name: string; presets: VerlagsPreset[] }[],
+    zipBaseName: string,
+    format: "pdf" | "tiff",
+  ) => {
+    if (!pdfTargetRef.current || !groups.length) return;
+    try {
+      const [{ default: JSZip }, { domToJpeg, domToPng }, { default: jsPDF }] = await Promise.all([
+        import("jszip"),
+        import("modern-screenshot"),
+        import("jspdf"),
+      ]);
+      const safe = (s: string) => s.replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue")
+        .replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss")
+        .replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+      const clip = (s: string, max: number) => s.length <= max ? s : s.slice(0, max).replace(/_+$/, "");
+      const zip = new JSZip();
+      const ext = format === "pdf" ? "pdf" : "tif";
+      const variants: [string, "redaktionell" | "rhein"][] = [["1", "redaktionell"], ["2", "rhein"]];
+      const winners: [string, boolean][] = [["mit-Gewinner", true], ["ohne-Gewinner", false]];
+      const usedNames = new Set<string>();
+      const d = new Date();
+      const pad2 = (n: number) => n.toString().padStart(2, "0");
+      const tsShort = `${(d.getFullYear()%100).toString().padStart(2,"0")}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`;
+      const total = groups.reduce((a, g) => a + g.presets.length, 0) * variants.length * winners.length;
+      let step = 0;
+      for (const g of groups) {
+        const folder = clip(safe(g.name), 24);
+        for (const preset of g.presets) {
+          const titelTeil = preset.titelKanonisch && preset.titelKanonisch.trim() && preset.titelKanonisch !== "n/a"
+            ? preset.titelKanonisch
+            : (preset.titel && preset.titel !== "n/a" ? preset.titel : preset.verlag);
+          const zShort = clip(safe(titelTeil), 28);
+          for (const [vNum, vVariant] of variants) {
+            for (const [wLabel, wOn] of winners) {
+              step++;
+              setPresetBulk({ current: step, total, name: `${g.name} · ${titelTeil} – V${vNum} ${wLabel}` });
+              const baseQuiz = { ...quiz, layout: { ...quiz.layout, variant: vVariant }, meta: { ...quiz.meta, winnerCount: wOn ? 5 : 0 } };
+              const overridden = applyPresetToQuiz(baseQuiz, preset, { preferPresetLogo: true });
+              setPublishingQuiz(overridden);
+              await new Promise(r => setTimeout(r, 120));
+              ensureRenderable(pdfTargetRef.current);
+              await waitForRenderReady(pdfTargetRef.current);
+              const base = `${folder}/${zShort}_Variante-${vNum}_${wLabel}`;
+              let candidate = `${base}.${ext}`;
+              let n = 2;
+              while (usedNames.has(candidate)) { candidate = `${base}_${n}.${ext}`; n++; }
+              usedNames.add(candidate);
+              if (format === "pdf") {
+                const fmt = getQuizSize(overridden.layout);
+                const imgData = await domToJpeg(pdfTargetRef.current, { scale: 4, quality: 0.9 });
+                const orientation: "portrait" | "landscape" = overridden.layout.orientation === "portrait" ? "portrait" : "landscape";
+                const pdf = new jsPDF({ orientation, unit: "mm", format: [fmt.w, fmt.h] });
+                pdf.addImage(imgData, "JPEG", 0, 0, fmt.w, fmt.h);
+                zip.file(candidate, pdf.output("blob"));
+              } else {
+                const png = await domToPng(pdfTargetRef.current, { scale: 2 });
+                const tiff = await encodeImageToTiff(png);
+                zip.file(candidate, tiff);
+              }
+            }
+          }
+        }
+      }
+      setPresetBulk({ current: total, total, name: "ZIP packen …" });
+      const blob = await zip.generateAsync(format === "tiff"
+        ? { type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } }
+        : { type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${clip(safe(zipBaseName), 24)}_${format === "pdf" ? "PDF" : "TIFF"}_${tsShort}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Strukturierter Gruppen-Export fehlgeschlagen:", e);
+      alert(`Gruppen-Export fehlgeschlagen: ${(e as Error).message}`);
+    } finally {
+      setPublishingQuiz(null);
+      setPresetBulk(null);
+    }
   };
 
   const handleDownloadPreset = async (preset: VerlagsPreset) => {
@@ -7506,7 +7565,7 @@ export default function Page() {
               onDownloadPresetTiff={handleDownloadPresetTiff}
               onDownloadPresetsBulk={handleDownloadPresetsBulk}
               onDownloadPresetsTiffBulk={handleDownloadPresetsTiffBulk}
-              onDownloadGroupAllZips={handleDownloadGroupAllZips}
+              onDownloadStructuredZip={handleDownloadStructuredZip}
               presetBulk={presetBulk}
               onPushPresetsMonday={handlePushPresetsToMonday}
               mondayBulk={mondayBulk}
