@@ -233,6 +233,11 @@ function germanDativeFallback(rawName: string): string {
 }
 function buildPublisherTitle(preset: VerlagsPreset | null, publisherName?: string): string {
   if (!preset && !publisherName) return "";
+  // SHZ-Gruppe (shz, NOZ, BEIG): auf Wunsch von Simona ohne den Zusatz
+  // "in der <Zeitung>" — nur "Das große Wissensquiz".
+  if (preset && (/^SHZ__/.test(preset.id) || (preset.verlag || "").toLowerCase() === "shz")) {
+    return "Das große Wissensquiz";
+  }
   const dat = (preset && DATIVE_BY_ID[preset.id])
     || germanDativeFallback(publisherName || preset?.titelKanonisch || preset?.titel || preset?.verlag || "");
   return `Das große Wissensquiz ${dat}`;
@@ -1463,6 +1468,63 @@ function useAutoFit(parentRef: React.RefObject<HTMLDivElement | null>, childRef:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   return scale;
+}
+
+// FillText: skaliert die Schriftgröße seines Inhalts so, dass er die verfügbare
+// (Flex-)Höhe möglichst ohne Überlauf FÜLLT. Anders als useAutoFit (das nur
+// verkleinert) sucht FillText per Binärsuche die GRÖSSTE Schrift zwischen min/max,
+// bei der der Text noch in die Box passt. So füllt ein fester Story-Text die
+// Spalte in jedem Anzeigenformat (breit/kurz wie Nürnberg ebenso wie schmal/hoch).
+function FillText({ children, deps, min = 11, max = 30, lineHeight = 1.4, color, style }: {
+  children: React.ReactNode;
+  deps: unknown[];
+  min?: number; max?: number; lineHeight?: number; color?: string;
+  style?: React.CSSProperties;
+}) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const txtRef = useRef<HTMLDivElement>(null);
+  // Konservativ starten (nicht max): falls ein Export-Screenshot ausnahmsweise
+  // vor Abschluss der Messung ausgelöst wird, ist die Schrift höchstens etwas
+  // zu klein – nie riesig/überlaufend. Die Messung wächst sie dann auf best.
+  const [fs, setFs] = useState(min);
+  useLayoutEffect(() => {
+    const box = boxRef.current, txt = txtRef.current;
+    if (!box || !txt) return;
+    let raf1 = 0, raf2 = 0, cancelled = false;
+    const measure = () => {
+      if (cancelled || !box || !txt) return;
+      raf1 = requestAnimationFrame(() => {
+        if (cancelled || !box || !txt) return;
+        raf2 = requestAnimationFrame(() => {
+          if (cancelled || !box || !txt) return;
+          const avail = box.clientHeight;
+          if (avail <= 2) return;
+          let lo = min, hi = max, best = min;
+          for (let i = 0; i < 16; i++) {
+            const mid = (lo + hi) / 2;
+            txt.style.fontSize = `${mid}px`;
+            if (txt.scrollHeight <= avail) { best = mid; lo = mid; } else { hi = mid; }
+          }
+          txt.style.fontSize = `${best}px`;
+          setFs(best);
+        });
+      });
+    };
+    measure();
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(box);
+    return () => { cancelled = true; if (raf1) cancelAnimationFrame(raf1); if (raf2) cancelAnimationFrame(raf2); ro.disconnect(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+  return (
+    <div ref={boxRef} style={{ overflow: "hidden", minHeight: 0, ...style }}>
+      <div ref={txtRef} lang="de" style={{ fontSize: `${fs}px`, lineHeight, color,
+        textAlign: "justify", textAlignLast: "left", whiteSpace: "normal",
+        hyphens: "auto" as const, WebkitHyphens: "auto" as const }}>
+        {children}
+      </div>
+    </div>
+  );
 }
 
 // Kontext für die neue Shell-Navigation: wenn gesetzt, blenden Sections aus,
@@ -4718,6 +4780,15 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
     .split(/\n|,|;/).map(s => s.trim())
     .filter(s => s && !/^auflösung der letzten (folge|ausgabe)/i.test(s))
     .slice(0, 5);
+  // Für die Anzeige (Rhein/V2): Auflösung soll NIE fehlen — Default Lösung 1–5.
+  const solutionDisplay = solutionLines.length
+    ? solutionLines
+    : ["Lösung 1", "Lösung 2", "Lösung 3", "Lösung 4", "Lösung 5"];
+  // Auf Wunsch des Kunden (Timo Fasching, via Yasmina): Lösungen/Auflösung der
+  // letzten Ausgabe dürfen NICHT abgebildet werden (müssten 2 Tage versetzt
+  // erscheinen → zu hohe Fehlerquote). Schalter zentral; auf true setzen, um
+  // den Auflösungs-Block wieder einzublenden.
+  const SHOW_SOLUTION = false;
 
   // Logo-Größen-Logik wie in den anderen Layouts (4,5 % Fläche, max 32×10 %).
   const [logoDim, setLogoDim] = useState<{ w: number; h: number } | null>(null);
@@ -4808,20 +4879,37 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 {ed(meta.subtitle, v => setMeta({ subtitle: v }), { multiline: true, placeholder: "Untertitel" })}
               </div>,
               { flexShrink: 0 })}
-            {wrap("howto",
-              <div style={{ color: cIntro, fontSize: px(17.5), lineHeight: 1.6, marginTop: px(12),
-                whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
-                hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
+            {/* Story (Blocksatz): füllt per Auto-Schriftgröße die verfügbare
+                Höhe in JEDEM Anzeigenformat (breit/kurz wie schmal/hoch). So
+                bleibt kein Weißraum, egal wie lang der Text ist. */}
+            <FillText
+              deps={[meta.howToText, width, height, showWinners, edit]}
+              min={13 * ws} max={34 * ws} lineHeight={1.4} color={cIntro}
+              style={{ flex: "1 1 0", marginTop: px(9) }}>
+              {edit
+                ? <InlineEditable block
+                    value={(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
+                    onChange={v => setMeta({ howToText: v.replace(/\s*\n\s*/g, " ").trim() })}
+                    multiline placeholder="Story-Text"
+                    style={{ whiteSpace: "normal", textAlign: "justify", display: "block" }} />
+                : (meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
+            </FillText>
+            {/* Auflösung der letzten Ausgabe — nur wenn SHOW_SOLUTION aktiv
+                (vom Kunden vorerst deaktiviert). */}
+            {SHOW_SOLUTION && wrap("solution",
+              <div>
+                <div style={{ color: cPrize, fontSize: px(11), fontWeight: 700, marginBottom: px(1) }}>
+                  Auflösung der letzten Ausgabe:
+                </div>
                 {edit
-                  ? <InlineEditable block
-                      value={(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
-                      onChange={v => setMeta({ howToText: v.replace(/\s*\n\s*/g, " ").trim() })}
-                      multiline placeholder="Story-Text"
-                      style={{ whiteSpace: "normal", textAlign: "justify", display: "block" }} />
-                  : (meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
+                  ? <div style={{ color: cPrize, fontSize: px(10), fontWeight: 700, lineHeight: 1.3 }}>
+                      <InlineEditable multiline placeholder="Lösungswörter (eine pro Zeile)"
+                        value={solutionLines.join("\n")} onChange={v => setMeta({ solutionWords: v })} /></div>
+                  : solutionDisplay.map((s, i) => (
+                      <div key={i} style={{ color: cPrize, fontSize: px(10), fontWeight: 700, lineHeight: 1.3 }}>{s}</div>
+                    ))}
               </div>,
-              { flex: "1 1 auto", minHeight: px(20) })}
-            <div style={{ flex: "0 0 0", minHeight: px(4) }} />
+              { marginTop: px(6), flexShrink: 0 })}
             {showWinners && (
               <div style={{ flexShrink: 0 }}>
                 {wrap("winnersHeadline",
@@ -5082,7 +5170,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           {/* Auflösung der letzten Ausgabe (Lösung 1–5) NUR im 4-spaltigen Layout
               mit Gewinnern (= !wide). In der 3-spaltigen Variante (ohne Gewinner)
               entfällt der Block, damit der Story-Text die Spalte füllt. */}
-          {!wide && (solutionLines.length > 0 || edit) && wrap("solution",
+          {SHOW_SOLUTION && !wide && (solutionLines.length > 0 || edit) && wrap("solution",
             <div>
               <div style={{ color: cPrize, fontSize: px(9), fontWeight: 700, marginBottom: px(1) }}>
                 Auflösung der letzten Ausgabe:
