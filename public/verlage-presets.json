@@ -253,11 +253,11 @@
   "logoPosition": "rechts unten",
   "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_Giessener-und-Alsfelder-Allgemeine-Z.png",
   "phoneNumbers": [
-   "01378 407281",
-   "01378 407282",
-   "01378 407283",
-   "01378 407284",
-   "01378 407285"
+   "01378 405781",
+   "01378 405782",
+   "01378 405783",
+   "01378 405784",
+   "01378 405785"
   ]
  },
  {
@@ -918,7 +918,7 @@
   },
   "format": "280x219",
   "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/Nuernberg_VNP.png",
+  "logoUrl": "/verlag-logos/Nuernberg_NN.png",
   "phoneNumbers": [
    "01378 220271",
    "01378 220272",
@@ -1024,11 +1024,11 @@
   "fontAvailable": true,
   "fontRaw": "Myriad Pro – Bold",
   "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
+   "title": "#001E59",
+   "question": "#001E59",
    "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
+   "prize": "#001E59",
+   "phone": "#001E59",
    "winners": "#000000",
    "terms": "#000000"
   },

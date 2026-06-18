@@ -41,6 +41,12 @@ type Quiz = {
     titleAuto: boolean;
     subtitle: string;
     publisher: string;
+    // Verlagsgruppe (z. B. "SAAR", "SHZ") — beim Export aus dem Preset gesetzt.
+    // Dient verlagsabhängigen Overrides (z. B. Bild pro Verlag).
+    verlag?: string;
+    // Preset-ID der gerade angewendeten Zeitung (z. B. "SHZ__Beig").
+    // Für zeitungsgenaue Overrides (BEIG ≠ shz ≠ NOZ).
+    presetId?: string;
     language: string;
     winnersText: string;
     termsText: string;
@@ -80,7 +86,10 @@ type Quiz = {
     colors: Record<string, string>;
     fontSizes: Record<string, number>;
     // image = oberes Bild (Frage 4), imageBottom = unteres Bild (Frage 5)
-    background: { image: string | null; imageBottom?: string | null; opacity: number; position: { x: number; y: number } };
+    background: { image: string | null; imageBottom?: string | null; opacity: number; position: { x: number; y: number };
+      // Verlagsabhängige Überschreibung des OBEREN Bildes: { "SAAR": dataUrl }.
+      // Greift nur, wenn meta.verlag passt; sonst bleibt das normale image.
+      imageTopByVerlag?: Record<string, string | null> };
     readability: Readability;
     // Optionales Zeitungslogo (Data-URL aus Upload oder Pfad in public/).
     // Erscheint unten rechts im Footer neben den Teilnahmebedingungen.
@@ -339,7 +348,7 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
   return {
     ...q,
     questions: newQuestions,
-    meta: { ...q.meta, ...presetMeta, termsText: finalTerms, title: newTitle, titleAuto: autoTitle ? false : (q.meta.titleAuto ?? false),
+    meta: { ...q.meta, ...presetMeta, verlag: preset.verlag, presetId: preset.id, termsText: finalTerms, title: newTitle, titleAuto: autoTitle ? false : (q.meta.titleAuto ?? false),
       ...(preset.hideWinners ? { winnerCount: 0 } : {}) },
     theme: {
       ...q.theme,
@@ -4224,7 +4233,7 @@ function BeilageRenderer({ quiz, width, height, selectedBlockId, onSelectBlock, 
   // Fragen in Anzeige-Reihenfolge: höchster Preis zuletzt (wie Screenshot: 50€ → 1000€).
   const ordered = [...questions];
 
-  const imgTop = theme.background?.image || null;
+  const imgTop = (meta.verlag ? theme.background?.imageTopByVerlag?.[meta.verlag] : null) || theme.background?.image || null;
   const imgBottom = theme.background?.imageBottom || null;
 
   // Dynamische Logo-Größe: alle Logos sollen die gleiche Fläche belegen,
@@ -4523,7 +4532,7 @@ function QuerformatRenderer({ quiz, width, height, selectedBlockId, onSelectBloc
   const winners = (meta.winners ?? []).slice(0, Math.max(0, Math.min(5, meta.winnerCount ?? 0)))
     .filter(w => (w.text && w.text.trim()) || w.photo);
 
-  const imgTop = theme.background?.image || null;
+  const imgTop = (meta.verlag ? theme.background?.imageTopByVerlag?.[meta.verlag] : null) || theme.background?.image || null;
   const imgBottom = theme.background?.imageBottom || null;
 
   // Logo-Größen-Logik wie Beilage (Standard): proportional 4,5 % Fläche,
@@ -4749,6 +4758,20 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const pad = width * 0.018;
   const edit = !!(editable && dispatch);
 
+  // ── Verlagsabhängige Wünsche (pro Gruppe, keine globalen Änderungen) ──
+  // SAAR (Nicole Böhme-Laglasse): Pfälzischer Merkur, Trier. Volksfreund, SZ.
+  const isSAAR = meta.verlag === "SAAR";
+  // BEIG (Simona, SHZ-Gruppe) — zeitungsgenau.
+  const isBEIG = meta.presetId === "SHZ__Beig";
+  // SAAR: Leerzeichen vor dem €-Zeichen ("50€" → "50 €").
+  const eur = (s: string) => isSAAR ? s.replace(/\s*€/g, " €") : s;
+  // SAAR: "Anzeige"-Hinweis raus (Verlag setzt ihn selbst). BEIG: nur bei
+  // Ohne-Gewinner-Variante raus.
+  const hideAnzeige = isSAAR || (isBEIG && !((meta.winners ?? []).length && (meta.winnerCount ?? 0) > 0));
+  // BEIG: statt Störer der Spieltag (X/27). Spieltag aus meta.spieltag, sonst 1.
+  const beigSpieltag = isBEIG;
+  const spieltagNo = Number(meta.spieltag || "") || 1;
+
   const onWhite = (hex: string | undefined, fb: string) => (hex && luminance(hex) < 0.85 ? hex : fb);
   const cTitle = onWhite(theme.colors.title, "#1A1A1A");
   const cIntro = onWhite(theme.colors.intro, "#1A1A1A");
@@ -4770,9 +4793,9 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const wide = rhein ? true : !showWinners;
   const col1Flex = rhein ? "0 0 26%" : (wide ? "0 0 21%" : "0 0 17%");
   const imgFlex = rhein ? "0 0 22%" : (wide ? "0 0 40%" : "0 0 30%");
-  const imgTop = theme.background?.image || null;
+  const imgTop = (meta.verlag ? theme.background?.imageTopByVerlag?.[meta.verlag] : null) || theme.background?.image || null;
   const imgBottom = theme.background?.imageBottom || null;
-  const topPrize = prizes.length ? getPrizeLabel(prizes.reduce((a, b) => (b.valueCents > a.valueCents ? b : a))) : "1000€";
+  const topPrize = eur(prizes.length ? getPrizeLabel(prizes.reduce((a, b) => (b.valueCents > a.valueCents ? b : a))) : "1000€");
 
   // Auflösungs-Zeilen: solutionWords per Zeile oder Komma getrennt. Eine evtl.
   // enthaltene Überschrift wird gefiltert — die setzt der Renderer selbst.
@@ -4808,7 +4831,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   // "Heute 1000€ gewinnen" mit dem Hauptgewinn des Quiz.
   const badgeLines = (meta.stoererText || `Heute\n${topPrize}\ngewinnen`)
     .split(/\n/).map(s => s.trim()).filter(Boolean);
-  const stoererD = Math.min(width * 0.095, height * 0.19);
+  const stoererD = Math.min(width * 0.095, height * 0.19) * (isSAAR ? 1.3 : 1);
 
   // Hilfen: setMeta dispatcht Meta-Patches; wrap macht ein Element frei
   // anpassbar (verschieben, skalieren, ausblenden); ed macht Texte inline
@@ -5089,8 +5112,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         fontFamily: theme.fontFamily, overflow: "hidden", boxSizing: "border-box",
         display: "flex", flexDirection: "column", padding: pad }}>
 
-      {/* ANZEIGE-Kennzeichnung oben links + rechts */}
-      {wrap("anzeige",
+      {/* ANZEIGE-Kennzeichnung oben links + rechts (SAAR/BEIG: ausgeblendet) */}
+      {!hideAnzeige && wrap("anzeige",
         <><span>ANZEIGE</span><span>ANZEIGE</span></>,
         { display: "flex", justifyContent: "space-between",
           fontSize: px(8), fontWeight: 700, letterSpacing: 2, color: "#1A1A1A" })}
@@ -5107,7 +5130,13 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             {/* Schrift leicht nach links gedreht (klassischer Störer-Look) */}
             <div style={{ transform: "rotate(-8deg)", display: "flex",
               flexDirection: "column", alignItems: "center" }}>
-              {badgeLines.map((l, i) => (
+              {beigSpieltag ? (
+                <>
+                  <span style={{ fontSize: stoererD * 0.135, fontWeight: 700, lineHeight: 1.12, whiteSpace: "nowrap" }}>Spieltag</span>
+                  <span style={{ fontSize: stoererD * 0.30, fontWeight: 700, lineHeight: 1.05, whiteSpace: "nowrap" }}>{spieltagNo}</span>
+                  <span style={{ fontSize: stoererD * 0.135, fontWeight: 700, lineHeight: 1.12, whiteSpace: "nowrap" }}>von 27</span>
+                </>
+              ) : badgeLines.map((l, i) => (
                 <span key={i} style={{
                   fontSize: badgeLines.length > 1 && i === 1 ? stoererD * 0.21 : stoererD * 0.135,
                   fontWeight: 700, lineHeight: 1.12, whiteSpace: "nowrap" }}>
@@ -5124,7 +5153,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           { flex: "0 0 auto", marginTop: px(2), order: rhein ? 2 : 0 })}
         <div style={{ flex: 1, textAlign: rhein ? "left" : "center", minWidth: 0, order: rhein ? 1 : 0 }}>
           {wrap("title",
-            <div style={{ color: cTitle, fontWeight: 700, fontSize: px(34), lineHeight: 1.05 }}>
+            <div style={{ color: cTitle, fontWeight: 700, fontSize: px(isSAAR ? 21 : 34), lineHeight: 1.05,
+              whiteSpace: isSAAR ? "nowrap" : "normal" }}>
               {edit
                 ? <InlineEditable value={effectiveTitle(quiz)} placeholder="Titel der Aktion"
                     onChange={v => setMeta({ title: v, titleAuto: false })} />
@@ -5164,7 +5194,17 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                     onChange={v => setMeta({ howToText: v.replace(/\s*\n\s*/g, " ").trim() })}
                     multiline placeholder="Story-Text"
                     style={{ whiteSpace: "normal", textAlign: "justify", display: "block" }} />
-                : (meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
+                : (isSAAR
+                    ? (() => {
+                        const t = (meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim();
+                        const sents = t.match(/[^.!?]+[.!?]+/g) || [t];
+                        const mid = Math.ceil(sents.length / 2);
+                        const paras = [sents.slice(0, mid).join(" ").trim(), sents.slice(mid).join(" ").trim()].filter(Boolean);
+                        return paras.map((p, i) => (
+                          <p key={i} style={{ margin: 0, marginBottom: i < paras.length - 1 ? px(7) : 0 }}>{p}</p>
+                        ));
+                      })()
+                    : (meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim())}
             </div>,
             { flex: "0 1 auto", minHeight: 0, overflow: "hidden" })}
           {/* Auflösung der letzten Ausgabe (Lösung 1–5) NUR im 4-spaltigen Layout
@@ -5286,7 +5326,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                           Frage verankert, aus dem Textfluss gelöst — einzeln
                           verschieb-/skalier-/editier-/löschbar. Der Fragetext
                           reserviert rechts Platz dafür. */}
-                      <div style={{ color: cQuestion, fontSize: px(wide ? 14 : 10.5), fontWeight: 700,
+                      <div style={{ color: cQuestion, fontSize: px((wide ? 14 : 10.5) * (isSAAR ? 1.18 : 1)), fontWeight: 700,
                         lineHeight: 1.25, paddingRight: px(wide ? 66 : 46) }}>
                         {edit
                           ? <InlineEditable value={q.text} placeholder="Frage eingeben"
@@ -5301,7 +5341,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                             ? <InlineEditable value={getPrizeLabel(prize)}
                                 style={{ minWidth: "1ch", padding: 0, margin: 0 }}
                                 onChange={v => dispatch!({ type: "UPDATE_PRIZE", id: prize.id, payload: { label: v || null } })} />
-                            : getPrizeLabel(prize)}
+                            : eur(getPrizeLabel(prize))}
                         </span>,
                         { position: "absolute", top: 0, right: 0 })}
                       {/* Telefonnummer deutlich größer; Kostenhinweis (Telemedia)
@@ -5310,7 +5350,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                         {edit
                           ? <InlineEditable value={q.phoneNumber ?? ""} placeholder="Telefonnummer"
                               onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } })} />
-                          : q.phoneNumber}
+                          : (isSAAR ? `☎︎ ${q.phoneNumber ?? ""}` : q.phoneNumber)}
                       </div>
                       {meta.phoneTermsText && (
                         <div style={{ color: cTerms, fontSize: px(wide ? 11 : 9), lineHeight: 1.2 }}>
