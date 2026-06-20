@@ -5233,7 +5233,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           <div style={{ flex: "1 1 0", minHeight: px(4) }} />
           {/* Kostenhinweis (Telemedia) steht unter jeder Telefonnummer in der
               Fragenspalte — hier links entfällt er. */}
-          {!rhein && wrap("publisherLogo",
+          {!rhein && !isBEIG && wrap("publisherLogo",
             theme.publisherLogo
               ? <img key={theme.publisherLogo} onLoad={onLogoLoad}
                   src={theme.publisherLogo} alt=""
@@ -5476,11 +5476,24 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
 
       {/* FUSSZEILE: lange Teilnahmebedingungen über volle Breite (sehr klein) */}
       {(meta.termsText || edit) && wrap("terms",
-        <div style={{ color: cTerms, fontSize: px(6),
-          lineHeight: 1.25, borderTop: "1px solid #D8D2C8", paddingTop: px(4),
-          textAlign: "justify", hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
-          {ed(meta.termsText, v => setMeta({ termsText: v }), { multiline: true, placeholder: "Teilnahmebedingungen" })}
-        </div>,
+        (isBEIG && theme.publisherLogo) ? (
+          // BEIG (Wunsch Simona): Logo unten rechts NEBEN den TNB.
+          <div style={{ display: "flex", alignItems: "flex-end", gap: px(10),
+            borderTop: "1px solid #D8D2C8", paddingTop: px(4) }}>
+            <div style={{ flex: 1, color: cTerms, fontSize: px(6), lineHeight: 1.25,
+              textAlign: "justify", hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
+              {ed(meta.termsText, v => setMeta({ termsText: v }), { multiline: true, placeholder: "Teilnahmebedingungen" })}
+            </div>
+            <img key={theme.publisherLogo} onLoad={onLogoLoad} src={theme.publisherLogo} alt=""
+              style={{ height: px(24), width: "auto", objectFit: "contain", flexShrink: 0, alignSelf: "flex-end" }} />
+          </div>
+        ) : (
+          <div style={{ color: cTerms, fontSize: px(6),
+            lineHeight: 1.25, borderTop: "1px solid #D8D2C8", paddingTop: px(4),
+            textAlign: "justify", hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
+            {ed(meta.termsText, v => setMeta({ termsText: v }), { multiline: true, placeholder: "Teilnahmebedingungen" })}
+          </div>
+        ),
         { marginTop: px(6), flexShrink: 0 })}
 
       {/* GITTER-OVERLAY (nur Editor, und nur während ein Element AUSGEWÄHLT ist):
