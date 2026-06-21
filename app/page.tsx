@@ -3926,9 +3926,12 @@ function NuernbergRenderer({ quiz, width, height, selectedBlockId, onSelectBlock
   const tag = `TAG ${spieltag}${datum ? ": " + datum : ""}`;
   const img1 = theme.background?.image || null;
   const img2 = theme.background?.imageBottom || null;
-  const RED = "linear-gradient(180deg,#E25A67 0%,#D63A48 55%,#C5283A 100%)";
+  // VNP-Hero: Verlauf rot → magenta (wie Vorlage, links rot, rechts Magenta).
+  const RED = "linear-gradient(95deg,#D81A48 0%,#DD2E72 52%,#E6007E 100%)";
   const RC = (w: 300 | 400 | 700): React.CSSProperties => ({ fontFamily: "'NB-RC',sans-serif", fontWeight: w });
   const cyan = "#00A7E0";
+  // Auto-Titel ohne Themen-/Verlagszusatz ("… – Thema: X", "… in der Zeitung").
+  const displayTitle = (meta.title || "").replace(/\s*[–-]\s*Thema:.*$/i, "").replace(/\s+in d(er|en)\s.*$/i, "").trim();
   return (
     <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden", background: "#fff", color: "#1a1a1a", fontFamily: "'NB-RC',sans-serif" }}>
       <style>{`
@@ -3941,7 +3944,7 @@ function NuernbergRenderer({ quiz, width, height, selectedBlockId, onSelectBlock
         <div style={{ ...RC(700), fontSize: P(11), color: "#fff", background: "#E6007E", padding: `${P(3)} ${P(11)}` }}>{tag}</div>
       </div>
       <div style={{ position: "absolute", left: 0, top: P(22), width: P(793.7), height: P(124), background: RED }} />
-      {wrap("nb_title", <div style={{ ...RC(700), fontSize: P(39), lineHeight: .95, color: "#fff" }}>{ed(meta.title, v => setMeta({ title: v, titleAuto: false }), { placeholder: "Titel" })}</div>, { position: "absolute", left: P(18), top: P(30), width: P(700) })}
+      {wrap("nb_title", <div style={{ ...RC(700), fontSize: P(39), lineHeight: .95, color: "#fff" }}>{ed(displayTitle, v => setMeta({ title: v, titleAuto: false }), { placeholder: "Titel" })}</div>, { position: "absolute", left: P(18), top: P(30), width: P(700) })}
       {wrap("nb_subtitle", <div style={{ ...RC(300), fontSize: P(16), color: "#fff" }}>{ed(meta.subtitle, v => setMeta({ subtitle: v }), { multiline: true, placeholder: "Untertitel" })}</div>, { position: "absolute", left: P(20), top: P(108), width: P(560) })}
       {wrap("nb_bank", <img src="/nuernberg/banknotes.png" alt="" style={{ width: "100%", display: "block" }} />, { position: "absolute", left: P(8), top: P(120), width: P(152), zIndex: 5 }, true)}
       {wrap("nb_story", (
