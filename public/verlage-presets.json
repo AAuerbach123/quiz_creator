@@ -908,12 +908,12 @@
   "fontAvailable": true,
   "fontRaw": "Roboto Condensed",
   "colors": {
-   "title": "#003D7A",
-   "question": "#003D7A",
-   "intro": "#003D7A",
-   "prize": "#003D7A",
-   "phone": "#003D7A",
-   "winners": "#000000",
+   "title": "#E2001A",
+   "question": "#1A2330",
+   "intro": "#00A7E0",
+   "prize": "#E6007E",
+   "phone": "#0079B8",
+   "winners": "#0079B8",
    "terms": "#000000"
   },
   "format": "280x219",
@@ -926,7 +926,7 @@
    "01378 220274",
    "01378 220275"
   ],
-  "layoutVariant": "nuernberg"
+  "layoutVariant": "redaktionell"
  },
  {
   "id": "SAAR__PM",
