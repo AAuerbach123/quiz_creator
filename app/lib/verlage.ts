@@ -24,7 +24,7 @@ export type VerlagsPreset = {
   logoUrl?: string | null;
   // Optionale Layout-Variante (aus KI-Analyse einer hochgeladenen Vorlage).
   // Wenn gesetzt, schaltet applyPresetToQuiz die Renderer-Variante um.
-  layoutVariant?: "beilage" | "querformat" | "redaktionell";
+  layoutVariant?: "beilage" | "querformat" | "redaktionell" | "rhein" | "swp";
   // Optionale Vorlagen-Texte (aus KI-Analyse). Wenn gesetzt, füllt
   // applyPresetToQuiz die entsprechenden meta-Felder. Titel und Fragen-
   // Überschrift sind bewusst NICHT enthalten (werden generiert).
@@ -149,7 +149,7 @@ export type GroupOverride = {
   fontFamily?: string;
   fontAvailable?: boolean;
   fontRaw?: string;
-  layoutVariant?: "beilage" | "querformat" | "redaktionell";
+  layoutVariant?: "beilage" | "querformat" | "redaktionell" | "rhein" | "swp";
   // Dateiname/Titel der analysierten Vorlage — für die Anzeige in der Liste.
   sourceName?: string;
 };

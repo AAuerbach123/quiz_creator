@@ -1303,5 +1303,28 @@
    "01378 803874",
    "01378 803875"
   ]
+ },
+ {
+  "id": "SWP__Schwabo",
+  "gruppe": "SWP",
+  "verlag": "SWP",
+  "titel": "Schwabo",
+  "titelKanonisch": "Schwarzwälder Bote (SWP-Vorlage)",
+  "fontFamily": "'Roboto Condensed', sans-serif",
+  "fontAvailable": true,
+  "fontRaw": "Lexend SemiBold / Roboto Condensed (in Vorlage eingebettet)",
+  "colors": {
+   "title": "#000000",
+   "question": "#000000",
+   "intro": "#000000",
+   "prize": "#000000",
+   "phone": "#000000",
+   "winners": "#000000",
+   "terms": "#000000"
+  },
+  "format": "280x190",
+  "logoPosition": "Fußleiste (in Vorlage integriert)",
+  "logoUrl": null,
+  "layoutVariant": "swp"
  }
 ]

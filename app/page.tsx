@@ -64,6 +64,10 @@ type Quiz = {
     // suchen wir? Jetzt mitraten!"). Wird beim Import aus dem Quiz-Thema
     // generiert; leer = neutraler Default im Renderer.
     questionsHeadline?: string;
+    // --- Schwabo/SWP-Layout ("swp") ---
+    // Anzeigedatum im Kalenderblatt + Gewinnerzeile (z. B. "1. Juli").
+    // Jahr wird für die Gewinnerzeile automatisch ergänzt ("… 2026").
+    swpDatum?: string;
     // --- Geldregen-spezifisch (Format "schatzsuche") ---
     // Spieltag-Nummer im Eck-Badge (z. B. "4"). Leer = "1".
     spieltag?: string;
@@ -107,7 +111,7 @@ type Quiz = {
   layout: {
     format: string; orientation: string;
     customSize?: { w: number; h: number };
-    variant?: "beilage" | "querformat" | "redaktionell" | "rhein";
+    variant?: "beilage" | "querformat" | "redaktionell" | "rhein" | "swp";
     // Freie Element-Anpassungen (Redaktionell-Layout): Versatz in Anteilen
     // der Anzeigenbreite/-höhe (auflösungsunabhängig), Skalierung und
     // Ausblenden ("Löschen") pro Element-ID. Gilt in Vorschau UND PDF.
@@ -2819,6 +2823,18 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
             placeholder={DEFAULT_QUESTIONS_HEADLINE}
             onChange={e => dispatch({ type: "UPDATE_META", payload: { questionsHeadline: e.target.value } })} />
         </Field>
+        {quiz.layout.variant === "swp" && (
+          <>
+            <Field label="Spieltag (Schwabo-Vorlage, z. B. 1)">
+              <Input value={quiz.meta.spieltag ?? ""} placeholder="1"
+                onChange={e => dispatch({ type: "UPDATE_META", payload: { spieltag: e.target.value } })} />
+            </Field>
+            <Field label="Datum (Kalenderblatt + Gewinnerzeile, z. B. 1. Juli)">
+              <Input value={quiz.meta.swpDatum ?? ""} placeholder="1. Juli"
+                onChange={e => dispatch({ type: "UPDATE_META", payload: { swpDatum: e.target.value } })} />
+            </Field>
+          </>
+        )}
         <Field label="Verlag"><Input value={quiz.meta.publisher} onChange={e => dispatch({ type: "UPDATE_META", payload: { publisher: e.target.value } })} /></Field>
         <Field label="Gewinner-Text"><Textarea rows={2} value={quiz.meta.winnersText} onChange={e => dispatch({ type: "UPDATE_META", payload: { winnersText: e.target.value } })} /></Field>
         <Field label="Teilnahmebedingungen"><Textarea rows={2} value={quiz.meta.termsText} onChange={e => dispatch({ type: "UPDATE_META", payload: { termsText: e.target.value } })} /></Field>
@@ -3043,6 +3059,17 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
             const size = parseAdSize(preset.format);
             if (size) {
               dispatch({ type: "UPDATE_LAYOUT", payload: { customSize: size } });
+            }
+            // Renderer-Variante aus dem Preset übernehmen. Sonderlayouts wie
+            // "swp" (Schwabo/SÜDWEST-PRESSE-Vorlage) bringen einen eigenen
+            // Renderer mit. Wenn das Preset keine Variante vorgibt, aber das
+            // Quiz gerade im swp-Layout steckt, zurück auf "redaktionell" –
+            // sonst bliebe die feste Schwabo-Platte mit fremdem Inhalt stehen.
+            if (preset.layoutVariant) {
+              dispatch({ type: "UPDATE_LAYOUT", payload: { variant: preset.layoutVariant } });
+              dispatch({ type: "UPDATE_META", payload: { verlag: preset.verlag, presetId: preset.id } });
+            } else if (quiz.layout.variant === "swp") {
+              dispatch({ type: "UPDATE_LAYOUT", payload: { variant: "redaktionell" } });
             }
             // Logo aus der Vorlage dauerhaft ins Quiz schreiben — überlebt
             // Reload (Quiz wird in IndexedDB persistiert). Wenn die Vorlage
@@ -3738,8 +3765,103 @@ type RendererProps = {
   dispatch?: React.Dispatch<Action>;
 };
 
+// ---------------------------------------------------------------------------
+// SWP / Schwabo-Layout ("swp")
+// ---------------------------------------------------------------------------
+// Pixelgenaue Schwabo-Anzeige nach der freigegebenen SÜDWEST-PRESSE-Vorlage
+// (Alen Pahic). Das komplette DESIGN (Strandfoto, Verläufe, Logos, Störer,
+// Teilnahmebedingungen, Preis-Pillen, Hotlines) liegt als feste „Platte" im
+// Hintergrund (/swp/plate_mit.png bzw. plate_ohne.png). Darüber liegen NUR die
+// täglich wechselnden, editierbaren Textfelder. So bleibt das Design unverän-
+// derbar (= freigegeben), der Inhalt aber im Tool editierbar und im Korrektur-
+// portal prüfbar – identischer Ablauf wie bei allen anderen Verlagen.
+//
+// Koordinaten in PostScript-Punkten der Originalvorlage (Seite 793,7×538,6 pt
+// = 280×190 mm). Skalierung u = width / 793,7 macht Vorschau UND PDF-Export
+// auflösungsunabhängig (analog ws im RedaktionellRenderer).
+function SwpRenderer({ quiz, width }: RendererProps) {
+  const { meta, questions } = quiz;
+  const u = width / 793.7;
+  const P = (v: number) => `${v * u}px`;
+
+  const winnerCount = Math.max(0, Math.min(5, meta.winnerCount ?? 0));
+  const winners = (meta.winners ?? []).slice(0, winnerCount);
+  const showWinners = winnerCount > 0;
+  const plate = showWinners ? "/swp/plate_mit.png" : "/swp/plate_ohne.png";
+
+  // Spieltag: "1" → "1. Spieltag"; ganzer Text bleibt erhalten, falls schon ausgeschrieben.
+  const sp = (meta.spieltag || "").trim();
+  const spieltagText = sp ? (/^\d+$/.test(sp) ? `${sp}. Spieltag` : sp) : "1. Spieltag";
+  const datum = (meta.swpDatum || "1. Juli").trim();
+  const winDatum = `${datum} 2026`;
+  const rubrik = (meta.questionsHeadline || "").trim();
+
+  // Pahic verschiebt in der Variante OHNE Gewinner (Seite 2) die Rubrik und
+  // die Fragen nach unten (mehr Platz, da die Gewinnerleiste fehlt). Daher
+  // pro Variante eigene Y-Koordinaten – sonst säße die Rubrik zu hoch und
+  // überdeckte das Höhlenbild.
+  const rubrikTop = showWinners ? 178.7 : 207.1;
+  const ROWY = showWinners
+    ? [212.1, 237.7, 263.2, 288.7, 314.2]   // Seite 1 (mit Gewinner)
+    : [240.5, 269.5, 298.6, 327.7, 356.7];  // Seite 2 (ohne Gewinner)
+  const COLX = [433.2, 500.2, 567.1, 634.1, 700.1];   // Gewinner-Spalten (pt)
+
+  const fLex: React.CSSProperties = { fontFamily: "'SWP-Lexend', sans-serif", fontWeight: 600 };
+  const fRC = (w: 400 | 700): React.CSSProperties => ({ fontFamily: "'SWP-RC', sans-serif", fontWeight: w });
+
+  return (
+    <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+      {/* Schriften der Vorlage (lokal aus /public/swp/fonts) */}
+      <style>{`
+        @font-face{font-family:'SWP-Lexend';font-weight:600;font-display:block;src:url('/swp/fonts/lexend-latin-600-normal.woff2') format('woff2');}
+        @font-face{font-family:'SWP-RC';font-weight:400;font-display:block;src:url('/swp/fonts/roboto-condensed-latin-400-normal.woff2') format('woff2');}
+        @font-face{font-family:'SWP-RC';font-weight:700;font-display:block;src:url('/swp/fonts/roboto-condensed-latin-700-normal.woff2') format('woff2');}
+      `}</style>
+
+      {/* feste Design-Ebene */}
+      <img src={plate} alt="" draggable={false}
+        style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%", display: "block" }} />
+
+      {/* Kalenderblatt (weiß, zentriert im blauen Innenfeld) */}
+      <div style={{ position: "absolute", left: P(672), top: P(111.5), width: P(90), textAlign: "center",
+        color: "#fff", fontSize: P(8), lineHeight: 1, ...fLex }}>{spieltagText}</div>
+      <div style={{ position: "absolute", left: P(672), top: P(128.5), width: P(90), textAlign: "center",
+        color: "#fff", fontSize: P(8), lineHeight: 1, ...fLex }}>{datum}</div>
+
+      {/* Rubrik */}
+      <div style={{ position: "absolute", left: P(374.1), top: P(rubrikTop), color: "#000",
+        fontSize: P(16), lineHeight: 1, whiteSpace: "nowrap", ...fLex }}>{rubrik}</div>
+
+      {/* 5 Fragetexte */}
+      {ROWY.map((y, i) => (
+        <div key={i} style={{ position: "absolute", left: P(416.7), top: P(y), color: "#000",
+          fontSize: P(9), lineHeight: 1, whiteSpace: "nowrap", ...fRC(400) }}>
+          {questions[i]?.text || ""}
+        </div>
+      ))}
+
+      {/* Gewinnerzeile + Namen (nur „mit Gewinner") */}
+      {showWinners && (
+        <>
+          <div style={{ position: "absolute", left: P(374.1), top: P(385.5), color: "#000",
+            fontSize: P(9), lineHeight: 1, whiteSpace: "nowrap", ...fRC(700) }}>{winDatum}</div>
+          {COLX.map((x, i) => (
+            <div key={i} style={{ position: "absolute", left: P(x), top: P(426.7), color: "#000",
+              fontSize: P(8), lineHeight: 1, whiteSpace: "nowrap", ...fRC(400) }}>
+              {winners[i]?.text || ""}
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
 function PreviewRenderer(props: RendererProps) {
   const fmt = props.quiz.layout.format;
+  if (props.quiz.layout.variant === "swp") {
+    return <SwpRenderer {...props} />;
+  }
   if (fmt === "schwedenraetsel") {
     return <SchwedenraetselRenderer quiz={props.quiz} width={props.width} height={props.height} />;
   }
