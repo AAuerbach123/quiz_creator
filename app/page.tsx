@@ -3905,7 +3905,7 @@ function NuernbergRenderer({ quiz, width, height, selectedBlockId, onSelectBlock
     </Adjustable>
   );
   const ed = (value: string, onChange: (v: string) => void, opts?: { multiline?: boolean; placeholder?: string }) =>
-    edit ? <InlineEditable value={value} onChange={onChange} multiline={opts?.multiline} placeholder={opts?.placeholder} /> : <>{value}</>;
+    edit ? <InlineEditable value={value} onChange={onChange} multiline={opts?.multiline} block={opts?.multiline} placeholder={opts?.placeholder} /> : <>{value}</>;
   const setMeta = (p: Record<string, unknown>) => dispatch?.({ type: "UPDATE_META", payload: p });
   const setWinner = (i: number, text: string) => {
     const ws = (meta.winners ?? []).slice();
@@ -3944,28 +3944,28 @@ function NuernbergRenderer({ quiz, width, height, selectedBlockId, onSelectBlock
         <div style={{ ...RC(700), fontSize: P(11), color: "#fff", background: "#E6007E", padding: `${P(3)} ${P(11)}` }}>{tag}</div>
       </div>
       <div style={{ position: "absolute", left: 0, top: P(22), width: P(793.7), height: P(124), background: RED }} />
-      {wrap("nb_title", <div style={{ ...RC(700), fontSize: P(39), lineHeight: .95, color: "#fff" }}>{ed(displayTitle, v => setMeta({ title: v, titleAuto: false }), { placeholder: "Titel" })}</div>, { position: "absolute", left: P(18), top: P(30), width: P(700) })}
-      {wrap("nb_subtitle", <div style={{ ...RC(300), fontSize: P(16), color: "#fff" }}>{ed(meta.subtitle, v => setMeta({ subtitle: v }), { multiline: true, placeholder: "Untertitel" })}</div>, { position: "absolute", left: P(20), top: P(108), width: P(560) })}
-      {wrap("nb_bank", <img src="/nuernberg/banknotes.png" alt="" style={{ width: "100%", display: "block" }} />, { position: "absolute", left: P(8), top: P(120), width: P(152), zIndex: 5 }, true)}
-      {wrap("nb_story", (
+      {wrap("nb2_title", <div style={{ ...RC(700), fontSize: P(39), lineHeight: .95, color: "#fff" }}>{ed(displayTitle, v => setMeta({ title: v, titleAuto: false }), { placeholder: "Titel" })}</div>, { position: "absolute", left: P(18), top: P(30), width: P(700) })}
+      {wrap("nb2_subtitle", <div style={{ ...RC(300), fontSize: P(16), color: "#fff" }}>{ed(meta.subtitle, v => setMeta({ subtitle: v }), { multiline: true, placeholder: "Untertitel" })}</div>, { position: "absolute", left: P(20), top: P(108), width: P(560) })}
+      {wrap("nb2_bank", <img src="/nuernberg/geldbuendel.png" alt="" style={{ width: "100%", display: "block" }} />, { position: "absolute", left: P(10), top: P(130), width: P(126), zIndex: 5 }, true)}
+      {wrap("nb2_story", (
         <div>
-          <div style={{ color: cyan, ...RC(700), fontSize: P(15), marginBottom: P(3) }}>Anrufen, gewinnen, freuen!</div>
-          <div style={{ ...RC(400), fontSize: P(10), lineHeight: 1.3, color: "#222" }}>{ed(meta.howToText || "", v => setMeta({ howToText: v }), { multiline: true, placeholder: "Sichern Sie sich jeden Tag Ihre Chance auf bis zu 1.000 €. …" })}</div>
-          <div style={{ color: cyan, ...RC(700), fontSize: P(15), marginTop: P(9), marginBottom: P(3) }}>So geht&apos;s:</div>
-          <div style={{ ...RC(400), fontSize: P(10), lineHeight: 1.55 }}>
+          <div style={{ color: cyan, ...RC(700), fontSize: P(13), marginBottom: P(2) }}>Anrufen, gewinnen, freuen!</div>
+          <div style={{ ...RC(400), fontSize: P(8.6), lineHeight: 1.24, color: "#222" }}>{ed(meta.howToText || "", v => setMeta({ howToText: v }), { multiline: true, placeholder: "Sichern Sie sich jeden Tag Ihre Chance auf bis zu 1.000 €. …" })}</div>
+          <div style={{ color: cyan, ...RC(700), fontSize: P(13), marginTop: P(6), marginBottom: P(2) }}>So geht&apos;s:</div>
+          <div style={{ ...RC(400), fontSize: P(8.6), lineHeight: 1.4 }}>
             <span style={{ color: cyan, fontWeight: 700 }}>1.</span> Frage auf der rechten Seite auswählen.<br />
             <span style={{ color: cyan, fontWeight: 700 }}>2.</span> Die zur Frage angegebene Telefonnummer wählen.<br />
             <span style={{ color: cyan, fontWeight: 700 }}>3.</span> Lösung nennen – und auf Ihr Glück hoffen.<br />
             <span style={{ color: cyan, fontWeight: 700 }}>4.</span> Teilnahmeschluss ist täglich um 23.59 Uhr.
           </div>
         </div>
-      ), { position: "absolute", left: P(18), top: P(214), width: P(196) })}
-      {/* Bilder übereinander, neben "So geht's" — nur in der Variante OHNE Gewinner */}
-      {!showWinners && img1 && wrap("nb_img1", <img src={img1} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: P(6), display: "block" }} />, { position: "absolute", left: P(224), top: P(214), width: P(102), height: P(66) }, true)}
-      {!showWinners && img2 && wrap("nb_img2", <img src={img2} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: P(6), display: "block" }} />, { position: "absolute", left: P(224), top: P(288), width: P(102), height: P(66) }, true)}
-      {wrap("nb_rubrik", <div style={{ color: cyan, ...RC(700), fontSize: P(16) }}>{ed(meta.questionsHeadline || "", v => setMeta({ questionsHeadline: v }), { placeholder: "Rubrik" })}</div>, { position: "absolute", left: P(336), top: P(156), width: P(440) })}
+      ), { position: "absolute", left: P(18), top: P(208), width: P(206) })}
+      {/* Bilder übereinander, rechts neben der Story — in beiden Varianten */}
+      {img1 && wrap("nb2_img1", <img src={img1} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: P(6), display: "block" }} />, { position: "absolute", left: P(232), top: P(214), width: P(96), height: P(64) }, true)}
+      {img2 && wrap("nb2_img2", <img src={img2} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: P(6), display: "block" }} />, { position: "absolute", left: P(232), top: P(286), width: P(96), height: P(64) }, true)}
+      {wrap("nb2_rubrik", <div style={{ color: cyan, ...RC(700), fontSize: P(16) }}>{ed(meta.questionsHeadline || "", v => setMeta({ questionsHeadline: v }), { placeholder: "Rubrik" })}</div>, { position: "absolute", left: P(336), top: P(156), width: P(440) })}
       {/* Frageboxen einzeln + untereinander */}
-      {questions.slice(0, 5).map((q, i) => wrap("nb_q" + (i + 1), (
+      {questions.slice(0, 5).map((q, i) => wrap("nb2_q" + (i + 1), (
         <div style={{ display: "flex", gap: P(10), alignItems: "center", height: "100%", background: "linear-gradient(180deg,#0098d8,#0079b8)", borderRadius: P(8), color: "#fff", padding: `${P(6)} ${P(12)}`, boxSizing: "border-box" }}>
           <div style={{ flex: "0 0 auto", width: P(84) }}>
             <div style={{ ...RC(400), fontSize: P(9), opacity: .9 }}>Frage {i + 1}</div>
@@ -3978,7 +3978,7 @@ function NuernbergRenderer({ quiz, width, height, selectedBlockId, onSelectBlock
         </div>
       ), { position: "absolute", left: P(336), top: P(178 + i * 60), width: P(444), height: P(52) }, true))}
       {showWinners ? (
-        wrap("nb_winners", (
+        wrap("nb2_winners", (
           <div>
             <div style={{ color: cyan, ...RC(700), fontSize: P(12), marginBottom: P(4) }}>Gewinner vom {datum || "…"} 2026</div>
             <div style={{ display: "flex", gap: P(6) }}>
@@ -3998,15 +3998,15 @@ function NuernbergRenderer({ quiz, width, height, selectedBlockId, onSelectBlock
               })}
             </div>
           </div>
-        ), { position: "absolute", left: P(18), top: P(372), width: P(300) }, true)
+        ), { position: "absolute", left: P(18), top: P(394), width: P(300) }, true)
       ) : (
-        wrap("nb_winline", <div style={{ ...RC(700), fontSize: P(12), color: "#222" }}>Die Gewinner werden ab dem 8. Juli 2026 veröffentlicht.</div>, { position: "absolute", left: P(18), top: P(384), width: P(300) })
+        wrap("nb2_winline", <div style={{ ...RC(700), fontSize: P(12), color: "#222" }}>Die Gewinner werden ab dem 8. Juli 2026 veröffentlicht.</div>, { position: "absolute", left: P(18), top: P(398), width: P(300) })
       )}
-      <div style={{ position: "absolute", left: 0, top: P(574), width: P(793.7), borderTop: `${P(1.5)} solid #D63A48`, padding: `${P(5)} ${P(14)}` }}>
-        <div style={{ ...RC(700), fontSize: P(7.2), width: P(556) }}>Fragen zur Teilnahme, sprechen Sie uns persönlich: 0800-7779889 · Keine Gewinnspielteilnahme. (Telemedia Interactive GmbH, kostenlos)</div>
-        <div style={{ ...RC(300), fontSize: P(5.3), lineHeight: 1.27, textAlign: "justify", width: P(556), color: "#333", marginTop: P(2) }}>{ed(meta.termsText || "", v => setMeta({ termsText: v }), { multiline: true, placeholder: "Teilnahmebedingungen" })}</div>
+      <div style={{ position: "absolute", left: 0, top: P(560), width: P(793.7), borderTop: `${P(1.5)} solid #D63A48`, padding: `${P(5)} ${P(14)}` }}>
+        <div style={{ ...RC(700), fontSize: P(7), width: P(620) }}>Fragen zur Teilnahme, sprechen Sie uns persönlich: 0800-7779889 · Keine Gewinnspielteilnahme. (Telemedia Interactive GmbH, kostenlos)</div>
+        <div style={{ ...RC(300), fontSize: P(4.7), lineHeight: 1.18, textAlign: "justify", width: P(620), color: "#333", marginTop: P(2) }}>{ed(meta.termsText || "", v => setMeta({ termsText: v }), { multiline: true, placeholder: "Teilnahmebedingungen" })}</div>
       </div>
-      {wrap("nb_logo", <img src="/nuernberg/logoblock.png" alt="" style={{ width: "100%", display: "block" }} />, { position: "absolute", left: P(593.7), top: P(500), width: P(186) }, true)}
+      {wrap("nb2_logo", <img src="/nuernberg/logoblock.png" alt="" style={{ width: "100%", display: "block" }} />, { position: "absolute", left: P(643.7), top: P(470), width: P(136) }, true)}
     </div>
   );
 }
@@ -4125,8 +4125,12 @@ function InlineEditable({
         background: "transparent",
         whiteSpace: multiline ? "pre-wrap" : "normal",
         // Auch leere Felder müssen anklickbar sein.
-        display: "inline-block",
-        minWidth: "8ch",
+        // Block-Modus: echter Block über volle Spaltenbreite, damit lange
+        // Absätze an der Spaltenkante umbrechen (statt als inline-block
+        // shrink-to-fit über die Spalte hinauszulaufen).
+        display: block ? "block" : "inline-block",
+        ...(block ? { width: "100%", maxWidth: "100%", overflowWrap: "break-word" as const } : {}),
+        minWidth: block ? undefined : "8ch",
         minHeight: "1em",
         ...style,
       }}
