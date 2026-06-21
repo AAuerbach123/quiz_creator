@@ -7,6 +7,7 @@ import type { ParsedQuiz } from "./api/import-quiz-document/parsers/types";
 import VerlagsVorlage, { parseAdSize } from "./components/VerlagsVorlage";
 import type { VerlagsPreset } from "./lib/verlage";
 import { mapFont, parseColor, saveCustomPreset, saveGroupOverride, loadGroupOverrides } from "./lib/verlage";
+import { applyGroupContent, getOverride, setMetaOverride, setQuestionOverride, clearOverride, GROUP_CONTENT_EVENT } from "./lib/groupContent";
 
 // ============================================================
 // TYPES
@@ -349,7 +350,7 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
   const newQuestions = preset.phoneNumbers && preset.phoneNumbers.length
     ? q.questions.map((qq, i) => ({ ...qq, phoneNumber: preset.phoneNumbers![i] ?? qq.phoneNumber }))
     : q.questions;
-  return {
+  const applied: Quiz = {
     ...q,
     questions: newQuestions,
     meta: { ...q.meta, ...presetMeta, verlag: preset.verlag, presetId: preset.id, termsText: finalTerms, title: newTitle, titleAuto: autoTitle ? false : (q.meta.titleAuto ?? false),
@@ -370,6 +371,10 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
       variant: preset.layoutVariant || (q.layout.variant === "rhein" ? "rhein" : "redaktionell")
     }
   };
+  // Zuletzt die gruppenspezifischen Inhalts-Overrides drüberlegen (gewinnen
+  // gegenüber Vorlage UND globalem Inhalt). Greift in JEDER Vorschau/Export,
+  // da alle Pfade über diese Funktion laufen.
+  return applyGroupContent(applied, preset.gruppe);
 }
 
 // Felder, die über ALLE "Zeitungen" (Quizze der Sammlung) identisch sein sollen:
@@ -3097,6 +3102,10 @@ function EditorPanel({ quiz, dispatch, canUndo, canRedo, onExport, onExportPdf, 
             dispatch({ type: "UPDATE_THEME", payload: { bigFooterLogo: presetWantsBigFooterLogo(preset) } });
           }}
         />
+      </Section>
+
+      <Section title="Inhalt pro Gruppe (Overrides)" defaultOpen={false} tabKey="verlag">
+        <GruppenInhalt quiz={quiz} />
       </Section>
 
       <Section title="Theme: Schrift & Farben" defaultOpen={false} tabKey="design">
@@ -6672,6 +6681,85 @@ function PortalChanges() {
   );
 }
 
+// Panel: Inhalt pro Verlagsgruppe übersteuern (Stufe 2). Globaler Inhalt bleibt
+// Standard; hier gesetzte Felder gelten NUR für die gewählte Gruppe an diesem
+// Spieltag (= aktives Quiz). Leeres Feld = globaler Wert. Die Overrides greifen
+// automatisch in Vorschau/Export, weil applyPresetToQuiz sie anwendet.
+function GruppenInhalt({ quiz }: { quiz: Quiz }) {
+  const [groups, setGroups] = useState<string[]>([]);
+  const [group, setGroup] = useState<string>("");
+  const [, tick] = useReducer((x: number) => x + 1, 0);
+  useEffect(() => {
+    let ok = true;
+    fetch("/verlage-presets.json").then(r => r.json()).then((ps: VerlagsPreset[]) => {
+      if (!ok) return;
+      setGroups(Array.from(new Set(ps.map(p => p.gruppe).filter(Boolean))).sort());
+    }).catch(() => {});
+    return () => { ok = false; };
+  }, []);
+  useEffect(() => {
+    const h = () => tick();
+    window.addEventListener(GROUP_CONTENT_EVENT, h);
+    return () => window.removeEventListener(GROUP_CONTENT_EVENT, h);
+  }, []);
+
+  const ov = group ? getOverride(group, quiz.id) : {};
+  const mv = (k: string) => ov.meta?.[k] ?? "";
+  const qv = (i: number, k: string) => ov.questions?.[String(i)]?.[k] ?? "";
+  const tag = (on: boolean) => (on ? ` · nur ${group}` : "");
+
+  const META: { key: string; label: string; area?: boolean; global: string }[] = [
+    { key: "questionsHeadline", label: "Fragen-Überschrift", global: quiz.meta.questionsHeadline ?? "" },
+    { key: "subtitle", label: "Untertitel / Intro", area: true, global: quiz.meta.subtitle ?? "" },
+    { key: "stoererText", label: "Störer-Text", global: quiz.meta.stoererText ?? "" },
+    { key: "winnersText", label: "Gewinner-Text", area: true, global: quiz.meta.winnersText ?? "" },
+    { key: "howToText", label: "So geht's-Text", area: true, global: quiz.meta.howToText ?? "" },
+    { key: "termsText", label: "Teilnahmebedingungen", area: true, global: quiz.meta.termsText ?? "" },
+  ];
+
+  return (
+    <div className="space-y-3">
+      <Field label="Inhalt bearbeiten für Gruppe">
+        <Select value={group} onChange={e => setGroup(e.target.value)}
+          options={[{ value: "", label: "— Gruppe wählen —" }, ...groups.map(g => ({ value: g, label: g }))]} />
+      </Field>
+      {!group ? (
+        <p className="text-xs text-stone-500">Eingaben hier gelten <b>nur für die gewählte Gruppe</b> an diesem Spieltag. Leere Felder = globaler Inhalt für alle Verlage.</p>
+      ) : (
+        <>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-stone-500">Spieltag: {quiz.meta.spieltag || "—"} · leeres Feld = global</span>
+            <button onClick={() => clearOverride(group, quiz.id)}
+              className="text-xs text-rose-600 hover:underline shrink-0">Alle für {group} zurücksetzen</button>
+          </div>
+          {META.map(f => (
+            <Field key={f.key} label={`${f.label}${tag(!!mv(f.key))}`}>
+              {f.area
+                ? <Textarea rows={2} value={mv(f.key)} placeholder={f.global || "(global leer)"}
+                    onChange={e => setMetaOverride(group, quiz.id, f.key, e.target.value)} />
+                : <Input value={mv(f.key)} placeholder={f.global || "(global leer)"}
+                    onChange={e => setMetaOverride(group, quiz.id, f.key, e.target.value)} />}
+            </Field>
+          ))}
+          {quiz.questions.slice(0, 5).map((qq, i) => (
+            <div key={qq.id} className="border-t border-stone-100 pt-2 space-y-2">
+              <Field label={`Frage ${i + 1}${tag(!!qv(i, "text"))}`}>
+                <Textarea rows={2} value={qv(i, "text")} placeholder={qq.text || "(global leer)"}
+                  onChange={e => setQuestionOverride(group, quiz.id, i, "text", e.target.value)} />
+              </Field>
+              <Field label={`Telefon ${i + 1}${tag(!!qv(i, "phoneNumber"))}`}>
+                <Input value={qv(i, "phoneNumber")} placeholder={qq.phoneNumber || "(global leer)"}
+                  onChange={e => setQuestionOverride(group, quiz.id, i, "phoneNumber", e.target.value)} />
+              </Field>
+            </div>
+          ))}
+          <p className="text-xs text-stone-500">Zum Prüfen rechts die Verlagsvorlage dieser Gruppe vorschauen/anwenden — dann erscheinen die Overrides.</p>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function Page() {
   const [history, dispatch] = useReducer(historyReducer, { past: [], present: defaultQuiz, future: [] });
   const quiz = history.present;
@@ -6679,6 +6767,15 @@ export default function Page() {
   const canRedo = history.future.length > 0;
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>("inhalt");
+  // Re-Render erzwingen, wenn sich gruppenspezifische Inhalts-Overrides ändern
+  // (diese liegen im localStorage, nicht im Reducer) — damit Vorschau/Export
+  // sofort die aktuellen Gruppenwerte zeigen.
+  const [, bumpGroupContent] = useReducer((x: number) => x + 1, 0);
+  useEffect(() => {
+    const h = () => bumpGroupContent();
+    window.addEventListener(GROUP_CONTENT_EVENT, h);
+    return () => window.removeEventListener(GROUP_CONTENT_EVENT, h);
+  }, []);
   const [imageStyleMode, setImageStyleMode] = useImageStyleMode();
   // Wenn gesetzt, rendert Vorschau und PDF-Export mit Schrift/Farben/Größe
   // einer Verlags-Vorlage *ohne* den Editor-Stand zu verändern.
