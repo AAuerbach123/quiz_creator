@@ -3893,10 +3893,26 @@ function SwpRenderer({ quiz, width }: RendererProps) {
 // in der Fußleiste. Datengetrieben (Titel/Untertitel/Rubrik/Fragen/Gewinner/
 // Bilder/Datum aus dem Quiz), mit/ohne Gewinner über meta.winnerCount.
 // Koordinaten in pt der 280×219-mm-Seite (793,7×620,8 pt); Skalierung u=width/793,7.
-function NuernbergRenderer({ quiz, width }: RendererProps) {
+function NuernbergRenderer({ quiz, width, height, selectedBlockId, onSelectBlock, editable, dispatch }: RendererProps) {
   const { meta, questions, prizes, theme } = quiz;
   const u = width / 793.7;
   const P = (v: number) => `${v * u}px`;
+  const edit = !!(editable && dispatch);
+  const wrap = (id: string, node: React.ReactNode, blk: React.CSSProperties, box?: boolean) => (
+    <Adjustable id={id} transforms={quiz.layout.transforms} dispatch={dispatch} editable={editable}
+      width={width} height={height} selectedBlockId={selectedBlockId} onSelectBlock={onSelectBlock} block={blk} box={box}>
+      {node}
+    </Adjustable>
+  );
+  const ed = (value: string, onChange: (v: string) => void, opts?: { multiline?: boolean; placeholder?: string }) =>
+    edit ? <InlineEditable value={value} onChange={onChange} multiline={opts?.multiline} placeholder={opts?.placeholder} /> : <>{value}</>;
+  const setMeta = (p: Record<string, unknown>) => dispatch?.({ type: "UPDATE_META", payload: p });
+  const setWinner = (i: number, text: string) => {
+    const ws = (meta.winners ?? []).slice();
+    while (ws.length <= i) ws.push({ id: "w" + (ws.length + 1), text: "", photo: null });
+    ws[i] = { ...ws[i], text };
+    setMeta({ winners: ws });
+  };
   const prizeLabelFor = (i: number) => {
     const q = questions[i]; if (!q) return "";
     const p = prizes.find(x => x.id === q.prizeTierId);
@@ -3924,58 +3940,60 @@ function NuernbergRenderer({ quiz, width }: RendererProps) {
         <div style={{ ...RC(700), fontSize: P(11), color: "#3a3a3a" }}>GEWINNSPIEL »WISSENSQUIZ«</div>
         <div style={{ ...RC(700), fontSize: P(11), color: "#fff", background: "#E6007E", padding: `${P(3)} ${P(11)}` }}>{tag}</div>
       </div>
-      <div style={{ position: "absolute", left: 0, top: P(22), width: P(793.7), height: P(124), background: RED, color: "#fff" }}>
-        <div style={{ position: "absolute", left: P(18), top: P(8), ...RC(700), fontSize: P(39), lineHeight: .95 }}>{meta.title}</div>
-        <div style={{ position: "absolute", left: P(20), top: P(86), ...RC(300), fontSize: P(16) }}>{meta.subtitle}</div>
-      </div>
-      <img src="/nuernberg/banknotes.png" alt="" style={{ position: "absolute", left: P(6), top: P(128), width: P(138), zIndex: 5 }} />
-      <div style={{ position: "absolute", left: P(12), top: P(188), width: P(40), height: P(40), borderRadius: "50%", background: "#E6007E", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", ...RC(700), fontSize: P(11), transform: "rotate(-10deg)", zIndex: 6 }}>50 ct</div>
-      <div style={{ position: "absolute", left: P(18), top: P(214), width: P(300) }}>
-        <div style={{ color: cyan, ...RC(700), fontSize: P(15), marginBottom: P(3) }}>Anrufen, gewinnen, freuen!</div>
-        <div style={{ ...RC(400), fontSize: P(10), lineHeight: 1.3, color: "#222" }}>{meta.howToText || "Sichern Sie sich jeden Tag Ihre Chance auf bis zu 1.000 €. Beantworten Sie heute eine oder alle fünf Fragen auf der rechten Seite."}</div>
-        <div style={{ color: cyan, ...RC(700), fontSize: P(15), marginTop: P(9), marginBottom: P(3) }}>So geht&apos;s:</div>
-        <div style={{ ...RC(400), fontSize: P(10), lineHeight: 1.55 }}>
-          <span style={{ color: cyan, fontWeight: 700 }}>1.</span> Frage auf der rechten Seite auswählen.<br />
-          <span style={{ color: cyan, fontWeight: 700 }}>2.</span> Die zur Frage angegebene Telefonnummer wählen.<br />
-          <span style={{ color: cyan, fontWeight: 700 }}>3.</span> Lösung nennen – und auf Ihr Glück hoffen.<br />
-          <span style={{ color: cyan, fontWeight: 700 }}>4.</span> Teilnahmeschluss ist täglich um 23.59 Uhr.
+      <div style={{ position: "absolute", left: 0, top: P(22), width: P(793.7), height: P(124), background: RED }} />
+      {wrap("nb_title", <div style={{ ...RC(700), fontSize: P(39), lineHeight: .95, color: "#fff" }}>{ed(meta.title, v => setMeta({ title: v, titleAuto: false }), { placeholder: "Titel" })}</div>, { position: "absolute", left: P(18), top: P(30), width: P(700) })}
+      {wrap("nb_subtitle", <div style={{ ...RC(300), fontSize: P(16), color: "#fff" }}>{ed(meta.subtitle, v => setMeta({ subtitle: v }), { multiline: true, placeholder: "Untertitel" })}</div>, { position: "absolute", left: P(20), top: P(108), width: P(560) })}
+      {wrap("nb_bank", <img src="/nuernberg/banknotes.png" alt="" style={{ width: "100%", display: "block" }} />, { position: "absolute", left: P(8), top: P(120), width: P(152), zIndex: 5 }, true)}
+      {wrap("nb_story", (
+        <div>
+          <div style={{ color: cyan, ...RC(700), fontSize: P(15), marginBottom: P(3) }}>Anrufen, gewinnen, freuen!</div>
+          <div style={{ ...RC(400), fontSize: P(10), lineHeight: 1.3, color: "#222" }}>{ed(meta.howToText || "", v => setMeta({ howToText: v }), { multiline: true, placeholder: "Sichern Sie sich jeden Tag Ihre Chance auf bis zu 1.000 €. …" })}</div>
+          <div style={{ color: cyan, ...RC(700), fontSize: P(15), marginTop: P(9), marginBottom: P(3) }}>So geht&apos;s:</div>
+          <div style={{ ...RC(400), fontSize: P(10), lineHeight: 1.55 }}>
+            <span style={{ color: cyan, fontWeight: 700 }}>1.</span> Frage auf der rechten Seite auswählen.<br />
+            <span style={{ color: cyan, fontWeight: 700 }}>2.</span> Die zur Frage angegebene Telefonnummer wählen.<br />
+            <span style={{ color: cyan, fontWeight: 700 }}>3.</span> Lösung nennen – und auf Ihr Glück hoffen.<br />
+            <span style={{ color: cyan, fontWeight: 700 }}>4.</span> Teilnahmeschluss ist täglich um 23.59 Uhr.
+          </div>
         </div>
-      </div>
-      <div style={{ position: "absolute", left: P(18), top: P(430), width: P(300), display: "flex", gap: P(10) }}>
-        {img1 && <img src={img1} alt="" style={{ width: P(145), height: P(84), objectFit: "cover", borderRadius: P(6) }} />}
-        {img2 && <img src={img2} alt="" style={{ width: P(145), height: P(84), objectFit: "cover", borderRadius: P(6) }} />}
-      </div>
-      <div style={{ position: "absolute", left: P(336), top: P(158), color: cyan, ...RC(700), fontSize: P(16) }}>{meta.questionsHeadline}</div>
-      <div style={{ position: "absolute", left: P(336), top: P(180), width: P(444), display: "flex", flexWrap: "wrap", gap: P(8) }}>
-        {questions.slice(0, 5).map((q, i) => (
-          <div key={q.id} style={{ width: P(218), background: "linear-gradient(180deg,#0098d8,#0079b8)", borderRadius: P(8), color: "#fff", padding: `${P(7)} ${P(11)}` }}>
-            <div style={{ ...RC(400), fontSize: P(9.5), opacity: .92 }}>Frage {i + 1}</div>
-            <div style={{ ...RC(700), fontSize: P(19), margin: `${P(-1)} 0 ${P(2)}` }}>{prizeLabelFor(i)}</div>
-            <div style={{ ...RC(400), fontSize: P(9), lineHeight: 1.15, minHeight: P(30) }}>{q.text}</div>
-            <div style={{ ...RC(700), fontSize: P(11.5), marginTop: P(2) }}>{q.phoneNumber}<span style={{ fontSize: P(8), verticalAlign: "super" }}>*</span></div>
-          </div>
-        ))}
-      </div>
+      ), { position: "absolute", left: P(18), top: P(214), width: P(300) })}
+      {img1 && wrap("nb_img1", <img src={img1} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: P(6), display: "block" }} />, { position: "absolute", left: P(18), top: P(430), width: P(145), height: P(84) }, true)}
+      {img2 && wrap("nb_img2", <img src={img2} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: P(6), display: "block" }} />, { position: "absolute", left: P(173), top: P(430), width: P(145), height: P(84) }, true)}
+      {wrap("nb_rubrik", <div style={{ color: cyan, ...RC(700), fontSize: P(16) }}>{ed(meta.questionsHeadline || "", v => setMeta({ questionsHeadline: v }), { placeholder: "Rubrik" })}</div>, { position: "absolute", left: P(336), top: P(158), width: P(440) })}
+      {wrap("nb_questions", (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: P(8) }}>
+          {questions.slice(0, 5).map((q, i) => (
+            <div key={q.id} style={{ width: P(218), background: "linear-gradient(180deg,#0098d8,#0079b8)", borderRadius: P(8), color: "#fff", padding: `${P(7)} ${P(11)}` }}>
+              <div style={{ ...RC(400), fontSize: P(9.5), opacity: .92 }}>Frage {i + 1}</div>
+              <div style={{ ...RC(700), fontSize: P(19), margin: `${P(-1)} 0 ${P(2)}` }}>{prizeLabelFor(i)}</div>
+              <div style={{ ...RC(400), fontSize: P(9), lineHeight: 1.15, minHeight: P(30) }}>{ed(q.text, v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { text: v } }), { placeholder: "Frage" })}</div>
+              <div style={{ ...RC(700), fontSize: P(11.5), marginTop: P(2) }}>{ed(q.phoneNumber ?? "", v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } }), { placeholder: "Telefon" })}<span style={{ fontSize: P(8), verticalAlign: "super" }}>*</span></div>
+            </div>
+          ))}
+        </div>
+      ), { position: "absolute", left: P(336), top: P(180), width: P(444) }, true)}
       {showWinners ? (
-        <>
-          <div style={{ position: "absolute", left: P(18), top: P(524), color: cyan, ...RC(700), fontSize: P(12) }}>Gewinner vom {datum || "…"} 2026</div>
-          <div style={{ position: "absolute", left: P(18), top: P(540), width: P(548), display: "flex", gap: P(6) }}>
-            {questions.slice(0, 5).map((q, i) => (
-              <div key={q.id} style={{ flex: 1, background: "#f0f6fb", border: `${P(1)} solid #cfe2ef`, borderRadius: P(5), padding: `${P(4)} ${P(5)}`, textAlign: "center" }}>
-                <div style={{ ...RC(700), fontSize: P(10), color: "#0079b8" }}>{prizeLabelFor(i)}</div>
-                <div style={{ ...RC(400), fontSize: P(8.5), color: "#333" }}>{winners[i]?.text || "Vorname Name"}</div>
-              </div>
-            ))}
+        wrap("nb_winners", (
+          <div>
+            <div style={{ color: cyan, ...RC(700), fontSize: P(12), marginBottom: P(4) }}>Gewinner vom {datum || "…"} 2026</div>
+            <div style={{ display: "flex", gap: P(6) }}>
+              {questions.slice(0, 5).map((q, i) => (
+                <div key={q.id} style={{ flex: 1, background: "#f0f6fb", border: `${P(1)} solid #cfe2ef`, borderRadius: P(5), padding: `${P(4)} ${P(5)}`, textAlign: "center" }}>
+                  <div style={{ ...RC(700), fontSize: P(10), color: "#0079b8" }}>{prizeLabelFor(i)}</div>
+                  <div style={{ ...RC(400), fontSize: P(8.5), color: "#333" }}>{ed(winners[i]?.text || "", v => setWinner(i, v), { placeholder: "Vorname Name" })}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </>
+        ), { position: "absolute", left: P(18), top: P(522), width: P(548) }, true)
       ) : (
-        <div style={{ position: "absolute", left: P(18), top: P(532), width: P(548), ...RC(700), fontSize: P(12), color: "#222" }}>Die Gewinner werden ab dem 8. Juli 2026 veröffentlicht.</div>
+        wrap("nb_winline", <div style={{ ...RC(700), fontSize: P(12), color: "#222" }}>Die Gewinner werden ab dem 8. Juli 2026 veröffentlicht.</div>, { position: "absolute", left: P(18), top: P(528), width: P(548) })
       )}
       <div style={{ position: "absolute", left: 0, top: P(574), width: P(793.7), borderTop: `${P(1.5)} solid #D63A48`, padding: `${P(5)} ${P(14)}` }}>
         <div style={{ ...RC(700), fontSize: P(7.2), width: P(556) }}>Fragen zur Teilnahme, sprechen Sie uns persönlich: 0800-7779889 · Keine Gewinnspielteilnahme. (Telemedia Interactive GmbH, kostenlos)</div>
-        <div style={{ ...RC(300), fontSize: P(5.3), lineHeight: 1.27, textAlign: "justify", width: P(556), color: "#333", marginTop: P(2) }}>{meta.termsText}</div>
+        <div style={{ ...RC(300), fontSize: P(5.3), lineHeight: 1.27, textAlign: "justify", width: P(556), color: "#333", marginTop: P(2) }}>{ed(meta.termsText || "", v => setMeta({ termsText: v }), { multiline: true, placeholder: "Teilnahmebedingungen" })}</div>
       </div>
-      <img src="/nuernberg/logoblock.png" alt="" style={{ position: "absolute", right: P(14), top: P(500), width: P(186) }} />
+      {wrap("nb_logo", <img src="/nuernberg/logoblock.png" alt="" style={{ width: "100%", display: "block" }} />, { position: "absolute", left: P(593.7), top: P(500), width: P(186) }, true)}
     </div>
   );
 }
