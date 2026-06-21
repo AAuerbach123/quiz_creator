@@ -5046,6 +5046,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const isSAAR = meta.verlag === "SAAR";
   // BEIG (Simona, SHZ-Gruppe) — zeitungsgenau.
   const isBEIG = meta.presetId === "SHZ__Beig";
+  // Nürnberg (VNP): Haller-Layout, aber roter Verlaufs-Titelbalken + Geldfächer.
+  const isNuern = meta.presetId === "Nürnberg__Nürnberg" || meta.verlag === "Nürnberg";
   // SAAR: Leerzeichen vor dem €-Zeichen ("50€" → "50 €").
   const eur = (s: string) => isSAAR ? s.replace(/\s*€/g, " €") : s;
   // SAAR: "Anzeige"-Hinweis raus (Verlag setzt ihn selbst). BEIG: nur bei
@@ -5401,7 +5403,30 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         { display: "flex", justifyContent: "space-between",
           fontSize: px(8), fontWeight: 700, letterSpacing: 2, color: "#1A1A1A" })}
 
+      {/* KOPF Nürnberg (VNP): roter Verlaufs-Balken mit weißem Titel + Geldfächer */}
+      {isNuern && (
+        <div style={{ position: "relative", width: "100%", marginTop: px(4), borderRadius: px(6),
+          overflow: "visible", padding: `${px(12)} ${px(16)}`, minHeight: px(94),
+          background: "linear-gradient(95deg,#D81A48 0%,#DD2E72 52%,#E6007E 100%)" }}>
+          {wrap("nu_title",
+            <div style={{ color: "#FFFFFF", fontWeight: 800, fontSize: px(34), lineHeight: 1.02, maxWidth: px(600) }}>
+              {edit
+                ? <InlineEditable value={effectiveTitle(quiz)} placeholder="Titel der Aktion"
+                    onChange={v => setMeta({ title: v, titleAuto: false })} />
+                : (effectiveTitle(quiz) || "Titel der Aktion")}
+            </div>)}
+          {wrap("nu_intro",
+            <div style={{ color: "#FFFFFF", fontSize: px(13), lineHeight: 1.25, marginTop: px(6), maxWidth: px(560) }}>
+              {ed(meta.subtitle, v => setMeta({ subtitle: v }), { multiline: true, placeholder: "Untertitel" })}
+            </div>)}
+          {wrap("nu_fan",
+            <img src="/nuernberg/euronoten_faecher.png" alt="" style={{ width: "100%", display: "block" }} />,
+            { position: "absolute", right: px(12), top: px(10), width: px(182), zIndex: 4 }, true)}
+        </div>
+      )}
+
       {/* KOPF: runder Störer links, zentrierte Headline + Untertitel */}
+      {!isNuern && (
       <div style={{ display: "flex", alignItems: "flex-start", gap: px(14), marginTop: px(4) }}>
         {wrap("stoerer",
           <div style={{ width: stoererD, height: stoererD, borderRadius: "50%",
@@ -5451,6 +5476,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         {/* Symmetrie-Platzhalter rechts in Störer-Breite, damit der Titel mittig sitzt (nur Augsburger) */}
         <div style={{ flex: "0 0 auto", width: stoererD, visibility: "hidden", display: rhein ? "none" : "block" }} />
       </div>
+      )}
 
       {/* HAUPTBEREICH: vier Spalten */}
       <div style={{ flex: 1, display: "flex", gap: px(12), marginTop: px(10), minHeight: 0 }}>
