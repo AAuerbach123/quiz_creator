@@ -5048,11 +5048,15 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const isBEIG = meta.presetId === "SHZ__Beig";
   // Nürnberg (VNP): Haller-Layout, aber roter Verlaufs-Titelbalken + Geldfächer.
   const isNuern = meta.presetId === "Nürnberg__Nürnberg" || meta.verlag === "Nürnberg";
+  // Nürnberg-Headline ohne Themen-/Verlagszusatz ("… in den … Nachrichten").
+  const nuTitle = (effectiveTitle(quiz) || "").replace(/\s*[–-]\s*Thema:.*$/i, "").replace(/\s+in d(er|en)\s.*$/i, "").trim();
+  // Nürnberg-Kicker oben rechts: TAG X[: Datum].
+  const nuTag = "TAG " + (meta.spieltag || "1").trim() + (meta.swpDatum ? ": " + meta.swpDatum.trim() : "");
   // SAAR: Leerzeichen vor dem €-Zeichen ("50€" → "50 €").
   const eur = (s: string) => isSAAR ? s.replace(/\s*€/g, " €") : s;
   // SAAR: "Anzeige"-Hinweis raus (Verlag setzt ihn selbst). BEIG: nur bei
   // Ohne-Gewinner-Variante raus.
-  const hideAnzeige = isSAAR || (isBEIG && !((meta.winners ?? []).length && (meta.winnerCount ?? 0) > 0));
+  const hideAnzeige = isSAAR || isNuern || (isBEIG && !((meta.winners ?? []).length && (meta.winnerCount ?? 0) > 0));
   // BEIG: statt Störer der Spieltag (X/27). Spieltag aus meta.spieltag, sonst 1.
   const beigSpieltag = isBEIG;
   const spieltagNo = Number(meta.spieltag || "") || 1;
@@ -5403,17 +5407,23 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         { display: "flex", justifyContent: "space-between",
           fontSize: px(8), fontWeight: 700, letterSpacing: 2, color: "#1A1A1A" })}
 
-      {/* KOPF Nürnberg (VNP): roter Verlaufs-Balken mit weißem Titel + Geldfächer */}
+      {/* KOPF Nürnberg (VNP): Kicker + roter Verlaufs-Balken mit weißem Titel + Geldfächer */}
       {isNuern && (
-        <div style={{ position: "relative", width: "100%", marginTop: px(4), borderRadius: px(6),
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: px(2), marginBottom: px(5) }}>
+          <div style={{ fontWeight: 700, fontSize: px(11), letterSpacing: px(0.4), color: "#3A3A3A" }}>GEWINNSPIEL »WISSENSQUIZ«</div>
+          <div style={{ fontWeight: 700, fontSize: px(11), color: "#FFFFFF", background: "#E6007E", padding: `${px(3)} ${px(11)}` }}>{nuTag}</div>
+        </div>
+      )}
+      {isNuern && (
+        <div style={{ position: "relative", width: "100%", borderRadius: px(6),
           overflow: "visible", padding: `${px(12)} ${px(16)}`, minHeight: px(94),
           background: "linear-gradient(95deg,#D81A48 0%,#DD2E72 52%,#E6007E 100%)" }}>
           {wrap("nu_title",
-            <div style={{ color: "#FFFFFF", fontWeight: 800, fontSize: px(34), lineHeight: 1.02, maxWidth: px(600) }}>
+            <div style={{ color: "#FFFFFF", fontWeight: 800, fontSize: px(36), lineHeight: 1.02, maxWidth: px(600) }}>
               {edit
-                ? <InlineEditable value={effectiveTitle(quiz)} placeholder="Titel der Aktion"
+                ? <InlineEditable value={nuTitle} placeholder="Titel der Aktion"
                     onChange={v => setMeta({ title: v, titleAuto: false })} />
-                : (effectiveTitle(quiz) || "Titel der Aktion")}
+                : (nuTitle || "Titel der Aktion")}
             </div>)}
           {wrap("nu_intro",
             <div style={{ color: "#FFFFFF", fontSize: px(13), lineHeight: 1.25, marginTop: px(6), maxWidth: px(560) }}>
@@ -5493,8 +5503,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             // gestreckt → große Lücken). Natürliche Höhe (kein flex-grow), damit
             // die "Auflösung" direkt unter dem Text sitzt; overflow:hidden begrenzt
             // sehr langen Text auf die Spalte (kein Überlauf ins Logo).
-            <div style={{ color: cIntro, fontSize: px(wide ? 16.5 : 13.75),
-              lineHeight: 1.38, whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
+            <div style={{ color: cIntro, fontSize: px(isNuern ? (wide ? 18.5 : 16) : (wide ? 16.5 : 13.75)),
+              lineHeight: 1.4, whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
               overflow: "hidden",
               hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
               {edit
