@@ -112,7 +112,7 @@ type Quiz = {
   layout: {
     format: string; orientation: string;
     customSize?: { w: number; h: number };
-    variant?: "beilage" | "querformat" | "redaktionell" | "rhein" | "swp";
+    variant?: "beilage" | "querformat" | "redaktionell" | "rhein" | "swp" | "nuernberg";
     // Freie Element-Anpassungen (Redaktionell-Layout): Versatz in Anteilen
     // der Anzeigenbreite/-höhe (auflösungsunabhängig), Skalierung und
     // Ausblenden ("Löschen") pro Element-ID. Gilt in Vorschau UND PDF.
@@ -3884,10 +3884,109 @@ function SwpRenderer({ quiz, width }: RendererProps) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Nürnberg / VNP-Layout ("nuernberg")
+// ---------------------------------------------------------------------------
+// Unser Wissensquiz im Look & Feel der Verlag Nürnberger Presse (VNP):
+// Kicker-Balken + Magenta-Tag, rote Hero-Fläche mit Verlauf, Euro-Banknoten als
+// Störer, cyanfarbene Abschnittsüberschriften, blaue Frage-Boxen, VNP-Logoblock
+// in der Fußleiste. Datengetrieben (Titel/Untertitel/Rubrik/Fragen/Gewinner/
+// Bilder/Datum aus dem Quiz), mit/ohne Gewinner über meta.winnerCount.
+// Koordinaten in pt der 280×219-mm-Seite (793,7×620,8 pt); Skalierung u=width/793,7.
+function NuernbergRenderer({ quiz, width }: RendererProps) {
+  const { meta, questions, prizes, theme } = quiz;
+  const u = width / 793.7;
+  const P = (v: number) => `${v * u}px`;
+  const prizeLabelFor = (i: number) => {
+    const q = questions[i]; if (!q) return "";
+    const p = prizes.find(x => x.id === q.prizeTierId);
+    return p ? getPrizeLabel(p) : "";
+  };
+  const winnerCount = Math.max(0, Math.min(5, meta.winnerCount ?? 0));
+  const winners = (meta.winners ?? []).slice(0, winnerCount);
+  const showWinners = winnerCount > 0;
+  const spieltag = (meta.spieltag || "1").trim();
+  const datum = (meta.swpDatum || "").trim();
+  const tag = `TAG ${spieltag}${datum ? ": " + datum : ""}`;
+  const img1 = theme.background?.image || null;
+  const img2 = theme.background?.imageBottom || null;
+  const RED = "linear-gradient(180deg,#E25A67 0%,#D63A48 55%,#C5283A 100%)";
+  const RC = (w: 300 | 400 | 700): React.CSSProperties => ({ fontFamily: "'NB-RC',sans-serif", fontWeight: w });
+  const cyan = "#00A7E0";
+  return (
+    <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden", background: "#fff", color: "#1a1a1a", fontFamily: "'NB-RC',sans-serif" }}>
+      <style>{`
+        @font-face{font-family:'NB-RC';font-weight:300;font-display:block;src:url('/swp/fonts/roboto-condensed-latin-300-normal.woff2') format('woff2');}
+        @font-face{font-family:'NB-RC';font-weight:400;font-display:block;src:url('/swp/fonts/roboto-condensed-latin-400-normal.woff2') format('woff2');}
+        @font-face{font-family:'NB-RC';font-weight:700;font-display:block;src:url('/swp/fonts/roboto-condensed-latin-700-normal.woff2') format('woff2');}
+      `}</style>
+      <div style={{ position: "absolute", left: 0, top: 0, width: P(793.7), height: P(22), display: "flex", alignItems: "center", justifyContent: "space-between", padding: `0 ${P(18)}` }}>
+        <div style={{ ...RC(700), fontSize: P(11), color: "#3a3a3a" }}>GEWINNSPIEL »WISSENSQUIZ«</div>
+        <div style={{ ...RC(700), fontSize: P(11), color: "#fff", background: "#E6007E", padding: `${P(3)} ${P(11)}` }}>{tag}</div>
+      </div>
+      <div style={{ position: "absolute", left: 0, top: P(22), width: P(793.7), height: P(124), background: RED, color: "#fff" }}>
+        <div style={{ position: "absolute", left: P(18), top: P(8), ...RC(700), fontSize: P(39), lineHeight: .95 }}>{meta.title}</div>
+        <div style={{ position: "absolute", left: P(20), top: P(86), ...RC(300), fontSize: P(16) }}>{meta.subtitle}</div>
+      </div>
+      <img src="/nuernberg/banknotes.png" alt="" style={{ position: "absolute", left: P(6), top: P(128), width: P(138), zIndex: 5 }} />
+      <div style={{ position: "absolute", left: P(12), top: P(188), width: P(40), height: P(40), borderRadius: "50%", background: "#E6007E", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", ...RC(700), fontSize: P(11), transform: "rotate(-10deg)", zIndex: 6 }}>50 ct</div>
+      <div style={{ position: "absolute", left: P(18), top: P(214), width: P(300) }}>
+        <div style={{ color: cyan, ...RC(700), fontSize: P(15), marginBottom: P(3) }}>Anrufen, gewinnen, freuen!</div>
+        <div style={{ ...RC(400), fontSize: P(10), lineHeight: 1.3, color: "#222" }}>{meta.howToText || "Sichern Sie sich jeden Tag Ihre Chance auf bis zu 1.000 €. Beantworten Sie heute eine oder alle fünf Fragen auf der rechten Seite."}</div>
+        <div style={{ color: cyan, ...RC(700), fontSize: P(15), marginTop: P(9), marginBottom: P(3) }}>So geht&apos;s:</div>
+        <div style={{ ...RC(400), fontSize: P(10), lineHeight: 1.55 }}>
+          <span style={{ color: cyan, fontWeight: 700 }}>1.</span> Frage auf der rechten Seite auswählen.<br />
+          <span style={{ color: cyan, fontWeight: 700 }}>2.</span> Die zur Frage angegebene Telefonnummer wählen.<br />
+          <span style={{ color: cyan, fontWeight: 700 }}>3.</span> Lösung nennen – und auf Ihr Glück hoffen.<br />
+          <span style={{ color: cyan, fontWeight: 700 }}>4.</span> Teilnahmeschluss ist täglich um 23.59 Uhr.
+        </div>
+      </div>
+      <div style={{ position: "absolute", left: P(18), top: P(430), width: P(300), display: "flex", gap: P(10) }}>
+        {img1 && <img src={img1} alt="" style={{ width: P(145), height: P(84), objectFit: "cover", borderRadius: P(6) }} />}
+        {img2 && <img src={img2} alt="" style={{ width: P(145), height: P(84), objectFit: "cover", borderRadius: P(6) }} />}
+      </div>
+      <div style={{ position: "absolute", left: P(336), top: P(158), color: cyan, ...RC(700), fontSize: P(16) }}>{meta.questionsHeadline}</div>
+      <div style={{ position: "absolute", left: P(336), top: P(180), width: P(444), display: "flex", flexWrap: "wrap", gap: P(8) }}>
+        {questions.slice(0, 5).map((q, i) => (
+          <div key={q.id} style={{ width: P(218), background: "linear-gradient(180deg,#0098d8,#0079b8)", borderRadius: P(8), color: "#fff", padding: `${P(7)} ${P(11)}` }}>
+            <div style={{ ...RC(400), fontSize: P(9.5), opacity: .92 }}>Frage {i + 1}</div>
+            <div style={{ ...RC(700), fontSize: P(19), margin: `${P(-1)} 0 ${P(2)}` }}>{prizeLabelFor(i)}</div>
+            <div style={{ ...RC(400), fontSize: P(9), lineHeight: 1.15, minHeight: P(30) }}>{q.text}</div>
+            <div style={{ ...RC(700), fontSize: P(11.5), marginTop: P(2) }}>{q.phoneNumber}<span style={{ fontSize: P(8), verticalAlign: "super" }}>*</span></div>
+          </div>
+        ))}
+      </div>
+      {showWinners ? (
+        <>
+          <div style={{ position: "absolute", left: P(18), top: P(524), color: cyan, ...RC(700), fontSize: P(12) }}>Gewinner vom {datum || "…"} 2026</div>
+          <div style={{ position: "absolute", left: P(18), top: P(540), width: P(548), display: "flex", gap: P(6) }}>
+            {questions.slice(0, 5).map((q, i) => (
+              <div key={q.id} style={{ flex: 1, background: "#f0f6fb", border: `${P(1)} solid #cfe2ef`, borderRadius: P(5), padding: `${P(4)} ${P(5)}`, textAlign: "center" }}>
+                <div style={{ ...RC(700), fontSize: P(10), color: "#0079b8" }}>{prizeLabelFor(i)}</div>
+                <div style={{ ...RC(400), fontSize: P(8.5), color: "#333" }}>{winners[i]?.text || "Vorname Name"}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div style={{ position: "absolute", left: P(18), top: P(532), width: P(548), ...RC(700), fontSize: P(12), color: "#222" }}>Die Gewinner werden ab dem 8. Juli 2026 veröffentlicht.</div>
+      )}
+      <div style={{ position: "absolute", left: 0, top: P(574), width: P(793.7), borderTop: `${P(1.5)} solid #D63A48`, padding: `${P(5)} ${P(14)}` }}>
+        <div style={{ ...RC(700), fontSize: P(7.2), width: P(556) }}>Fragen zur Teilnahme, sprechen Sie uns persönlich: 0800-7779889 · Keine Gewinnspielteilnahme. (Telemedia Interactive GmbH, kostenlos)</div>
+        <div style={{ ...RC(300), fontSize: P(5.3), lineHeight: 1.27, textAlign: "justify", width: P(556), color: "#333", marginTop: P(2) }}>{meta.termsText}</div>
+      </div>
+      <img src="/nuernberg/logoblock.png" alt="" style={{ position: "absolute", right: P(14), top: P(500), width: P(186) }} />
+    </div>
+  );
+}
+
 function PreviewRenderer(props: RendererProps) {
   const fmt = props.quiz.layout.format;
   if (props.quiz.layout.variant === "swp") {
     return <SwpRenderer {...props} />;
+  }
+  if (props.quiz.layout.variant === "nuernberg") {
+    return <NuernbergRenderer {...props} />;
   }
   if (fmt === "schwedenraetsel") {
     return <SchwedenraetselRenderer quiz={props.quiz} width={props.width} height={props.height} />;
@@ -6688,6 +6787,8 @@ function PortalChanges() {
 function GruppenInhalt({ quiz }: { quiz: Quiz }) {
   const [groups, setGroups] = useState<string[]>([]);
   const [group, setGroup] = useState<string>("");
+  type Wish = { grp?: string; paper?: string; variant?: string; kategorie?: string; status?: string; text?: string; autor?: string };
+  const [wishes, setWishes] = useState<Wish[]>([]);
   const [, tick] = useReducer((x: number) => x + 1, 0);
   useEffect(() => {
     let ok = true;
@@ -6695,8 +6796,17 @@ function GruppenInhalt({ quiz }: { quiz: Quiz }) {
       if (!ok) return;
       setGroups(Array.from(new Set(ps.map(p => p.gruppe).filter(Boolean))).sort());
     }).catch(() => {});
+    // Portal-Änderungswünsche laden (kommen aus dem Korrekturportal pro Gruppe).
+    fetch("/api/portal-comments").then(r => r.json()).then(j => {
+      if (ok && Array.isArray(j.comments)) setWishes(j.comments as Wish[]);
+    }).catch(() => {});
     return () => { ok = false; };
   }, []);
+  // Gruppennamen normalisieren (Portal nutzt teils Unterstriche statt Leerzeichen).
+  const norm = (s: string) => (s || "").toLowerCase().replace(/[_\s]+/g, " ").trim();
+  const groupWishes = group
+    ? wishes.filter(w => norm(w.grp || "") === norm(group) && w.status !== "ok")
+    : [];
   useEffect(() => {
     const h = () => tick();
     window.addEventListener(GROUP_CONTENT_EVENT, h);
@@ -6732,6 +6842,20 @@ function GruppenInhalt({ quiz }: { quiz: Quiz }) {
             <button onClick={() => clearOverride(group, quiz.id)}
               className="text-xs text-rose-600 hover:underline shrink-0">Alle für {group} zurücksetzen</button>
           </div>
+          {groupWishes.length > 0 && (
+            <div className="rounded-md border border-amber-200 bg-amber-50 p-2 space-y-1.5">
+              <div className="text-xs font-medium text-amber-800">Portal-Wünsche dieser Gruppe ({groupWishes.length})</div>
+              {groupWishes.map((w, i) => (
+                <div key={i} className="text-[11.5px] text-stone-700 border-t border-amber-100 pt-1 first:border-0 first:pt-0">
+                  <span className="text-stone-500">
+                    {[w.paper, w.kategorie, w.autor].filter(Boolean).join(" · ")}
+                  </span>
+                  {w.text && <div className="text-stone-800">{w.text}</div>}
+                </div>
+              ))}
+              <div className="text-[11px] text-amber-700">Trage den Wunsch unten ins passende Feld ein — gilt dann nur für {group}.</div>
+            </div>
+          )}
           {META.map(f => (
             <Field key={f.key} label={`${f.label}${tag(!!mv(f.key))}`}>
               {f.area

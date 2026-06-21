@@ -925,7 +925,8 @@
    "01378 220273",
    "01378 220274",
    "01378 220275"
-  ]
+  ],
+  "layoutVariant": "nuernberg"
  },
  {
   "id": "SAAR__PM",
@@ -1306,8 +1307,8 @@
  },
  {
   "id": "SWP__Schwabo",
-  "gruppe": "SWP",
-  "verlag": "SWP",
+  "gruppe": "Schwabo",
+  "verlag": "Schwabo",
   "titel": "Schwabo",
   "titelKanonisch": "Schwarzwälder Bote (SWP-Vorlage)",
   "fontFamily": "'Roboto Condensed', sans-serif",
@@ -1324,7 +1325,7 @@
   },
   "format": "280x190",
   "logoPosition": "Fußleiste (in Vorlage integriert)",
-  "logoUrl": "/verlag-logos/Schwarzwaelder-Bote.png",
+  "logoUrl": null,
   "layoutVariant": "swp"
  }
 ]
