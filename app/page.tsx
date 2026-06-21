@@ -3809,6 +3809,24 @@ function SwpRenderer({ quiz, width }: RendererProps) {
   const fLex: React.CSSProperties = { fontFamily: "'SWP-Lexend', sans-serif", fontWeight: 600 };
   const fRC = (w: 400 | 700): React.CSSProperties => ({ fontFamily: "'SWP-RC', sans-serif", fontWeight: w });
 
+  // Rubrik einzeilig halten: passt sie bei 16 pt nicht in die verfügbare Breite
+  // bis zum Kalenderblatt (~286 pt), wird die Schrift automatisch verkleinert
+  // (min. 9 pt) statt rechts rauszulaufen.
+  const rubRef = useRef<HTMLDivElement>(null);
+  const [rubFs, setRubFs] = useState(16);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const el = rubRef.current;
+      if (!el) return;
+      const maxW = 286 * u;
+      el.style.fontSize = `${16 * u}px`;
+      const w = el.scrollWidth;
+      setRubFs(w > maxW ? Math.max(9, 16 * (maxW / w)) : 16);
+    };
+    measure();
+    (document as { fonts?: { ready?: Promise<unknown> } }).fonts?.ready?.then(measure);
+  }, [rubrik, u]);
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
       {/* Schriften der Vorlage (lokal aus /public/swp/fonts) */}
@@ -3829,8 +3847,8 @@ function SwpRenderer({ quiz, width }: RendererProps) {
         color: "#fff", fontSize: P(8), lineHeight: 1, ...fLex }}>{datum}</div>
 
       {/* Rubrik */}
-      <div style={{ position: "absolute", left: P(374.1), top: P(rubrikTop), color: "#000",
-        fontSize: P(16), lineHeight: 1, whiteSpace: "nowrap", ...fLex }}>{rubrik}</div>
+      <div ref={rubRef} style={{ position: "absolute", left: P(374.1), top: P(rubrikTop), color: "#000",
+        fontSize: `${rubFs * u}px`, lineHeight: 1, whiteSpace: "nowrap", ...fLex }}>{rubrik}</div>
 
       {/* 5 Fragetexte */}
       {ROWY.map((y, i) => (
