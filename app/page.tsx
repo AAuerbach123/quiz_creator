@@ -3959,38 +3959,48 @@ function NuernbergRenderer({ quiz, width, height, selectedBlockId, onSelectBlock
             <span style={{ color: cyan, fontWeight: 700 }}>4.</span> Teilnahmeschluss ist täglich um 23.59 Uhr.
           </div>
         </div>
-      ), { position: "absolute", left: P(18), top: P(214), width: P(300) })}
-      {img1 && wrap("nb_img1", <img src={img1} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: P(6), display: "block" }} />, { position: "absolute", left: P(18), top: P(430), width: P(145), height: P(84) }, true)}
-      {img2 && wrap("nb_img2", <img src={img2} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: P(6), display: "block" }} />, { position: "absolute", left: P(173), top: P(430), width: P(145), height: P(84) }, true)}
-      {wrap("nb_rubrik", <div style={{ color: cyan, ...RC(700), fontSize: P(16) }}>{ed(meta.questionsHeadline || "", v => setMeta({ questionsHeadline: v }), { placeholder: "Rubrik" })}</div>, { position: "absolute", left: P(336), top: P(158), width: P(440) })}
-      {wrap("nb_questions", (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: P(8) }}>
-          {questions.slice(0, 5).map((q, i) => (
-            <div key={q.id} style={{ width: P(218), background: "linear-gradient(180deg,#0098d8,#0079b8)", borderRadius: P(8), color: "#fff", padding: `${P(7)} ${P(11)}` }}>
-              <div style={{ ...RC(400), fontSize: P(9.5), opacity: .92 }}>Frage {i + 1}</div>
-              <div style={{ ...RC(700), fontSize: P(19), margin: `${P(-1)} 0 ${P(2)}` }}>{prizeLabelFor(i)}</div>
-              <div style={{ ...RC(400), fontSize: P(9), lineHeight: 1.15, minHeight: P(30) }}>{ed(q.text, v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { text: v } }), { placeholder: "Frage" })}</div>
-              <div style={{ ...RC(700), fontSize: P(11.5), marginTop: P(2) }}>{ed(q.phoneNumber ?? "", v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } }), { placeholder: "Telefon" })}<span style={{ fontSize: P(8), verticalAlign: "super" }}>*</span></div>
-            </div>
-          ))}
+      ), { position: "absolute", left: P(18), top: P(214), width: P(196) })}
+      {/* Bilder übereinander, neben "So geht's" — nur in der Variante OHNE Gewinner */}
+      {!showWinners && img1 && wrap("nb_img1", <img src={img1} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: P(6), display: "block" }} />, { position: "absolute", left: P(224), top: P(214), width: P(102), height: P(66) }, true)}
+      {!showWinners && img2 && wrap("nb_img2", <img src={img2} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: P(6), display: "block" }} />, { position: "absolute", left: P(224), top: P(288), width: P(102), height: P(66) }, true)}
+      {wrap("nb_rubrik", <div style={{ color: cyan, ...RC(700), fontSize: P(16) }}>{ed(meta.questionsHeadline || "", v => setMeta({ questionsHeadline: v }), { placeholder: "Rubrik" })}</div>, { position: "absolute", left: P(336), top: P(156), width: P(440) })}
+      {/* Frageboxen einzeln + untereinander */}
+      {questions.slice(0, 5).map((q, i) => wrap("nb_q" + (i + 1), (
+        <div style={{ display: "flex", gap: P(10), alignItems: "center", height: "100%", background: "linear-gradient(180deg,#0098d8,#0079b8)", borderRadius: P(8), color: "#fff", padding: `${P(6)} ${P(12)}`, boxSizing: "border-box" }}>
+          <div style={{ flex: "0 0 auto", width: P(84) }}>
+            <div style={{ ...RC(400), fontSize: P(9), opacity: .9 }}>Frage {i + 1}</div>
+            <div style={{ ...RC(700), fontSize: P(21), lineHeight: 1 }}>{prizeLabelFor(i)}</div>
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ ...RC(400), fontSize: P(9.5), lineHeight: 1.15 }}>{ed(q.text, v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { text: v } }), { placeholder: "Frage" })}</div>
+            <div style={{ ...RC(700), fontSize: P(11.5), marginTop: P(2) }}>{ed(q.phoneNumber ?? "", v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } }), { placeholder: "Telefon" })}<span style={{ fontSize: P(8), verticalAlign: "super" }}>*</span></div>
+          </div>
         </div>
-      ), { position: "absolute", left: P(336), top: P(180), width: P(444) }, true)}
+      ), { position: "absolute", left: P(336), top: P(178 + i * 60), width: P(444), height: P(52) }, true))}
       {showWinners ? (
         wrap("nb_winners", (
           <div>
             <div style={{ color: cyan, ...RC(700), fontSize: P(12), marginBottom: P(4) }}>Gewinner vom {datum || "…"} 2026</div>
             <div style={{ display: "flex", gap: P(6) }}>
-              {questions.slice(0, 5).map((q, i) => (
-                <div key={q.id} style={{ flex: 1, background: "#f0f6fb", border: `${P(1)} solid #cfe2ef`, borderRadius: P(5), padding: `${P(4)} ${P(5)}`, textAlign: "center" }}>
-                  <div style={{ ...RC(700), fontSize: P(10), color: "#0079b8" }}>{prizeLabelFor(i)}</div>
-                  <div style={{ ...RC(400), fontSize: P(8.5), color: "#333" }}>{ed(winners[i]?.text || "", v => setWinner(i, v), { placeholder: "Vorname Name" })}</div>
-                </div>
-              ))}
+              {Array.from({ length: 5 }).map((_, i) => {
+                const w = (meta.winners ?? [])[i];
+                return (
+                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: P(2), minWidth: 0 }}>
+                    <div style={{ width: "100%", aspectRatio: "4 / 5", background: "#D7DBE0", borderRadius: P(3), overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {w?.photo
+                        ? <img src={w.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 25%" }} />
+                        : <span style={{ color: "#A3AAB3", fontSize: P(7) }}>Foto</span>}
+                    </div>
+                    <div style={{ color: "#0079b8", ...RC(700), fontSize: P(10) }}>{prizeLabelFor(i)}</div>
+                    <div style={{ color: "#333", ...RC(400), fontSize: P(8), textAlign: "center", width: "100%" }}>{ed(w?.text || "", v => setWinner(i, v), { placeholder: "Vorname" })}</div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        ), { position: "absolute", left: P(18), top: P(522), width: P(548) }, true)
+        ), { position: "absolute", left: P(18), top: P(372), width: P(300) }, true)
       ) : (
-        wrap("nb_winline", <div style={{ ...RC(700), fontSize: P(12), color: "#222" }}>Die Gewinner werden ab dem 8. Juli 2026 veröffentlicht.</div>, { position: "absolute", left: P(18), top: P(528), width: P(548) })
+        wrap("nb_winline", <div style={{ ...RC(700), fontSize: P(12), color: "#222" }}>Die Gewinner werden ab dem 8. Juli 2026 veröffentlicht.</div>, { position: "absolute", left: P(18), top: P(384), width: P(300) })
       )}
       <div style={{ position: "absolute", left: 0, top: P(574), width: P(793.7), borderTop: `${P(1.5)} solid #D63A48`, padding: `${P(5)} ${P(14)}` }}>
         <div style={{ ...RC(700), fontSize: P(7.2), width: P(556) }}>Fragen zur Teilnahme, sprechen Sie uns persönlich: 0800-7779889 · Keine Gewinnspielteilnahme. (Telemedia Interactive GmbH, kostenlos)</div>
