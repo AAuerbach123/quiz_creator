@@ -46,6 +46,9 @@ export function parseAdSize(s: string): { w: number; h: number } | null {
 // Verlagsgruppen, die ihre Anzeige SELBST gestalten und von uns nur Bilder/
 // Vorlagen bekommen (laut Mails von Yasmina/Robert). Für diese gibt es keinen
 // Layout-Export (PDF/TIFF) — sie werden im Kopf entsprechend markiert.
+// Die echte Südwest Presse ("SWP") liefert ihre Anzeige selbst. Den Schwabo
+// (SWP-Vorlage) erzeugen WIR — der läuft als eigene Gruppe "Schwabo" und ist
+// daher exportierbar.
 const SELF_DESIGN_GROUPS = new Set(["SWP", "SWMH", "Neue-Westfaeische", "Neue Westfälische", "Rhein", "Rhein-Zeitung", "Mittelrhein"]);
 
 export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onDownloadStructuredZip, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {

@@ -5600,14 +5600,17 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             fontSize: px(150), fontWeight: 800, color: cPrize, opacity: 0.08,
             lineHeight: 0.8, pointerEvents: "none", userSelect: "none" }}>!?</div>
           {wrap("questionsHeadline",
-            <div style={{ color: cPrize, fontSize: px(wide ? 16 : 12.5), fontWeight: 700, lineHeight: 1.15 }}>
+            <div style={{ color: cPrize, fontSize: px(wide ? 19 : 15.5), fontWeight: 700, lineHeight: 1.15 }}>
               {ed(meta.questionsHeadline ?? "", v => setMeta({ questionsHeadline: v }),
                 { placeholder: DEFAULT_QUESTIONS_HEADLINE }) }
               {!edit && !meta.questionsHeadline && DEFAULT_QUESTIONS_HEADLINE}
             </div>,
-            { marginBottom: px(wide ? 16 : 13) })}
+            { marginBottom: px(2) })}
+          {/* Abstand Überschrift→1. Frage hier als marginTop am Container:
+              die Überschrift ist oft per gespeichertem Transform skaliert,
+              wodurch ihr eigener marginBottom überschrieben wird. */}
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
-            justifyContent: "flex-start", gap: px(wide ? 14 : 11) }}>
+            justifyContent: "space-between", gap: px(4), marginTop: px(wide ? 40 : 34) }}>
             {questions.map((q, qi) => {
               const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];
               if (!(q.text || q.phoneNumber) && !edit) return null;
