@@ -5605,9 +5605,9 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 { placeholder: DEFAULT_QUESTIONS_HEADLINE }) }
               {!edit && !meta.questionsHeadline && DEFAULT_QUESTIONS_HEADLINE}
             </div>,
-            { marginBottom: px(5) })}
+            { marginBottom: px(wide ? 16 : 13) })}
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
-            justifyContent: "space-between", gap: px(3) }}>
+            justifyContent: "flex-start", gap: px(wide ? 14 : 11) }}>
             {questions.map((q, qi) => {
               const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];
               if (!(q.text || q.phoneNumber) && !edit) return null;
