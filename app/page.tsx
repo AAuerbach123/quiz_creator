@@ -5600,17 +5600,15 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             fontSize: px(150), fontWeight: 800, color: cPrize, opacity: 0.08,
             lineHeight: 0.8, pointerEvents: "none", userSelect: "none" }}>!?</div>
           {wrap("questionsHeadline",
-            <div style={{ color: cPrize, fontSize: px(wide ? 19 : 15.5), fontWeight: 700, lineHeight: 1.15 }}>
+            <div style={{ color: cPrize, fontSize: px(wide ? 23 : 19), fontWeight: 700, lineHeight: 1.15 }}>
               {ed(meta.questionsHeadline ?? "", v => setMeta({ questionsHeadline: v }),
                 { placeholder: DEFAULT_QUESTIONS_HEADLINE }) }
               {!edit && !meta.questionsHeadline && DEFAULT_QUESTIONS_HEADLINE}
             </div>,
-            { marginBottom: px(2) })}
-          {/* Abstand Überschrift→1. Frage hier als marginTop am Container:
-              die Überschrift ist oft per gespeichertem Transform skaliert,
-              wodurch ihr eigener marginBottom überschrieben wird. */}
+            { marginTop: px(8), marginBottom: px(2) })}
+          {/* Abstand Überschrift→1. Frage als marginTop am Container (kein Transform). */}
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
-            justifyContent: "space-between", gap: px(4), marginTop: px(wide ? 40 : 34) }}>
+            justifyContent: "space-between", gap: px(4), marginTop: px(wide ? 14 : 11) }}>
             {questions.map((q, qi) => {
               const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];
               if (!(q.text || q.phoneNumber) && !edit) return null;
@@ -5697,10 +5695,10 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           {/* Gewinner-Überschrift als EIGENER Block: separat verschieb-,
               skalier-, editier- und ausblendbar. */}
           {wrap("winnersHeadline",
-            <div style={{ color: cPrize, fontSize: px(13), fontWeight: 700 }}>
+            <div style={{ color: cPrize, fontSize: px(wide ? 23 : 19), fontWeight: 700, lineHeight: 1.15 }}>
               {ed(meta.winnersText || "Unsere neuen Gewinner:", v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
             </div>,
-            { marginBottom: px(8), flexShrink: 0 })}
+            { marginTop: px(8), marginBottom: px(8), flexShrink: 0 })}
           {wrap("winners",
             <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
               <div style={{ flex: 1, minHeight: 0, display: "flex",
