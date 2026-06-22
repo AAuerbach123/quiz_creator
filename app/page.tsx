@@ -5075,6 +5075,14 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const cQuestion = onWhite(theme.colors.question, "#1A1A1A");
   const cPhone = onWhite(theme.colors.phone, "#2B5A8C");
   const cTerms = onWhite(theme.colors.terms, "#555555");
+  // SAAR-Verlagswunsch (Nicole Böhme-Laglasse, Mail 22.06.2026): NUR der runde
+  // Störer oben links und die Preis-Pillen sollen bei SZ (Saarbrücker Zeitung)
+  // und TV (Trierischer Volksfreund) orange sein — CMYK 0/40/90/0 ≈ RGB 255/153/26.
+  // Alle übrigen blauen Elemente (Fragen-Überschrift, Telefon, Gewinnbeträge,
+  // Wasserzeichen) bleiben Verlagsblau. PM (Pfälzischer Merkur) bleibt unverändert.
+  const isSZ = meta.presetId === "SAAR__SZ";
+  const isTV = meta.presetId === "SAAR__TV";
+  const cBadge = (isSZ || isTV) ? "#FF991A" : cPrize;
 
   const winners = (meta.winners ?? []).slice(0, Math.max(0, Math.min(5, meta.winnerCount ?? 0)));
   // "ohne Gewinner"-Variante: keine Gewinner -> Spalte 4 entfällt. Damit kein
@@ -5299,7 +5307,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             {/* Störer oben über der linken Bildecke */}
             {wrap("stoerer",
               <div style={{ width: stoererD, height: stoererD, borderRadius: "50%",
-                background: cPrize, color: "#FFFFFF", display: "flex", flexDirection: "column",
+                background: cBadge, color: "#FFFFFF", display: "flex", flexDirection: "column",
                 alignItems: "center", justifyContent: "center", textAlign: "center",
                 padding: stoererD * 0.08, boxShadow: "0 2px 8px rgba(0,0,0,0.18)" }}>
                 <div style={{ transform: "rotate(-8deg)", display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -5471,7 +5479,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
       <div style={{ display: "flex", alignItems: "flex-start", gap: px(14), marginTop: px(4) }}>
         {wrap("stoerer",
           <div style={{ width: stoererD, height: stoererD, borderRadius: "50%",
-            background: cPrize, color: "#FFFFFF",
+            background: cBadge, color: "#FFFFFF",
             display: "flex", flexDirection: "column", alignItems: "center",
             justifyContent: "center", textAlign: "center",
             padding: stoererD * 0.08,
@@ -5685,7 +5693,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                           : q.text}
                       </div>
                       {prize && wrap(`prize_${q.id}`,
-                        <span style={{ display: "inline-block", background: cPrize, color: "#FFFFFF",
+                        <span style={{ display: "inline-block", background: cBadge, color: "#FFFFFF",
                           fontSize: px(wide ? 16 : 12), fontWeight: 700, padding: `${px(wide ? 2.5 : 1.5)} ${px(wide ? 12 : 9)}`,
                           borderRadius: px(wide ? 12 : 9), whiteSpace: "nowrap", textAlign: "center" }}>
                           {edit
