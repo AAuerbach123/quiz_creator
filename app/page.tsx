@@ -5041,6 +5041,13 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const pad = width * 0.018;
   const edit = !!(editable && dispatch);
 
+  // Fragen-Spalte exakt auf die Unterkante des zweiten Bildes ausrichten.
+  // Die Bilder haben feste Höhen (Transforms) und füllen die Zeile nicht ganz;
+  // ohne diese Korrektur reicht die Fragenliste bis zur (höheren) Zeilenunterkante.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const imgColRef = useRef<HTMLDivElement>(null);
+  const qRowRef = useRef<HTMLDivElement>(null);
+
   // ── Verlagsabhängige Wünsche (pro Gruppe, keine globalen Änderungen) ──
   // SAAR (Nicole Böhme-Laglasse): Pfälzischer Merkur, Trier. Volksfreund, SZ.
   const isSAAR = meta.verlag === "SAAR";
@@ -5085,6 +5092,30 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const imgTop = (meta.verlag ? theme.background?.imageTopByVerlag?.[meta.verlag] : null) || theme.background?.image || null;
   const imgBottom = theme.background?.imageBottom || null;
   const topPrize = eur(prizes.length ? getPrizeLabel(prizes.reduce((a, b) => (b.valueCents > a.valueCents ? b : a))) : "1000€");
+
+  // Fragen-Spalte exakt auf die Unterkante des 2. Bildes ausrichten (ResizeObserver,
+  // robust gegen Skalierung/Fenstergröße/Bild-Transforms). Nur 4-Spalten-Layout.
+  useLayoutEffect(() => {
+    if (rhein) return;
+    const align = () => {
+      const r2 = rootRef.current, c2 = imgColRef.current, q2 = qRowRef.current;
+      if (!r2 || !c2 || !q2) return;
+      const scale = r2.getBoundingClientRect().width / width || 1;
+      const last = c2.lastElementChild as HTMLElement | null;
+      if (!last) return;
+      // flex:1 (=flex-basis:0%) würde eine explizite Höhe überschreiben → flex:none.
+      q2.style.flex = "0 0 auto"; q2.style.height = "";
+      const target = (last.getBoundingClientRect().bottom - q2.getBoundingClientRect().top) / scale;
+      if (target > 8) q2.style.height = `${target}px`; else { q2.style.flex = ""; q2.style.height = ""; }
+    };
+    const root = rootRef.current, col = imgColRef.current;
+    const ro = new ResizeObserver(() => requestAnimationFrame(align));
+    if (root) ro.observe(root);
+    if (col) ro.observe(col);
+    const raf = requestAnimationFrame(align);
+    return () => { ro.disconnect(); cancelAnimationFrame(raf); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width, height, wide, rhein, questions, imgTop, imgBottom, meta.questionsHeadline, meta.winnerCount]);
 
   // Auflösungs-Zeilen: solutionWords per Zeile oder Komma getrennt. Eine evtl.
   // enthaltene Überschrift wird gefiltert — die setzt der Renderer selbst.
@@ -5396,7 +5427,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   }
 
   return (
-    <div onClick={() => onSelectBlock(null)}
+    <div ref={rootRef} onClick={() => onSelectBlock(null)}
       style={{ width, height, position: "relative", background: "#FFFFFF", color: "#1A1A1A",
         fontFamily: theme.fontFamily, overflow: "hidden", boxSizing: "border-box",
         display: "flex", flexDirection: "column", padding: pad }}>
@@ -5569,7 +5600,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         </div>
 
         {/* SPALTE 2: zwei gestapelte Bilder */}
-        <div style={{ flex: imgFlex, display: "flex", flexDirection: "column", gap: px(8), minWidth: 0 }}>
+        <div ref={imgColRef} style={{ flex: imgFlex, display: "flex", flexDirection: "column", gap: px(8), minWidth: 0 }}>
           {/* Bilder werden auf Datenebene passend zugeschnitten (fitCardImage);
               objectFit:cover gleicht Rest-Differenzen aus. */}
           {wrap("img_top",
@@ -5607,8 +5638,8 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             </div>,
             { marginTop: px(8), marginBottom: px(2) })}
           {/* Abstand Überschrift→1. Frage als marginTop am Container (kein Transform). */}
-          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
-            justifyContent: "space-between", gap: px(4), marginTop: px(wide ? 14 : 11) }}>
+          <div ref={qRowRef} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
+            justifyContent: "space-between", gap: px(1), marginTop: px(wide ? 14 : 11) }}>
             {questions.map((q, qi) => {
               const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];
               if (!(q.text || q.phoneNumber) && !edit) return null;
@@ -5646,7 +5677,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                           Frage verankert, aus dem Textfluss gelöst — einzeln
                           verschieb-/skalier-/editier-/löschbar. Der Fragetext
                           reserviert rechts Platz dafür. */}
-                      <div style={{ color: cQuestion, fontSize: px((wide ? 14 : 10.5) * (isSAAR ? 1.18 : 1)), fontWeight: 700,
+                      <div style={{ color: cQuestion, fontSize: px((wide ? 16 : 13) * (isSAAR ? 1.18 : 1)), fontWeight: 700,
                         lineHeight: 1.25, paddingRight: px(wide ? 66 : 46) }}>
                         {edit
                           ? <InlineEditable value={q.text} placeholder="Frage eingeben"
@@ -5666,7 +5697,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                         { position: "absolute", top: 0, right: 0 })}
                       {/* Telefonnummer deutlich größer; Kostenhinweis (Telemedia)
                           steht unter JEDER Nummer. */}
-                      <div style={{ color: cPhone, fontSize: px(wide ? 17 : 13), fontWeight: 700, letterSpacing: 0.3 }}>
+                      <div style={{ color: cPhone, fontSize: px(wide ? 20 : 16), fontWeight: 700, letterSpacing: 0.3 }}>
                         {edit
                           ? <InlineEditable value={q.phoneNumber ?? ""} placeholder="Telefonnummer"
                               onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } })} />
