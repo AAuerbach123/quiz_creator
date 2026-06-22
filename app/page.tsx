@@ -5058,7 +5058,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   // Nürnberg-Headline ohne Themen-/Verlagszusatz ("… in den … Nachrichten").
   const nuTitle = (effectiveTitle(quiz) || "").replace(/\s*[–-]\s*Thema:.*$/i, "").replace(/\s+in d(er|en)\s.*$/i, "").trim();
   // Nürnberg-Kicker oben rechts: TAG X[: Datum].
-  const nuTag = "TAG " + (meta.spieltag || "1").trim() + (meta.swpDatum ? ": " + meta.swpDatum.trim() : "");
+  const nuTag = "Spieltag " + (meta.spieltag || "1").trim();
   // SAAR: Leerzeichen vor dem €-Zeichen ("50€" → "50 €").
   const eur = (s: string) => isSAAR ? s.replace(/\s*€/g, " €") : s;
   // SAAR: "Anzeige"-Hinweis raus (Verlag setzt ihn selbst). BEIG: nur bei
