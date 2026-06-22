@@ -5502,7 +5502,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           { flex: "0 0 auto", marginTop: px(2), order: rhein ? 2 : 0 })}
         <div style={{ flex: 1, textAlign: rhein ? "left" : "center", minWidth: 0, order: rhein ? 1 : 0 }}>
           {wrap("title",
-            <div style={{ color: cTitle, fontWeight: 700, fontSize: px(isSAAR ? 21 : 34), lineHeight: 1.05,
+            <div style={{ color: cTitle, fontWeight: 700, fontSize: px(isSAAR ? 31.5 : 51), lineHeight: 1.05,
               whiteSpace: isSAAR ? "nowrap" : "normal" }}>
               {edit
                 ? <InlineEditable value={effectiveTitle(quiz)} placeholder="Titel der Aktion"
@@ -5510,7 +5510,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 : (effectiveTitle(quiz) || "Titel der Aktion")}
             </div>)}
           {wrap("intro",
-            <div style={{ color: cIntro, fontSize: px(13), lineHeight: 1.25, marginTop: px(4) }}>
+            <div style={{ color: cIntro, fontSize: px(19.5), lineHeight: 1.25, marginTop: px(4) }}>
               {ed(meta.subtitle, v => setMeta({ subtitle: v }), { multiline: true, placeholder: "Untertitel" })}
             </div>)}
         </div>
