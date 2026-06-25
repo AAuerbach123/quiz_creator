@@ -5183,14 +5183,18 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   // Im breiten "ohne Gewinner"-Layout (wide) Logos kleiner halten, damit breite
   // Wortmarken (OTZ/TLZ/TA) die schmale Spalte 1 nicht füllen und den Story-Text
   // verdrängen.
-  const targetLogoArea = width * height * (wide ? 0.032 : 0.045);
+  // Pro-Verlag-Logofaktor: einzelne Block-/Quadrat-Logos wirken bei gleicher
+  // Fläche kleiner als breite Wortmarken. Faktor skaliert linear (Fläche ²,
+  // Deckel ¹), sodass das Logo gleichmäßig um den Faktor größer wird.
+  const logoScale = meta.presetId === "Ippen__Maerkische-Z" ? 1.4 : 1;
+  const targetLogoArea = width * height * (wide ? 0.032 : 0.045) * logoScale * logoScale;
   const onLogoLoad: React.ReactEventHandler<HTMLImageElement> = (e) => {
     const img = e.currentTarget;
     if (!img.naturalWidth || !img.naturalHeight) return;
     const aspect = img.naturalWidth / img.naturalHeight;
     const h = Math.sqrt(targetLogoArea / aspect);
     const w = aspect * h;
-    const scale = Math.min(1, (width * (wide ? 0.13 : 0.16)) / w, (height * (wide ? 0.06 : 0.08)) / h);
+    const scale = Math.min(1, (width * (wide ? 0.13 : 0.16) * logoScale) / w, (height * (wide ? 0.06 : 0.08) * logoScale) / h);
     setLogoDim({ w: Math.round(w * scale), h: Math.round(h * scale) });
   };
 
