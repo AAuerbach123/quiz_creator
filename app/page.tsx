@@ -5275,7 +5275,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                     value={(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
                     onChange={v => setMeta({ howToText: v.replace(/\s*\n\s*/g, " ").trim() })}
                     multiline placeholder="Story-Text"
-                    style={{ whiteSpace: "normal", textAlign: "justify", display: "block" }} />
+                    style={{ whiteSpace: "normal", textAlign: "left", display: "block" }} />
                 : (meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
             </FillText>
             {/* Auflösung der letzten Ausgabe — nur wenn SHOW_SOLUTION aktiv
@@ -5635,7 +5635,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                     value={(meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim()}
                     onChange={v => setMeta({ howToText: v.replace(/\s*\n\s*/g, " ").trim() })}
                     multiline placeholder="Story-Text"
-                    style={{ whiteSpace: "normal", textAlign: "justify", display: "block" }} />
+                    style={{ whiteSpace: "normal", textAlign: "left", display: "block" }} />
                 : (isSAAR
                     ? (() => {
                         const t = (meta.howToText || REDAKTIONELL_DEFAULT_HOWTO).replace(/\s*\n\s*/g, " ").trim();

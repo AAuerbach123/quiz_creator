@@ -49,7 +49,9 @@ export function parseAdSize(s: string): { w: number; h: number } | null {
 // Die echte Südwest Presse ("SWP") liefert ihre Anzeige selbst. Den Schwabo
 // (SWP-Vorlage) erzeugen WIR — der läuft als eigene Gruppe "Schwabo" und ist
 // daher exportierbar.
-const SELF_DESIGN_GROUPS = new Set(["SWP", "SWMH", "Neue-Westfaeische", "Neue Westfälische", "Rhein", "Rhein-Zeitung", "Mittelrhein"]);
+// 25.06.2026 (Wunsch Andreas): NW, SWMH und Mittelrhein/Rhein sollen ins
+// Portal — also wieder exportierbar. Nur die echte Südwest Presse bleibt außen vor.
+const SELF_DESIGN_GROUPS = new Set(["SWP"]);
 
 export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onDownloadStructuredZip, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
   const [presets, setPresets] = useState<VerlagsPreset[]>([]);
