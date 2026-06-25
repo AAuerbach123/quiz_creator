@@ -252,10 +252,10 @@ function buildPublisherTitle(preset: VerlagsPreset | null, publisherName?: strin
   if (preset && (/^SHZ__/.test(preset.id) || (preset.verlag || "").toLowerCase() === "shz")) {
     return "Das große Wissensquiz";
   }
-  // Einheitlicher Titel auf Team-Wunsch (25.06.): immer "in Ihrer Zeitung"
-  // statt des jeweiligen Zeitungsnamens. (SHZ bleibt oben ohne Zusatz.)
+  // Einheitlicher Titel auf Team-Wunsch (Yasmina 25.06.): "Das große
+  // Wissensquiz Ihrer Zeitung" (ohne "in") für ALLE. (SHZ bleibt oben ohne Zusatz.)
   void DATIVE_BY_ID; void germanDativeFallback;
-  return "Das große Wissensquiz in Ihrer Zeitung";
+  return "Das große Wissensquiz Ihrer Zeitung";
 }
 function presetWantsBigFooterLogo(p: VerlagsPreset): boolean {
   const hay = `${p.verlag} ${p.titel} ${p.titelKanonisch || ""}`;
@@ -5111,7 +5111,9 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const eur = (s: string) => isSAAR ? s.replace(/\s*€/g, " €") : s;
   // SAAR: "Anzeige"-Hinweis raus (Verlag setzt ihn selbst). SHZ-Gruppe (Simona,
   // 18.6.): "Anzeige" generell weglassen — in JEDER Variante (mit & ohne Gewinner).
-  const hideAnzeige = isSAAR || isNuern || isSHZgroup;
+  // Ippen (Frau Heß, 25.06.): "ANZEIGE" oben links+rechts ebenfalls raus.
+  const isIppen = /^Ippen__/.test(meta.presetId || "");
+  const hideAnzeige = isSAAR || isNuern || isSHZgroup || isIppen;
   // SHZ-Redesign (Simona): Spieltag wandert in eine eigene Pille (s.u.), der runde
   // Störer zeigt wieder den Preis. Daher hier kein Spieltag-im-Störer mehr.
   const beigSpieltag = false;
