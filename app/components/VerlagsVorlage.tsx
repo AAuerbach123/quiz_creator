@@ -51,7 +51,11 @@ export function parseAdSize(s: string): { w: number; h: number } | null {
 // daher exportierbar.
 // 25.06.2026 (Wunsch Andreas): NW, SWMH und Mittelrhein/Rhein sollen ins
 // Portal — also wieder exportierbar. Nur die echte Südwest Presse bleibt außen vor.
-const SELF_DESIGN_GROUPS = new Set(["SWP"]);
+// HCSB (Frankenpost, Neue Presse, Nordbayerischer Kurier, Suhler) gestaltet
+// Robert selbst im Rhein-Stil und liefert fertige PDFs → kein Tool-Export.
+// Nürnberg (VNP, 25.06.): Robert baut die Anzeige selbst und liefert sie →
+// ebenfalls kein Tool-Export, wird wie SWP/HCSB als fertiges PDF importiert.
+const SELF_DESIGN_GROUPS = new Set(["SWP", "HCSB", "Nürnberg"]);
 
 export default function VerlagsVorlage({ applyPreset, onPreviewPreset, onDownloadPreset, onDownloadPresetTiff, onDownloadPresetsBulk, onDownloadPresetsTiffBulk, onDownloadStructuredZip, onPushPresetsMonday, downloadingPresetId, previewPresetId, bulkProgress, mondayProgress, onSetWinners, winnersShown }: Props) {
   const [presets, setPresets] = useState<VerlagsPreset[]>([]);
