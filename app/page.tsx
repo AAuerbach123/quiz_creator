@@ -252,9 +252,10 @@ function buildPublisherTitle(preset: VerlagsPreset | null, publisherName?: strin
   if (preset && (/^SHZ__/.test(preset.id) || (preset.verlag || "").toLowerCase() === "shz")) {
     return "Das große Wissensquiz";
   }
-  const dat = (preset && DATIVE_BY_ID[preset.id])
-    || germanDativeFallback(publisherName || preset?.titelKanonisch || preset?.titel || preset?.verlag || "");
-  return `Das große Wissensquiz ${dat}`;
+  // Einheitlicher Titel auf Team-Wunsch (25.06.): immer "in Ihrer Zeitung"
+  // statt des jeweiligen Zeitungsnamens. (SHZ bleibt oben ohne Zusatz.)
+  void DATIVE_BY_ID; void germanDativeFallback;
+  return "Das große Wissensquiz in Ihrer Zeitung";
 }
 function presetWantsBigFooterLogo(p: VerlagsPreset): boolean {
   const hay = `${p.verlag} ${p.titel} ${p.titelKanonisch || ""}`;
@@ -363,7 +364,7 @@ function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { pref
   const applied: Quiz = {
     ...q,
     questions: newQuestions,
-    meta: { ...q.meta, ...presetMeta, verlag: preset.verlag, presetId: preset.id, termsText: finalTerms, title: newTitle, titleAuto: autoTitle ? false : (q.meta.titleAuto ?? false),
+    meta: { ...q.meta, ...presetMeta, verlag: preset.verlag, presetId: preset.id, termsText: finalTerms, title: newTitle, titleAuto: autoTitle ? false : (q.meta.titleAuto ?? false), winnersText: "",
       ...(preset.hideWinners ? { winnerCount: 0 } : {}) },
     theme: {
       ...q.theme,
@@ -4642,10 +4643,10 @@ function BeilageRenderer({ quiz, width, height, selectedBlockId, onSelectBlock, 
               )}
 
               {/* Überschrift über dem Gewinner-Raster — komplett fett. */}
-              {winners.length > 0 && (
+              {winners.length > 0 && meta.winnersText && (
                 <div style={{ marginTop: px(10), fontWeight: 700,
                   color: cTitle, fontSize: px(11), lineHeight: 1.2 }}>
-                  Unsere neuen Gewinner
+                  {meta.winnersText}
                 </div>
               )}
               {/* Gewinner-Raster: 3 Spalten in Zeile 1, 2 Spalten in Zeile 2
@@ -4918,10 +4919,10 @@ function QuerformatRenderer({ quiz, width, height, selectedBlockId, onSelectBloc
           {/* Gewinner-Box */}
           {winners.length > 0 && (
             <div onClick={click("winners")} style={{ ...sel("winners") }}>
-              <div style={{ color: cTitle, fontSize: px(10), fontWeight: 700, marginBottom: px(6),
+              {meta.winnersText && <div style={{ color: cTitle, fontSize: px(10), fontWeight: 700, marginBottom: px(6),
                 letterSpacing: 0.5, textTransform: "uppercase" }}>
-                Unsere neuen Gewinner
-              </div>
+                {meta.winnersText}
+              </div>}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)",
                 columnGap: px(8), rowGap: px(4) }}>
                 {winners.map((w, i) => {
@@ -5308,9 +5309,9 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
               { marginTop: px(6), flexShrink: 0 })}
             {showWinners && (
               <div style={{ flexShrink: 0 }}>
-                {wrap("winnersHeadline",
+                {meta.winnersText && wrap("winnersHeadline",
                   <div style={{ color: cPrize, fontSize: px(14), fontWeight: 700, marginBottom: px(5) }}>
-                    {ed(meta.winnersText || "Unsere neuen Gewinner:", v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
+                    {ed(meta.winnersText, v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
                   </div>,
                   { marginBottom: px(2) })}
                 {wrap("winners",
@@ -5842,10 +5843,10 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           minWidth: 0, minHeight: 0 }}>
           {/* Gewinner-Überschrift als EIGENER Block: separat verschieb-,
               skalier-, editier- und ausblendbar. */}
-          {wrap("winnersHeadline",
+          {meta.winnersText && wrap("winnersHeadline",
             <div style={{ color: cPrize, fontSize: px(wide ? 23 : 19), fontWeight: 700, lineHeight: 1.15,
               textAlign: "left", paddingLeft: px(isFunke ? 5 : 0) }}>
-              {ed(meta.winnersText || "Unsere neuen Gewinner:", v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
+              {ed(meta.winnersText, v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
             </div>,
             // Gleiche Größe + gleicher Abstand zur ersten Box wie Fragen-Überschrift→1. Frage
             // (marginBottom 2 + qRow marginTop 5 = 7).
@@ -5901,9 +5902,9 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         <div style={{ display: "flex", alignItems: "flex-end", gap: px(12), marginTop: px(8), flexShrink: 0 }}>
           {showWinners && (
             <div style={{ flex: 1, minWidth: 0 }}>
-              {wrap("winnersHeadline",
+              {meta.winnersText && wrap("winnersHeadline",
                 <div style={{ color: cPrize, fontSize: px(12), fontWeight: 700, marginBottom: px(3) }}>
-                  {ed(meta.winnersText || "Unsere neuen Gewinner:", v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
+                  {ed(meta.winnersText, v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
                 </div>,
                 { marginBottom: px(2) })}
               {wrap("winners",
