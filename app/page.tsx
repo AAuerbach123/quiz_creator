@@ -5103,6 +5103,10 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const isStrandBg = isSHZgroup || isFunke;
   // Nürnberg (VNP): Haller-Layout, aber roter Verlaufs-Titelbalken + Geldfächer.
   const isNuern = meta.presetId === "Nürnberg__Nürnberg" || meta.verlag === "Nürnberg";
+  // Nürnberg jetzt im Rhein-Zeitung-Layout (Wunsch 25.06.): die Nürnberg-
+  // Spezialgestaltung (roter Balken/Geldfächer/Kicker) ist deaktiviert.
+  // isNuern bleibt nur für hideAnzeige (ANZEIGE-Hinweis aus).
+  const nuernDesign = false;
   // Nürnberg-Headline ohne Themen-/Verlagszusatz ("… in den … Nachrichten").
   const nuTitle = (effectiveTitle(quiz) || "").replace(/\s*[–-]\s*Thema:.*$/i, "").replace(/\s+in d(er|en)\s.*$/i, "").trim();
   // Nürnberg-Kicker oben rechts: TAG X[: Datum].
@@ -5255,7 +5259,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           fontFamily: theme.fontFamily, overflow: "hidden", boxSizing: "border-box",
           display: "flex", flexDirection: "column", padding: pad }}>
 
-        {wrap("anzeige",
+        {!hideAnzeige && wrap("anzeige",
           <><span>ANZEIGE</span><span>ANZEIGE</span></>,
           { display: "flex", justifyContent: "space-between",
             fontSize: px(8), fontWeight: 700, letterSpacing: 2, color: "#1A1A1A" })}
@@ -5532,7 +5536,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
 
       {/* Spieltag-Pille für alle übrigen Gruppen (P6, Wunsch Julija/Yasmina):
           SHZ zeigt sie schon oben links, Nürnberg im Kicker. */}
-      {!isSHZgroup && !isNuern && wrap("spieltag_pill",
+      {!isSHZgroup && !nuernDesign && wrap("spieltag_pill",
         <div style={{ display: "inline-block", background: cPrize, color: "#FFFFFF", fontWeight: 700,
           fontSize: px(11), padding: `${px(3)} ${px(10)}`, borderRadius: px(20), whiteSpace: "nowrap",
           boxShadow: "0 1px 4px rgba(0,0,0,0.18)" }}>
@@ -5541,13 +5545,13 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         { position: "absolute", top: px(18), right: px(6), zIndex: 6 })}
 
       {/* KOPF Nürnberg (VNP): Kicker + roter Verlaufs-Balken mit weißem Titel + Geldfächer */}
-      {isNuern && (
+      {nuernDesign && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: px(2), marginBottom: px(5) }}>
           <div style={{ fontWeight: 700, fontSize: px(11), letterSpacing: px(0.4), color: "#3A3A3A" }}>GEWINNSPIEL »WISSENSQUIZ HOCH 5«</div>
           <div style={{ fontWeight: 700, fontSize: px(11), color: "#FFFFFF", background: "#E6007E", padding: `${px(3)} ${px(11)}` }}>{nuTag}</div>
         </div>
       )}
-      {isNuern && (
+      {nuernDesign && (
         <div style={{ position: "relative", width: "100%", borderRadius: px(6),
           overflow: "visible", padding: `${px(12)} ${px(16)}`, minHeight: px(94),
           background: "linear-gradient(95deg,#D81A48 0%,#DD2E72 52%,#E6007E 100%)" }}>
@@ -5569,7 +5573,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
       )}
 
       {/* KOPF: runder Störer links, zentrierte Headline + Untertitel */}
-      {!isNuern && (
+      {!nuernDesign && (
       <div style={{ display: "flex", alignItems: "flex-start", gap: px(14), marginTop: px(isSHZgroup ? 34 : 4) }}>
         {/* SHZ (Simona, 18.6.): runder Störer war zu klein → ganz raus; stattdessen
             bleibt die Spieltag-Pille oben links. Unsichtbarer Platzhalter in
@@ -5641,7 +5645,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             // gestreckt → große Lücken). Natürliche Höhe (kein flex-grow), damit
             // die "Auflösung" direkt unter dem Text sitzt; overflow:hidden begrenzt
             // sehr langen Text auf die Spalte (kein Überlauf ins Logo).
-            <div style={{ color: cIntro, fontSize: px(isNuern ? (wide ? 18.5 : 16) : (wide ? 16.5 : 13.75)),
+            <div style={{ color: cIntro, fontSize: px(nuernDesign ? (wide ? 18.5 : 16) : (wide ? 16.5 : 13.75)),
               lineHeight: 1.4, whiteSpace: "normal", textAlign: "justify", textAlignLast: "left",
               overflow: "hidden",
               hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
