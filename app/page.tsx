@@ -491,9 +491,17 @@ const defaultQuiz: Quiz = {
 
 const formatCents = (c: number, cur = "EUR") => {
   const sym = cur === "EUR" ? "€" : cur === "CHF" ? "CHF" : cur;
-  return `${(c / 100).toFixed(0)}${sym}`;
+  return `${(c / 100).toLocaleString("de-DE")} ${sym}`;
 };
-const getPrizeLabel = (p: PrizeTier) => p?.label || formatCents(p.valueCents, p.currency);
+// Geldbeträge einheitlich: Tausenderpunkt + Leerzeichen vor dem €/CHF
+// (Wunsch Julija, 25.06.2026 — gilt für alle Verlage). Normalisiert auch
+// abweichend gespeicherte Labels (z. B. "1000€" → "1.000 €").
+const normalizeEuro = (s: string): string =>
+  (s || "").replace(/(\d[\d.\s]*?)\s*(€|CHF)/g, (_m, num: string, sym: string) => {
+    const n = parseInt(num.replace(/[.\s]/g, ""), 10);
+    return `${isNaN(n) ? num.trim() : n.toLocaleString("de-DE")} ${sym}`;
+  });
+const getPrizeLabel = (p: PrizeTier) => normalizeEuro(p?.label || formatCents(p.valueCents, p.currency));
 const genId = (prefix = "id") => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
 // Auto-Titel: NIE eine Frage als Titel (Kundenvorgabe!). Stattdessen wird
