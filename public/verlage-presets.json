@@ -1,1331 +1,1331 @@
 [
- {
-  "id": "Augsburger Allgemeinen__n/a",
-  "gruppe": "AUGSBURGER",
-  "verlag": "Augsburger Allgemeinen",
-  "titel": "Augsburger Allgemeine",
-  "titelKanonisch": "Augsburger Allgemeine",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#205077",
-   "phone": "#205077",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Augsburger Allgemeinen__n/a",
+    "gruppe": "AUGSBURGER",
+    "verlag": "Augsburger Allgemeinen",
+    "titel": "Augsburger Allgemeine",
+    "titelKanonisch": "Augsburger Allgemeine",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#000000",
+      "question": "#000000",
+      "intro": "#000000",
+      "prize": "#205077",
+      "phone": "#205077",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "315x220",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/Augsburger_Allgemeine.png",
+    "phoneNumbers": [
+      "01378 005561",
+      "01378 005562",
+      "01378 005563",
+      "01378 005564",
+      "01378 005565"
+    ]
   },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/Augsburger_Allgemeine.png",
-  "phoneNumbers": [
-   "01378 005561",
-   "01378 005562",
-   "01378 005563",
-   "01378 005564",
-   "01378 005565"
-  ]
- },
- {
-  "id": "Funke__OTZ",
-  "gruppe": "FUNKE",
-  "verlag": "Funke",
-  "titel": "OTZ",
-  "titelKanonisch": "Ostthüringer Zeitung (OTZ)",
-  "fontFamily": "'Utopia Std', serif",
-  "fontAvailable": true,
-  "fontRaw": "Utopia Std - Black Headline",
-  "colors": {
-   "title": "#FF0000",
-   "question": "#FF0000",
-   "intro": "#0019E6",
-   "prize": "#0019E6",
-   "phone": "#0019E6",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Funke__OTZ",
+    "gruppe": "FUNKE",
+    "verlag": "Funke",
+    "titel": "OTZ",
+    "titelKanonisch": "Ostthüringer Zeitung (OTZ)",
+    "fontFamily": "'Utopia Std', serif",
+    "fontAvailable": true,
+    "fontRaw": "Utopia Std - Black Headline",
+    "colors": {
+      "title": "#C8102E",
+      "question": "#C8102E",
+      "intro": "#0019E6",
+      "prize": "#0019E6",
+      "phone": "#0019E6",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "315x220",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/FUNKE_Material_Logos_OTZ.png",
+    "phoneNumbers": [
+      "01379 441291",
+      "01379 441292",
+      "01379 441293",
+      "01379 441294",
+      "01379 441295"
+    ]
   },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/FUNKE_Material_Logos_OTZ.png",
-  "phoneNumbers": [
-   "01379 441291",
-   "01379 441292",
-   "01379 441293",
-   "01379 441294",
-   "01379 441295"
-  ]
- },
- {
-  "id": "Funke__TA",
-  "gruppe": "FUNKE",
-  "verlag": "Funke",
-  "titel": "TA",
-  "titelKanonisch": "Thüringer Allgemeine (TA)",
-  "fontFamily": "'Utopia Std', serif",
-  "fontAvailable": true,
-  "fontRaw": "Utopia Std - Black Headline",
-  "colors": {
-   "title": "#0058B2",
-   "question": "#0058B2",
-   "intro": "#0058B2",
-   "prize": "#0058B2",
-   "phone": "#0058B2",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Funke__TA",
+    "gruppe": "FUNKE",
+    "verlag": "Funke",
+    "titel": "TA",
+    "titelKanonisch": "Thüringer Allgemeine (TA)",
+    "fontFamily": "'Utopia Std', serif",
+    "fontAvailable": true,
+    "fontRaw": "Utopia Std - Black Headline",
+    "colors": {
+      "title": "#008D36",
+      "question": "#008D36",
+      "intro": "#008D36",
+      "prize": "#008D36",
+      "phone": "#008D36",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "315x220",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/FUNKE_Material_Logos_TA.png",
+    "phoneNumbers": [
+      "01379 441281",
+      "01379 441282",
+      "01379 441283",
+      "01379 441284",
+      "01379 441285"
+    ]
   },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/FUNKE_Material_Logos_TA.png",
-  "phoneNumbers": [
-   "01379 441281",
-   "01379 441282",
-   "01379 441283",
-   "01379 441284",
-   "01379 441285"
-  ]
- },
- {
-  "id": "Funke__TLZ",
-  "gruppe": "FUNKE",
-  "verlag": "Funke",
-  "titel": "TLZ",
-  "titelKanonisch": "Thüringische Landeszeitung (TLZ)",
-  "fontFamily": "'Tabac Sans', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Tabac Sans – Black",
-  "colors": {
-   "title": "#0059B2",
-   "question": "#0059B2",
-   "intro": "#BF0000",
-   "prize": "#BF0000",
-   "phone": "#BF0000",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Funke__TLZ",
+    "gruppe": "FUNKE",
+    "verlag": "Funke",
+    "titel": "TLZ",
+    "titelKanonisch": "Thüringische Landeszeitung (TLZ)",
+    "fontFamily": "'Tabac Sans', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Tabac Sans – Black",
+    "colors": {
+      "title": "#0059B2",
+      "question": "#0059B2",
+      "intro": "#BF0000",
+      "prize": "#BF0000",
+      "phone": "#BF0000",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "315x220",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/FUNKE_Material_Logos_TLZ.png",
+    "phoneNumbers": [
+      "01379 441271",
+      "01379 441272",
+      "01379 441273",
+      "01379 441274",
+      "01379 441275"
+    ]
   },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/FUNKE_Material_Logos_TLZ.png",
-  "phoneNumbers": [
-   "01379 441271",
-   "01379 441272",
-   "01379 441273",
-   "01379 441274",
-   "01379 441275"
-  ]
- },
- {
-  "id": "Ippen__Allgemeine Zeitung der Lüneburger Heide",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Allgemeine Zeitung der Lüneburger Heide",
-  "titelKanonisch": "Allgemeine Zeitung der Lüneburger Heide",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Allgemeine Zeitung der Lüneburger Heide",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Allgemeine Zeitung der Lüneburger Heide",
+    "titelKanonisch": "Allgemeine Zeitung der Lüneburger Heide",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_2_C._Beckers_Buchdruckerei_GmbH_Co._KG_Allgemeine-Zeitung-der-Lueneburger-Heide.png",
+    "phoneNumbers": [
+      "01378 403781",
+      "01378 403782",
+      "01378 403783",
+      "01378 403784",
+      "01378 403785"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_2_C._Beckers_Buchdruckerei_GmbH_Co._KG_Allgemeine-Zeitung-der-Lueneburger-Heide.png",
-  "phoneNumbers": [
-   "01378 403781",
-   "01378 403782",
-   "01378 403783",
-   "01378 403784",
-   "01378 403785"
-  ]
- },
- {
-  "id": "Ippen__AltmarkZeitung",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "AltmarkZeitung",
-  "titelKanonisch": "AltmarkZeitung",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__AltmarkZeitung",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "AltmarkZeitung",
+    "titelKanonisch": "AltmarkZeitung",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_2_C._Beckers_Buchdruckerei_GmbH_Co._KG_Altmark-Zeitung.png",
+    "phoneNumbers": [
+      "01378 403781",
+      "01378 403782",
+      "01378 403783",
+      "01378 403784",
+      "01378 403785"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_2_C._Beckers_Buchdruckerei_GmbH_Co._KG_Altmark-Zeitung.png",
-  "phoneNumbers": [
-   "01378 403781",
-   "01378 403782",
-   "01378 403783",
-   "01378 403784",
-   "01378 403785"
-  ]
- },
- {
-  "id": "Ippen__Frankfurter-Neue-Presse",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Frankfurter-Neue-Presse",
-  "titelKanonisch": "Frankfurter Neue Presse",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Frankfurter-Neue-Presse",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Frankfurter-Neue-Presse",
+    "titelKanonisch": "Frankfurter Neue Presse",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_10_Frankfurter_Societaets-Medien_GmbH_Frankfurter-Neue-Presse.png",
+    "phoneNumbers": [
+      "01378 405681",
+      "01378 405682",
+      "01378 405683",
+      "01378 405684",
+      "01378 405685"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_10_Frankfurter_Societaets-Medien_GmbH_Frankfurter-Neue-Presse.png",
-  "phoneNumbers": [
-   "01378 405281",
-   "01378 405282",
-   "01378 405283",
-   "01378 405284",
-   "01378 405285"
-  ]
- },
- {
-  "id": "Ippen__Frankfurter-Rundschau",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Frankfurter-Rundschau",
-  "titelKanonisch": "Frankfurter Rundschau",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Frankfurter-Rundschau",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Frankfurter-Rundschau",
+    "titelKanonisch": "Frankfurter Rundschau",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_11_Frankfurter_RundschaueGmbH_Frankfurter-Rundschau.png",
+    "phoneNumbers": [
+      "01378 405281",
+      "01378 405282",
+      "01378 405283",
+      "01378 405284",
+      "01378 405285"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_11_Frankfurter_RundschaueGmbH_Frankfurter-Rundschau.png",
-  "phoneNumbers": [
-   "01378 405681",
-   "01378 405682",
-   "01378 405683",
-   "01378 405684",
-   "01378 405685"
-  ]
- },
- {
-  "id": "Ippen__Giessener-Alsfelder",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Giessener-Alsfelder",
-  "titelKanonisch": "Gießener Allgemeine Zeitung / Alsfelder Allgemeine Zeitung",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Giessener-Alsfelder",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Giessener-Alsfelder",
+    "titelKanonisch": "Gießener Allgemeine Zeitung / Alsfelder Allgemeine Zeitung",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_Giessener-und-Alsfelder-Allgemeine-Z.png",
+    "phoneNumbers": [
+      "01378 405781",
+      "01378 405782",
+      "01378 405783",
+      "01378 405784",
+      "01378 405785"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_Giessener-und-Alsfelder-Allgemeine-Z.png",
-  "phoneNumbers": [
-   "01378 405781",
-   "01378 405782",
-   "01378 405783",
-   "01378 405784",
-   "01378 405785"
-  ]
- },
- {
-  "id": "Ippen__Giessener-Anzeiger",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Giessener-Anzeiger",
-  "titelKanonisch": "Gießener Anzeiger",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Giessener-Anzeiger",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Giessener-Anzeiger",
+    "titelKanonisch": "Gießener Anzeiger",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_13_GAeMediaeGmbH_Co._KG_Giessener-Anzeiger.png",
+    "phoneNumbers": [
+      "01378 407281",
+      "01378 407282",
+      "01378 407283",
+      "01378 407284",
+      "01378 407285"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_13_GAeMediaeGmbH_Co._KG_Giessener-Anzeiger.png",
-  "phoneNumbers": [
-   "01378 407281",
-   "01378 407282",
-   "01378 407283",
-   "01378 407284",
-   "01378 407285"
-  ]
- },
- {
-  "id": "Ippen__HNA",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "HNA",
-  "titelKanonisch": "Hessische / Niedersächsische Allgemeine (HNA)",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__HNA",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "HNA",
+    "titelKanonisch": "Hessische / Niedersächsische Allgemeine (HNA)",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_14_Verlag_Dierichs_GmbH_Co._KG_HNA.png",
+    "phoneNumbers": [
+      "01378 405881",
+      "01378 405882",
+      "01378 405883",
+      "01378 405884",
+      "01378 405885"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_14_Verlag_Dierichs_GmbH_Co._KG_HNA.png",
-  "phoneNumbers": [
-   "01378 405881",
-   "01378 405882",
-   "01378 405883",
-   "01378 405884",
-   "01378 405885"
-  ]
- },
- {
-  "id": "Ippen__Hanauer-Anzeiger",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Hanauer-Anzeiger",
-  "titelKanonisch": "Hanauer Anzeiger",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Hanauer-Anzeiger",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Hanauer-Anzeiger",
+    "titelKanonisch": "Hanauer Anzeiger",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_6_Hanauer_Anzeiger_GmbH_Co.KG_Hanauer-Anzeiger.png",
+    "phoneNumbers": [
+      "01378 404381",
+      "01378 404382",
+      "01378 404383",
+      "01378 404384",
+      "01378 404385"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_6_Hanauer_Anzeiger_GmbH_Co.KG_Hanauer-Anzeiger.png",
-  "phoneNumbers": [
-   "01378 404381",
-   "01378 404382",
-   "01378 404383",
-   "01378 404384",
-   "01378 404385"
-  ]
- },
- {
-  "id": "Ippen__Hersfelder-Zeitung",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Hersfelder-Zeitung",
-  "titelKanonisch": "Hersfelder Zeitung",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Hersfelder-Zeitung",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Hersfelder-Zeitung",
+    "titelKanonisch": "Hersfelder Zeitung",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_17_Hoehl-Druck_GmbH_Co._Hersfelder_Zeitung_KG_Hersfelder-Zeitung.png",
+    "phoneNumbers": [
+      "01378 406281",
+      "01378 406282",
+      "01378 406283",
+      "01378 406284",
+      "01378 406285"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_17_Hoehl-Druck_GmbH_Co._Hersfelder_Zeitung_KG_Hersfelder-Zeitung.png",
-  "phoneNumbers": [
-   "01378 406281",
-   "01378 406282",
-   "01378 406283",
-   "01378 406284",
-   "01378 406285"
-  ]
- },
- {
-  "id": "Ippen__Isenhagener Kreisblatt",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Isenhagener Kreisblatt",
-  "titelKanonisch": "Isenhagener Kreisblatt",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Isenhagener Kreisblatt",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Isenhagener Kreisblatt",
+    "titelKanonisch": "Isenhagener Kreisblatt",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_2_C._Beckers_Buchdruckerei_GmbH_Co._KG_Isenhagener-Kreisblatt.png",
+    "phoneNumbers": [
+      "01378 403781",
+      "01378 403782",
+      "01378 403783",
+      "01378 403784",
+      "01378 403785"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_2_C._Beckers_Buchdruckerei_GmbH_Co._KG_Isenhagener-Kreisblatt.png",
-  "phoneNumbers": [
-   "01378 403781",
-   "01378 403782",
-   "01378 403783",
-   "01378 403784",
-   "01378 403785"
-  ]
- },
- {
-  "id": "Ippen__Karl-Sasse-Verlage",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Karl-Sasse-Verlage",
-  "titelKanonisch": "",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Karl-Sasse-Verlage",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Karl-Sasse-Verlage",
+    "titelKanonisch": "",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_9_Karl_Sasse_GmbH_Co._KG_Wildeshauser-Zeitung.png",
+    "phoneNumbers": [
+      "01378 403891",
+      "01378 403892",
+      "01378 403893",
+      "01378 403894",
+      "01378 403895"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_9_Karl_Sasse_GmbH_Co._KG_Wildeshauser-Zeitung.png",
-  "phoneNumbers": [
-   "01378 403891",
-   "01378 403892",
-   "01378 403893",
-   "01378 403894",
-   "01378 403895"
-  ]
- },
- {
-  "id": "Ippen__Kreiszeitung-Verlag",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Kreiszeitung-Verlag",
-  "titelKanonisch": "Kreiszeitung",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Kreiszeitung-Verlag",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Kreiszeitung-Verlag",
+    "titelKanonisch": "Kreiszeitung",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_9_Karl_Sasse_GmbH_Co._KG_Wildeshauser-Zeitung.png",
+    "phoneNumbers": [
+      "01378 403791",
+      "01378 403792",
+      "01378 403793",
+      "01378 403794",
+      "01378 403795"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_9_Karl_Sasse_GmbH_Co._KG_Wildeshauser-Zeitung.png",
-  "phoneNumbers": [
-   "01378 403791",
-   "01378 403792",
-   "01378 403793",
-   "01378 403794",
-   "01378 403795"
-  ]
- },
- {
-  "id": "Ippen__Leine-Deister-Zeitung",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Leine-Deister-Zeitung",
-  "titelKanonisch": "Leine-Deister-Zeitung",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Leine-Deister-Zeitung",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Leine-Deister-Zeitung",
+    "titelKanonisch": "Leine-Deister-Zeitung",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_18_Zeitungsverlag_F._Wolff_Sohn_KG_LDZ_Logo.png",
+    "phoneNumbers": [
+      "01378 406381",
+      "01378 406382",
+      "01378 406383",
+      "01378 406384",
+      "01378 406385"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_18_Zeitungsverlag_F._Wolff_Sohn_KG_LDZ_Logo.png",
-  "phoneNumbers": [
-   "01378 406381",
-   "01378 406382",
-   "01378 406383",
-   "01378 406384",
-   "01378 406385"
-  ]
- },
- {
-  "id": "Ippen__Maerkische-Z",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Maerkische-Z",
-  "titelKanonisch": "",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Maerkische-Z",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Maerkische-Z",
+    "titelKanonisch": "",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_21_Ma_rkischer_Zeitungsverlag_GmbH_CO.KG_MZV-Block_untereinander_blau_2017.png",
+    "phoneNumbers": [
+      "01378 406881",
+      "01378 406882",
+      "01378 406883",
+      "01378 406884",
+      "01378 406885"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_21_Ma_rkischer_Zeitungsverlag_GmbH_CO.KG_MZV-Block_untereinander_blau_2017.png",
-  "phoneNumbers": [
-   "01378 406881",
-   "01378 406882",
-   "01378 406883",
-   "01378 406884",
-   "01378 406885"
-  ]
- },
- {
-  "id": "Ippen__Muenchner-Merkur",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Muenchner-Merkur",
-  "titelKanonisch": "Münchner Merkur / Heimatzeitungen",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Muenchner-Merkur",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Muenchner-Merkur",
+    "titelKanonisch": "Münchner Merkur / Heimatzeitungen",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_4_Mu_nchener_Zeitungs-Verlag_GmbH_Co._KG_Muenchener-Merkur.jpg",
+    "phoneNumbers": [
+      "01378 403981",
+      "01378 403982",
+      "01378 403983",
+      "01378 403984",
+      "01378 403985"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_4_Mu_nchener_Zeitungs-Verlag_GmbH_Co._KG_Muenchener-Merkur.jpg",
-  "phoneNumbers": [
-   "01378 403981",
-   "01378 403982",
-   "01378 403983",
-   "01378 403984",
-   "01378 403985"
-  ]
- },
- {
-  "id": "Ippen__Oberhessische-Lauterbacher",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Oberhessische-Lauterbacher",
-  "titelKanonisch": "",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Oberhessische-Lauterbacher",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Oberhessische-Lauterbacher",
+    "titelKanonisch": "",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_LA_OZ_Kombi_Logo.png",
+    "phoneNumbers": [
+      "01378 405781",
+      "01378 405782",
+      "01378 405783",
+      "01378 405784",
+      "01378 405785"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_LA_OZ_Kombi_Logo.png",
-  "phoneNumbers": [
-   "01378 405781",
-   "01378 405782",
-   "01378 405783",
-   "01378 405784",
-   "01378 405785"
-  ]
- },
- {
-  "id": "Ippen__Offenbach-Post",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Offenbach-Post",
-  "titelKanonisch": "Offenbach-Post",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Offenbach-Post",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Offenbach-Post",
+    "titelKanonisch": "Offenbach-Post",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_5_Pressehaus_Bintz-Verlag_GmbH_Co._KG_Offenbach-Post.png",
+    "phoneNumbers": [
+      "01378 404281",
+      "01378 404282",
+      "01378 404283",
+      "01378 404284",
+      "01378 404285"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_5_Pressehaus_Bintz-Verlag_GmbH_Co._KG_Offenbach-Post.png",
-  "phoneNumbers": [
-   "01378 404281",
-   "01378 404282",
-   "01378 404283",
-   "01378 404284",
-   "01378 404285"
-  ]
- },
- {
-  "id": "Ippen__Soester-Anzeiger",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Soester-Anzeiger",
-  "titelKanonisch": "Soester Anzeiger",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Soester-Anzeiger",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Soester-Anzeiger",
+    "titelKanonisch": "Soester Anzeiger",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_20_Jahn_Verlag_GmbH_CO._KG_Soester-Anzeiger.png",
+    "phoneNumbers": [
+      "01378 406781",
+      "01378 406782",
+      "01378 406783",
+      "01378 406784",
+      "01378 406785"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_20_Jahn_Verlag_GmbH_CO._KG_Soester-Anzeiger.png",
-  "phoneNumbers": [
-   "01378 406781",
-   "01378 406782",
-   "01378 406783",
-   "01378 406784",
-   "01378 406785"
-  ]
- },
- {
-  "id": "Ippen__TZ",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "TZ",
-  "titelKanonisch": "tz",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__TZ",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "TZ",
+    "titelKanonisch": "tz",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_3_Zeitungsverlag_tz_GmbH_Co._KG_TZ.jpg",
+    "phoneNumbers": [
+      "01378 802781",
+      "01378 802782",
+      "01378 802783",
+      "01378 802784",
+      "01378 802785"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_3_Zeitungsverlag_tz_GmbH_Co._KG_TZ.jpg",
-  "phoneNumbers": [
-   "01378 403881",
-   "01378 403882",
-   "01378 403883",
-   "01378 403884",
-   "01378 403885"
-  ]
- },
- {
-  "id": "Ippen__Usinger-Kreis",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Usinger-Kreis",
-  "titelKanonisch": "",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Usinger-Kreis",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Usinger-Kreis",
+    "titelKanonisch": "",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_KA_UA_Kombi.png",
+    "phoneNumbers": [
+      "01378 405781",
+      "01378 405782",
+      "01378 405783",
+      "01378 405784",
+      "01378 405785"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_KA_UA_Kombi.png",
-  "phoneNumbers": [
-   "01378 405781",
-   "01378 405782",
-   "01378 405783",
-   "01378 405784",
-   "01378 405785"
-  ]
- },
- {
-  "id": "Ippen__Waldeckische-Landeszeitung",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Waldeckische-Landeszeitung",
-  "titelKanonisch": "Waldeckische Landeszeitung",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Waldeckische-Landeszeitung",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Waldeckische-Landeszeitung",
+    "titelKanonisch": "Waldeckische Landeszeitung",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_15_Wilhelm_Bing_Druckerei_und_Verlag_GmbH_Waldeckische-Landeszeitung.png",
+    "phoneNumbers": [
+      "01378 405981",
+      "01378 405982",
+      "01378 405983",
+      "01378 405984",
+      "01378 405985"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_15_Wilhelm_Bing_Druckerei_und_Verlag_GmbH_Waldeckische-Landeszeitung.png",
-  "phoneNumbers": [
-   "01378 405981",
-   "01378 405982",
-   "01378 405983",
-   "01378 405984",
-   "01378 405985"
-  ]
- },
- {
-  "id": "Ippen__Werra-Rundschau",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Werra-Rundschau",
-  "titelKanonisch": "Werra Rundschau",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Werra-Rundschau",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Werra-Rundschau",
+    "titelKanonisch": "Werra Rundschau",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_16_WerraeVerlag_Kluthe_GmbH_Co._KG_Werra-Rundschau.png",
+    "phoneNumbers": [
+      "01378 406181",
+      "01378 406182",
+      "01378 406183",
+      "01378 406184",
+      "01378 406185"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_16_WerraeVerlag_Kluthe_GmbH_Co._KG_Werra-Rundschau.png",
-  "phoneNumbers": [
-   "01378 406181",
-   "01378 406182",
-   "01378 406183",
-   "01378 406184",
-   "01378 406185"
-  ]
- },
- {
-  "id": "Ippen__Westfaelischer-Anz",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Westfaelischer-Anz",
-  "titelKanonisch": "Westfälischer Anzeiger",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Westfaelischer-Anz",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Westfaelischer-Anz",
+    "titelKanonisch": "Westfälischer Anzeiger",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_19_Westfaelischer_Anzeiger_Verlagsgesellschaft_mbH_Co._KG_Westfaelischer-Anzeiger.png",
+    "phoneNumbers": [
+      "01378 406581",
+      "01378 406582",
+      "01378 406583",
+      "01378 406584",
+      "01378 406585"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_19_Westfaelischer_Anzeiger_Verlagsgesellschaft_mbH_Co._KG_Westfaelischer-Anzeiger.png",
-  "phoneNumbers": [
-   "01378 406581",
-   "01378 406582",
-   "01378 406583",
-   "01378 406584",
-   "01378 406585"
-  ]
- },
- {
-  "id": "Ippen__Wetterauer-Butzbacher",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Wetterauer-Butzbacher",
-  "titelKanonisch": "",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Wetterauer-Butzbacher",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Wetterauer-Butzbacher",
+    "titelKanonisch": "",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_Kombi_LOGO_WZ-BZ.png",
+    "phoneNumbers": [
+      "01378 405781",
+      "01378 405782",
+      "01378 405783",
+      "01378 405784",
+      "01378 405785"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_12_Mittelhessische_Druck-_und_Verlagshaus_Kombi_LOGO_WZ-BZ.png",
-  "phoneNumbers": [
-   "01378 405781",
-   "01378 405782",
-   "01378 405783",
-   "01378 405784",
-   "01378 405785"
-  ]
- },
- {
-  "id": "Ippen__Wildeshauser-Zeitung",
-  "gruppe": "IPPEN",
-  "verlag": "Ippen",
-  "titel": "Wildeshauser-Zeitung",
-  "titelKanonisch": "Wildeshauser Zeitung",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Ippen__Wildeshauser-Zeitung",
+    "gruppe": "IPPEN",
+    "verlag": "Ippen",
+    "titel": "Wildeshauser-Zeitung",
+    "titelKanonisch": "Wildeshauser Zeitung",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#00238C",
+      "question": "#00238C",
+      "intro": "#3668FF",
+      "prize": "#00238C",
+      "phone": "#00238C",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "282,5x215",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/IPPEN_Material_Logos_9_Karl_Sasse_GmbH_Co._KG_Wildeshauser-Zeitung.png",
+    "phoneNumbers": [
+      "01378 405181",
+      "01378 405182",
+      "01378 405183",
+      "01378 405184",
+      "01378 405185"
+    ]
   },
-  "format": "282,5x215",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/IPPEN_Material_Logos_9_Karl_Sasse_GmbH_Co._KG_Wildeshauser-Zeitung.png",
-  "phoneNumbers": [
-   "01378 405181",
-   "01378 405182",
-   "01378 405183",
-   "01378 405184",
-   "01378 405185"
-  ]
- },
- {
-  "id": "Neue-Westfaeische__n/a",
-  "gruppe": "Neue-Westfaeische",
-  "verlag": "Neue-Westfaeische",
-  "titel": "Neue Westfälische",
-  "titelKanonisch": "Neue Westfälische",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "Neue-Westfaeische__n/a",
+    "gruppe": "Neue-Westfaeische",
+    "verlag": "Neue-Westfaeische",
+    "titel": "Neue Westfälische",
+    "titelKanonisch": "Neue Westfälische",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#000000",
+      "question": "#000000",
+      "intro": "#000000",
+      "prize": "#000000",
+      "phone": "#000000",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "315x220",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/NW_Logo.png",
+    "phoneNumbers": [
+      "01378 608271",
+      "01378 608272",
+      "01378 608273",
+      "01378 608274",
+      "01378 608275"
+    ]
   },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/NW_Logo.png",
-  "phoneNumbers": [
-   "01378 608271",
-   "01378 608272",
-   "01378 608273",
-   "01378 608274",
-   "01378 608275"
-  ]
- },
- {
-  "gruppe": "Neue-Westfaeische",
-  "verlag": "Neue-Westfaeische",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "gruppe": "Neue-Westfaeische",
+    "verlag": "Neue-Westfaeische",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#000000",
+      "question": "#000000",
+      "intro": "#000000",
+      "prize": "#000000",
+      "phone": "#000000",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "315x220",
+    "logoPosition": "rechts unten",
+    "id": "Neue-Westfaeische__Haller Kreisblatt",
+    "titel": "Haller Kreisblatt",
+    "titelKanonisch": "Haller Kreisblatt",
+    "logoUrl": null,
+    "phoneNumbers": [
+      "01378 608371",
+      "01378 608372",
+      "01378 608373",
+      "01378 608374",
+      "01378 608375"
+    ]
   },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "id": "Neue-Westfaeische__Haller Kreisblatt",
-  "titel": "Haller Kreisblatt",
-  "titelKanonisch": "Haller Kreisblatt",
-  "logoUrl": null,
-  "phoneNumbers": [
-   "01378 608371",
-   "01378 608372",
-   "01378 608373",
-   "01378 608374",
-   "01378 608375"
-  ]
- },
- {
-  "id": "Nürnberg__Nürnberg",
-  "gruppe": "NUERNBERG",
-  "verlag": "Nürnberg",
-  "titel": "Nürnberg",
-  "titelKanonisch": "Nürnberger Nachrichten / Nürnberger Zeitung",
-  "fontFamily": "'Roboto Condensed', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Roboto Condensed",
-  "colors": {
-   "title": "#E2001A",
-   "question": "#1A2330",
-   "intro": "#00A7E0",
-   "prize": "#E6007E",
-   "phone": "#0079B8",
-   "winners": "#0079B8",
-   "terms": "#000000"
+  {
+    "id": "Nürnberg__Nürnberg",
+    "gruppe": "NUERNBERG",
+    "verlag": "Nürnberg",
+    "titel": "Nürnberg",
+    "titelKanonisch": "Nürnberger Nachrichten / Nürnberger Zeitung",
+    "fontFamily": "'Roboto Condensed', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Roboto Condensed",
+    "colors": {
+      "title": "#E2001A",
+      "question": "#1A2330",
+      "intro": "#00A7E0",
+      "prize": "#E6007E",
+      "phone": "#0079B8",
+      "winners": "#0079B8",
+      "terms": "#000000"
+    },
+    "format": "280x219",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/Nuernberg_NN.png",
+    "phoneNumbers": [
+      "01378 220271",
+      "01378 220272",
+      "01378 220273",
+      "01378 220274",
+      "01378 220275"
+    ],
+    "layoutVariant": "redaktionell"
   },
-  "format": "280x219",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/Nuernberg_NN.png",
-  "phoneNumbers": [
-   "01378 220271",
-   "01378 220272",
-   "01378 220273",
-   "01378 220274",
-   "01378 220275"
-  ],
-  "layoutVariant": "redaktionell"
- },
- {
-  "id": "SAAR__PM",
-  "gruppe": "SAAR",
-  "verlag": "SAAR",
-  "titel": "PM",
-  "titelKanonisch": "Pfälzischer Merkur (PM)",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#9B0849",
-   "question": "#9B0849",
-   "intro": "#9B0849",
-   "prize": "#B02040",
-   "phone": "#B02040",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SAAR__PM",
+    "gruppe": "SAAR",
+    "verlag": "SAAR",
+    "titel": "PM",
+    "titelKanonisch": "Pfälzischer Merkur (PM)",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#9B0849",
+      "question": "#9B0849",
+      "intro": "#9B0849",
+      "prize": "#B02040",
+      "phone": "#B02040",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "325x240",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SAAR_Material_Logos_PM_Logo_2025_Kontur_cmyk.png",
+    "phoneNumbers": [
+      "01378 806371",
+      "01378 806372",
+      "01378 806373",
+      "01378 806374",
+      "01378 806375"
+    ]
   },
-  "format": "325x240",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SAAR_Material_Logos_PM_Logo_2025_Kontur_cmyk.png",
-  "phoneNumbers": [
-   "01378 806371",
-   "01378 806372",
-   "01378 806373",
-   "01378 806374",
-   "01378 806375"
-  ]
- },
- {
-  "id": "SAAR__SZ",
-  "gruppe": "SAAR",
-  "verlag": "SAAR",
-  "titel": "SZ",
-  "titelKanonisch": "Saarbrücker Zeitung (SZ)",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#005C99",
-   "question": "#005C99",
-   "intro": "#005C99",
-   "prize": "#004080",
-   "phone": "#004080",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SAAR__SZ",
+    "gruppe": "SAAR",
+    "verlag": "SAAR",
+    "titel": "SZ",
+    "titelKanonisch": "Saarbrücker Zeitung (SZ)",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#005C99",
+      "question": "#005C99",
+      "intro": "#005C99",
+      "prize": "#004080",
+      "phone": "#004080",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "325x240",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SAAR_Material_Logos_SZ_Icon.png",
+    "phoneNumbers": [
+      "01378 806171",
+      "01378 806172",
+      "01378 806173",
+      "01378 806174",
+      "01378 806175"
+    ]
   },
-  "format": "325x240",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SAAR_Material_Logos_SZ_Icon.png",
-  "phoneNumbers": [
-   "01378 806171",
-   "01378 806172",
-   "01378 806173",
-   "01378 806174",
-   "01378 806175"
-  ]
- },
- {
-  "id": "SAAR__TV",
-  "gruppe": "SAAR",
-  "verlag": "SAAR",
-  "titel": "TV",
-  "titelKanonisch": "Trierischer Volksfreund (TV)",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#005C99",
-   "question": "#005C99",
-   "intro": "#005C99",
-   "prize": "#305070",
-   "phone": "#305070",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SAAR__TV",
+    "gruppe": "SAAR",
+    "verlag": "SAAR",
+    "titel": "TV",
+    "titelKanonisch": "Trierischer Volksfreund (TV)",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#005C99",
+      "question": "#005C99",
+      "intro": "#005C99",
+      "prize": "#305070",
+      "phone": "#305070",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "325x240",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SAAR_Material_Logos_TV_Icon_2025_rgb.png",
+    "phoneNumbers": [
+      "01378 806271",
+      "01378 806272",
+      "01378 806273",
+      "01378 806274",
+      "01378 806275"
+    ]
   },
-  "format": "325x240",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SAAR_Material_Logos_TV_Icon_2025_rgb.png",
-  "phoneNumbers": [
-   "01378 806271",
-   "01378 806272",
-   "01378 806273",
-   "01378 806274",
-   "01378 806275"
-  ]
- },
- {
-  "id": "SHZ__Beig",
-  "gruppe": "SHZ",
-  "verlag": "SHZ",
-  "titel": "Beig",
-  "titelKanonisch": "BEIG",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#001E59",
-   "question": "#001E59",
-   "intro": "#3668FF",
-   "prize": "#001E59",
-   "phone": "#001E59",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SHZ__Beig",
+    "gruppe": "SHZ",
+    "verlag": "SHZ",
+    "titel": "Beig",
+    "titelKanonisch": "BEIG",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#001E59",
+      "question": "#001E59",
+      "intro": "#001E59",
+      "prize": "#001E59",
+      "phone": "#001E59",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "278x190",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SHZ_Material_Logos_shz_Logo_CMYK_dunkelblau.png",
+    "phoneNumbers": [
+      "01378 804771",
+      "01378 804772",
+      "01378 804773",
+      "01378 804774",
+      "01378 804775"
+    ]
   },
-  "format": "278x190",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SHZ_Material_Logos_shz_Logo_CMYK_dunkelblau.png",
-  "phoneNumbers": [
-   "01378 804771",
-   "01378 804772",
-   "01378 804773",
-   "01378 804774",
-   "01378 804775"
-  ]
- },
- {
-  "id": "SHZ__NOZ",
-  "gruppe": "SHZ",
-  "verlag": "SHZ",
-  "titel": "NOZ",
-  "titelKanonisch": "NOZ (Neue Osnabrücker Zeitung)",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SHZ__NOZ",
+    "gruppe": "SHZ",
+    "verlag": "SHZ",
+    "titel": "NOZ",
+    "titelKanonisch": "NOZ (Neue Osnabrücker Zeitung)",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#001E59",
+      "question": "#001E59",
+      "intro": "#001E59",
+      "prize": "#001E59",
+      "phone": "#001E59",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "318x220",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SHZ_Material_Logos_noz_Logo_CMYK_dunkelblau.png",
+    "phoneNumbers": [
+      "01378 805771",
+      "01378 805772",
+      "01378 805773",
+      "01378 805774",
+      "01378 805775"
+    ]
   },
-  "format": "318x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SHZ_Material_Logos_noz_Logo_CMYK_dunkelblau.png",
-  "phoneNumbers": [
-   "01378 805771",
-   "01378 805772",
-   "01378 805773",
-   "01378 805774",
-   "01378 805775"
-  ]
- },
- {
-  "id": "SHZ__SHZ",
-  "gruppe": "SHZ",
-  "verlag": "SHZ",
-  "titel": "SHZ",
-  "titelKanonisch": "shz (Schleswig-Holsteinischer Zeitungsverlag)",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#00238C",
-   "question": "#00238C",
-   "intro": "#3668FF",
-   "prize": "#00238C",
-   "phone": "#00238C",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SHZ__SHZ",
+    "gruppe": "SHZ",
+    "verlag": "SHZ",
+    "titel": "SHZ",
+    "titelKanonisch": "shz (Schleswig-Holsteinischer Zeitungsverlag)",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#001E59",
+      "question": "#001E59",
+      "intro": "#001E59",
+      "prize": "#001E59",
+      "phone": "#001E59",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "278x190",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SHZ_Material_Logos_shz_Logo_CMYK_dunkelblau.png",
+    "phoneNumbers": [
+      "01378 403881",
+      "01378 403882",
+      "01378 403883",
+      "01378 403884",
+      "01378 403885"
+    ]
   },
-  "format": "278x190",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SHZ_Material_Logos_shz_Logo_CMYK_dunkelblau.png",
-  "phoneNumbers": [
-   "01378 802781",
-   "01378 802782",
-   "01378 802783",
-   "01378 802784",
-   "01378 802785"
-  ]
- },
- {
-  "id": "SWMH__Die Oberbadische, Markgräfler Tagblatt, Weiler Zeitung",
-  "gruppe": "SWMH",
-  "verlag": "SWMH",
-  "titel": "Die Oberbadische, Markgräfler Tagblatt, Weiler Zeitung",
-  "titelKanonisch": "",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SWMH__Die Oberbadische, Markgräfler Tagblatt, Weiler Zeitung",
+    "gruppe": "SWMH",
+    "verlag": "SWMH",
+    "titel": "Die Oberbadische, Markgräfler Tagblatt, Weiler Zeitung",
+    "titelKanonisch": "",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#000000",
+      "question": "#000000",
+      "intro": "#000000",
+      "prize": "#000000",
+      "phone": "#000000",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "280 x 190",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SWMH_Material_Logoe06_Die_Oberbadische_Markgraefler-Tagblatt_Weiler-Z_Die_Oberbadische_3_Zeitungen_Logo.png",
+    "phoneNumbers": [
+      "01378 408171",
+      "01378 408172",
+      "01378 408173",
+      "01378 408174",
+      "01378 408175"
+    ]
   },
-  "format": "280 x 190",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SWMH_Material_Logoe06_Die_Oberbadische_Markgraefler-Tagblatt_Weiler-Z_Die_Oberbadische_3_Zeitungen_Logo.png",
-  "phoneNumbers": [
-   "01378 408171",
-   "01378 408172",
-   "01378 408173",
-   "01378 408174",
-   "01378 408175"
-  ]
- },
- {
-  "id": "SWMH__Frankenpost",
-  "gruppe": "SWMH",
-  "verlag": "SWMH",
-  "titel": "Frankenpost",
-  "titelKanonisch": "Frankenpost",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SWMH__Frankenpost",
+    "gruppe": "SWMH",
+    "verlag": "SWMH",
+    "titel": "Frankenpost",
+    "titelKanonisch": "Frankenpost",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#000000",
+      "question": "#000000",
+      "intro": "#000000",
+      "prize": "#000000",
+      "phone": "#000000",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "315x220",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SWMH_Material_Logoe01_Frankenpost_Frankenpost.png",
+    "phoneNumbers": [
+      "01378 408271",
+      "01378 408272",
+      "01378 408273",
+      "01378 408274",
+      "01378 408275"
+    ]
   },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SWMH_Material_Logoe01_Frankenpost_Frankenpost.png",
-  "phoneNumbers": [
-   "01378 408271",
-   "01378 408272",
-   "01378 408273",
-   "01378 408274",
-   "01378 408275"
-  ]
- },
- {
-  "id": "SWMH__Neue Presse",
-  "gruppe": "SWMH",
-  "verlag": "SWMH",
-  "titel": "Neue Presse",
-  "titelKanonisch": "Neue Presse",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SWMH__Neue Presse",
+    "gruppe": "SWMH",
+    "verlag": "SWMH",
+    "titel": "Neue Presse",
+    "titelKanonisch": "Neue Presse",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#000000",
+      "question": "#000000",
+      "intro": "#000000",
+      "prize": "#000000",
+      "phone": "#000000",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "315x220",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SWMH_Material_Logoe02_Neue_Presse_05_Neue_Presse.png",
+    "phoneNumbers": [
+      "01378 408371",
+      "01378 408372",
+      "01378 408373",
+      "01378 408374",
+      "01378 408375"
+    ]
   },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SWMH_Material_Logoe02_Neue_Presse_05_Neue_Presse.png",
-  "phoneNumbers": [
-   "01378 408371",
-   "01378 408372",
-   "01378 408373",
-   "01378 408374",
-   "01378 408375"
-  ]
- },
- {
-  "id": "SWMH__Nordbayerischer Kurier",
-  "gruppe": "SWMH",
-  "verlag": "SWMH",
-  "titel": "Nordbayerischer Kurier",
-  "titelKanonisch": "Nordbayerischer Kurier",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SWMH__Nordbayerischer Kurier",
+    "gruppe": "SWMH",
+    "verlag": "SWMH",
+    "titel": "Nordbayerischer Kurier",
+    "titelKanonisch": "Nordbayerischer Kurier",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#000000",
+      "question": "#000000",
+      "intro": "#000000",
+      "prize": "#000000",
+      "phone": "#000000",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "315x220",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SWMH_Material_Logoe04_Nordbayerischer_Kurier_Nordbayerischer_Kurier-Logo-2017.png",
+    "phoneNumbers": [
+      "01378 408571",
+      "01378 408572",
+      "01378 408573",
+      "01378 408574",
+      "01378 408575"
+    ]
   },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SWMH_Material_Logoe04_Nordbayerischer_Kurier_Nordbayerischer_Kurier-Logo-2017.png",
-  "phoneNumbers": [
-   "01378 408571",
-   "01378 408572",
-   "01378 408573",
-   "01378 408574",
-   "01378 408575"
-  ]
- },
- {
-  "id": "SWMH__Schwarzwälder Bote, Neckarquelle, Lahrer Zeitung",
-  "gruppe": "SWMH",
-  "verlag": "SWMH",
-  "titel": "Schwarzwälder Bote, Neckarquelle, Lahrer Zeitung",
-  "titelKanonisch": "",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SWMH__Schwarzwälder Bote, Neckarquelle, Lahrer Zeitung",
+    "gruppe": "SWMH",
+    "verlag": "SWMH",
+    "titel": "Schwarzwälder Bote, Neckarquelle, Lahrer Zeitung",
+    "titelKanonisch": "",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#000000",
+      "question": "#000000",
+      "intro": "#000000",
+      "prize": "#000000",
+      "phone": "#000000",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "280 x 190",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SWMH_Material_Logo_05_Schwazwalder-Bote_Lahrer-Z_LZ_Logo_4c_2017.jpg",
+    "phoneNumbers": [
+      "01378 408171",
+      "01378 408172",
+      "01378 408173",
+      "01378 408174",
+      "01378 408175"
+    ]
   },
-  "format": "280 x 190",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SWMH_Material_Logo_05_Schwazwalder-Bote_Lahrer-Z_LZ_Logo_4c_2017.jpg",
-  "phoneNumbers": [
-   "01378 408171",
-   "01378 408172",
-   "01378 408173",
-   "01378 408174",
-   "01378 408175"
-  ]
- },
- {
-  "id": "SWMH__Suhler Verlagsgesellschaft",
-  "gruppe": "SWMH",
-  "verlag": "SWMH",
-  "titel": "Suhler Verlagsgesellschaft",
-  "titelKanonisch": "",
-  "fontFamily": "'Myriad Pro', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Myriad Pro – Bold",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SWMH__Suhler Verlagsgesellschaft",
+    "gruppe": "SWMH",
+    "verlag": "SWMH",
+    "titel": "Suhler Verlagsgesellschaft",
+    "titelKanonisch": "",
+    "fontFamily": "'Myriad Pro', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Myriad Pro – Bold",
+    "colors": {
+      "title": "#000000",
+      "question": "#000000",
+      "intro": "#000000",
+      "prize": "#000000",
+      "phone": "#000000",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "315x220",
+    "logoPosition": "rechts unten",
+    "logoUrl": "/verlag-logos/SWMH_Material_Logoe03_Suhler-Verlagsgesellschaft_Suhler_Verlagsges_FreiesWort.png",
+    "phoneNumbers": [
+      "01378 408471",
+      "01378 408472",
+      "01378 408473",
+      "01378 408474",
+      "01378 408475"
+    ]
   },
-  "format": "315x220",
-  "logoPosition": "rechts unten",
-  "logoUrl": "/verlag-logos/SWMH_Material_Logoe03_Suhler-Verlagsgesellschaft_Suhler_Verlagsges_FreiesWort.png",
-  "phoneNumbers": [
-   "01378 408471",
-   "01378 408472",
-   "01378 408473",
-   "01378 408474",
-   "01378 408475"
-  ]
- },
- {
-  "id": "SWP__SWP",
-  "gruppe": "SWP",
-  "verlag": "SWP",
-  "titel": "SWP",
-  "titelKanonisch": "Südwest Presse (SWP)",
-  "fontFamily": "'Lexend', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Lexend",
-  "colors": {
-   "title": "#FFFFFF",
-   "question": "#FFFFFF",
-   "intro": "#FFFFFF",
-   "prize": "#FFFFFF",
-   "phone": "#FFFFFF",
-   "winners": "#000000",
-   "terms": "#000000"
+  {
+    "id": "SWP__SWP",
+    "gruppe": "SWP",
+    "verlag": "SWP",
+    "titel": "SWP",
+    "titelKanonisch": "Südwest Presse (SWP)",
+    "fontFamily": "'Lexend', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Lexend",
+    "colors": {
+      "title": "#FFFFFF",
+      "question": "#FFFFFF",
+      "intro": "#FFFFFF",
+      "prize": "#FFFFFF",
+      "phone": "#FFFFFF",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "321x220",
+    "logoPosition": "n/a",
+    "logoUrl": "",
+    "phoneNumbers": [
+      "01378 803871",
+      "01378 803872",
+      "01378 803873",
+      "01378 803874",
+      "01378 803875"
+    ]
   },
-  "format": "321x220",
-  "logoPosition": "n/a",
-  "logoUrl": "",
-  "phoneNumbers": [
-   "01378 803871",
-   "01378 803872",
-   "01378 803873",
-   "01378 803874",
-   "01378 803875"
-  ]
- },
- {
-  "id": "SWP__Schwabo",
-  "gruppe": "Schwabo",
-  "verlag": "Schwabo",
-  "titel": "Schwabo",
-  "titelKanonisch": "Schwarzwälder Bote (SWP-Vorlage)",
-  "fontFamily": "'Roboto Condensed', sans-serif",
-  "fontAvailable": true,
-  "fontRaw": "Lexend SemiBold / Roboto Condensed (in Vorlage eingebettet)",
-  "colors": {
-   "title": "#000000",
-   "question": "#000000",
-   "intro": "#000000",
-   "prize": "#000000",
-   "phone": "#000000",
-   "winners": "#000000",
-   "terms": "#000000"
-  },
-  "format": "280x190",
-  "logoPosition": "Fußleiste (in Vorlage integriert)",
-  "logoUrl": null,
-  "layoutVariant": "swp"
- }
+  {
+    "id": "SWP__Schwabo",
+    "gruppe": "Schwabo",
+    "verlag": "Schwabo",
+    "titel": "Schwabo",
+    "titelKanonisch": "Schwarzwälder Bote (SWP-Vorlage)",
+    "fontFamily": "'Roboto Condensed', sans-serif",
+    "fontAvailable": true,
+    "fontRaw": "Lexend SemiBold / Roboto Condensed (in Vorlage eingebettet)",
+    "colors": {
+      "title": "#000000",
+      "question": "#000000",
+      "intro": "#000000",
+      "prize": "#000000",
+      "phone": "#000000",
+      "winners": "#000000",
+      "terms": "#000000"
+    },
+    "format": "280x190",
+    "logoPosition": "Fußleiste (in Vorlage integriert)",
+    "logoUrl": null,
+    "layoutVariant": "swp"
+  }
 ]

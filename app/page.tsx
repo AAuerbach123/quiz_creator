@@ -300,6 +300,16 @@ function buildFullTerms(v: TermsVariant): string {
     : v.termsText;
 }
 
+// Trennt die Service-Hotline ("Fragen zur Teilnahme … kostenlos)") aus dem
+// kombinierten TNB-Text, damit sie prominent ÜBER den Teilnahmebedingungen
+// stehen kann (Wunsch Julija/Yasmina, 24.06.2026). Funktioniert auch für bereits
+// gespeichert zusammengesetzte Texte.
+function splitServiceHotline(t: string): { hotline: string; body: string } {
+  const m = (t || "").match(/Fragen zur Teilnahme[\s\S]*?kostenlos\)/i);
+  if (!m) return { hotline: "", body: t || "" };
+  return { hotline: m[0].trim(), body: (t || "").replace(m[0], "").replace(/\s{2,}/g, " ").trim() };
+}
+
 function applyPresetToQuiz(q: Quiz, preset: VerlagsPreset | null, _opts?: { preferPresetLogo?: boolean }): Quiz {
   if (!preset) return q;
   const size = parseAdSize(preset.format);
@@ -954,10 +964,18 @@ function buildViewerHtml(quizzes: Quiz[], cardImages: string[]): string {
 // die Blöcke nicht leer und damit unsichtbar bleiben.
 const DEFAULT_WINNERS_TEXT = "Gewinnerinnen und Gewinner werden hier veröffentlicht";
 const DEFAULT_TERMS_TEXT = "Teilnahmebedingungen unter 0800 890 890 / Dieser Anruf ist kostenlos. Zu diesem Gewinnspiel wird keine Korrespondenz geführt.";
-const DEFAULT_PHONE_TERMS_TEXT = "Telemedia interactive GmbH, 0,50€ pro Anruf aus dem dt. Festnetz";
+const DEFAULT_PHONE_TERMS_TEXT = "Telemedia Interactive GmbH, 0,50 € pro Anruf aus dem dt. Festnetz sowie Mobilfunk (Flatrates nicht inbegriffen).";
 // Entfernt den (auf Kundenwunsch unerwünschten) Zusatz "Mobilfunk teurer" beim
 // Rendern — greift auch für bereits gespeicherte Quizze, ohne Daten zu ändern.
-const cleanPhoneTerms = (s?: string) => (s || "").replace(/[,;]?\s*Mobilfunk\s+teurer\.?/gi, "").trim();
+const cleanPhoneTerms = (s?: string) => {
+  let t = (s || "").replace(/[,;]?\s*Mobilfunk\s+teurer\.?/gi, "").trim();
+  // Vollständiger Tarifhinweis (Julija/Yasmina, 24.06.2026): Mobilfunk-Zusatz
+  // sicherstellen — auch für bereits gespeicherte Kurzfassungen.
+  if (t && /Festnetz/i.test(t) && !/Mobilfunk/i.test(t)) {
+    t = t.replace(/[.\s]*$/, "") + " sowie Mobilfunk (Flatrates nicht inbegriffen).";
+  }
+  return t;
+};
 
 // IndexedDB-Persistenz für die Quiz-Sammlung.
 // localStorage hat ~5-10 MB Limit, das reicht für 27 Quizzes mit Bildern nicht.
@@ -1347,7 +1365,7 @@ function quizReducer(state: Quiz, action: Action): Quiz {
       const newShadow = state.theme.readability.textShadow < 0.9 ? 0.95 : state.theme.readability.textShadow;
       const winnersText = state.meta.winnersText || "Gewinnerinnen und Gewinner werden hier veröffentlicht";
       const termsText = state.meta.termsText || "Teilnahmebedingungen unter 0800 890 890 / Dieser Anruf ist kostenlos. Zu diesem Gewinnspiel wird keine Korrespondenz geführt.";
-      const phoneTermsText = state.meta.phoneTermsText || "Telemedia interactive GmbH, 0,50€ pro Anruf aus dem dt. Festnetz";
+      const phoneTermsText = state.meta.phoneTermsText || DEFAULT_PHONE_TERMS_TEXT;
       // Titel = zufälliger kreativer Satz mit Thema + Hauptgewinn
       // (Kundenwunsch: KEINE Frage als Titel, Gewinnsumme muss vorkommen).
       const aiQuestions = p.questions || [];
@@ -1537,7 +1555,7 @@ function FillText({ children, deps, min = 11, max = 30, lineHeight = 1.4, color,
   return (
     <div ref={boxRef} style={{ overflow: "hidden", minHeight: 0, ...style }}>
       <div ref={txtRef} lang="de" style={{ fontSize: `${fs}px`, lineHeight, color,
-        textAlign: "justify", textAlignLast: "left", whiteSpace: "normal",
+        textAlign: "left", whiteSpace: "normal",
         hyphens: "auto" as const, WebkitHyphens: "auto" as const }}>
         {children}
       </div>
@@ -3872,11 +3890,23 @@ function SwpRenderer({ quiz, width }: RendererProps) {
         <>
           <div style={{ position: "absolute", left: P(374.1), top: P(385.5), color: "#000",
             fontSize: P(9), lineHeight: 1, whiteSpace: "nowrap", ...fRC(700) }}>{winDatum}</div>
+          {/* Name (ohne "gewinnt") in eigener Zeile UNTER dem Betrag.
+              "gewinnt" wandert hinter den (auf der Platte gedruckten) Betrag,
+              damit nichts mehr in die Nachbarspalte läuft (Wunsch Andreas). */}
           {COLX.map((x, i) => (
-            <div key={i} style={{ position: "absolute", left: P(x), top: P(426.7), color: "#000",
-              fontSize: P(8), lineHeight: 1, whiteSpace: "nowrap", ...fRC(400) }}>
-              {winners[i]?.text || ""}
+            <div key={i} style={{ position: "absolute", left: P(x), top: P(427.5), color: "#000",
+              fontSize: P(7.5), lineHeight: 1, whiteSpace: "nowrap", ...fRC(700) }}>
+              {(winners[i]?.text || "").replace(/\s*gewinnt\s*\.?$/i, "")}
             </div>
+          ))}
+          {/* "gewinnt" auf der Betragszeile, direkt hinter den jeweiligen Betrag. */}
+          {[445.7, 516.7, 583.7, 650.7, 722.7].map((xr, i) => (
+            winners[i]?.text ? (
+              <div key={"g" + i} style={{ position: "absolute", left: P(xr + 4), top: P(419.6), color: "#000",
+                fontSize: P(6.8), lineHeight: 1, whiteSpace: "nowrap", ...fRC(400) }}>
+                gewinnt
+              </div>
+            ) : null
           ))}
         </>
       )}
@@ -5051,8 +5081,17 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   // ── Verlagsabhängige Wünsche (pro Gruppe, keine globalen Änderungen) ──
   // SAAR (Nicole Böhme-Laglasse): Pfälzischer Merkur, Trier. Volksfreund, SZ.
   const isSAAR = meta.verlag === "SAAR";
-  // BEIG (Simona, SHZ-Gruppe) — zeitungsgenau.
-  const isBEIG = meta.presetId === "SHZ__Beig";
+  // SHZ-Gruppe (Simona): BEIG + NOZ + shz bekommen die gleiche Behandlung
+  // (Störer → Spieltag, "Anzeige"-Hinweis raus, Logo unten rechts neben TNB).
+  // presetId-basiert (SHZ__Beig/NOZ/SHZ) — meta.verlag trägt hier den Zeitungs-,
+  // nicht den Gruppennamen.
+  const isSHZgroup = /^SHZ__/.test(meta.presetId || "");
+  // FUNKE (Oskar Hoyer): OTZ/TA/TLZ bekommen den Strand-Hintergrund wie SHZ,
+  // kompaktere Fragen (kein Überlauf in die TNB) und einen einzelnen "Anzeige"-
+  // Hinweis oben rechts.
+  const isFunke = /^Funke__/.test(meta.presetId || "") || meta.verlag === "Funke";
+  // Layout-Gruppen, die den Strand-Hintergrund teilen.
+  const isStrandBg = isSHZgroup || isFunke;
   // Nürnberg (VNP): Haller-Layout, aber roter Verlaufs-Titelbalken + Geldfächer.
   const isNuern = meta.presetId === "Nürnberg__Nürnberg" || meta.verlag === "Nürnberg";
   // Nürnberg-Headline ohne Themen-/Verlagszusatz ("… in den … Nachrichten").
@@ -5061,20 +5100,25 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const nuTag = "Spieltag " + (meta.spieltag || "1").trim();
   // SAAR: Leerzeichen vor dem €-Zeichen ("50€" → "50 €").
   const eur = (s: string) => isSAAR ? s.replace(/\s*€/g, " €") : s;
-  // SAAR: "Anzeige"-Hinweis raus (Verlag setzt ihn selbst). BEIG: nur bei
-  // Ohne-Gewinner-Variante raus.
-  const hideAnzeige = isSAAR || isNuern || (isBEIG && !((meta.winners ?? []).length && (meta.winnerCount ?? 0) > 0));
-  // BEIG: statt Störer der Spieltag (X/27). Spieltag aus meta.spieltag, sonst 1.
-  const beigSpieltag = isBEIG;
+  // SAAR: "Anzeige"-Hinweis raus (Verlag setzt ihn selbst). SHZ-Gruppe (Simona,
+  // 18.6.): "Anzeige" generell weglassen — in JEDER Variante (mit & ohne Gewinner).
+  const hideAnzeige = isSAAR || isNuern || isSHZgroup;
+  // SHZ-Redesign (Simona): Spieltag wandert in eine eigene Pille (s.u.), der runde
+  // Störer zeigt wieder den Preis. Daher hier kein Spieltag-im-Störer mehr.
+  const beigSpieltag = false;
   const spieltagNo = Number(meta.spieltag || "") || 1;
 
   const onWhite = (hex: string | undefined, fb: string) => (hex && luminance(hex) < 0.85 ? hex : fb);
+  // SHZ-Gruppe (Wunsch Andreas, korrigiert): Quiz-Schriften in VERLAGSBLAU statt
+  // Schwarz — Titel, Untertitel, "so geht's", Fragen, Telefon, Telemedia, Pillen.
   const cTitle = onWhite(theme.colors.title, "#1A1A1A");
-  const cIntro = onWhite(theme.colors.intro, "#1A1A1A");
+  // FUNKE (Julija 24.06.): Fließtext (Untertitel/Story/Fragen) auf nahezu Schwarz
+  // für bessere Lesbarkeit; Akzente (Titel/Preis/Telefon/Störer) bleiben farbig.
+  const cIntro = isFunke ? "#1A1A1A" : onWhite(theme.colors.intro, "#1A1A1A");
   const cPrize = onWhite(theme.colors.prize, "#2B5A8C");
-  const cQuestion = onWhite(theme.colors.question, "#1A1A1A");
+  const cQuestion = isFunke ? "#1A1A1A" : onWhite(theme.colors.question, "#1A1A1A");
   const cPhone = onWhite(theme.colors.phone, "#2B5A8C");
-  const cTerms = onWhite(theme.colors.terms, "#555555");
+  const cTerms = isSHZgroup ? cPrize : onWhite(theme.colors.terms, "#555555");
   // SAAR-Verlagswunsch (Nicole Böhme-Laglasse, Mail 22.06.2026): NUR der runde
   // Störer oben links und die Preis-Pillen sollen bei SZ (Saarbrücker Zeitung)
   // und TV (Trierischer Volksfreund) orange sein — CMYK 0/40/90/0 ≈ RGB 255/153/26.
@@ -5082,7 +5126,9 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   // Wasserzeichen) bleiben Verlagsblau. PM (Pfälzischer Merkur) bleibt unverändert.
   const isSZ = meta.presetId === "SAAR__SZ";
   const isTV = meta.presetId === "SAAR__TV";
-  const cBadge = (isSZ || isTV) ? "#FF991A" : cPrize;
+  const cBadge = (isSZ || isTV) ? "#FF991A" : cPrize; // orange für SZ/TV (SAAR)
+  // Preis-Pillen: Verlagsblau (= cBadge; bei SAAR SZ/TV orange).
+  const cPill = cBadge;
 
   const winners = (meta.winners ?? []).slice(0, Math.max(0, Math.min(5, meta.winnerCount ?? 0)));
   // "ohne Gewinner"-Variante: keine Gewinner -> Spalte 4 entfällt. Damit kein
@@ -5101,29 +5147,11 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   const imgBottom = theme.background?.imageBottom || null;
   const topPrize = eur(prizes.length ? getPrizeLabel(prizes.reduce((a, b) => (b.valueCents > a.valueCents ? b : a))) : "1000€");
 
-  // Fragen-Spalte exakt auf die Unterkante des 2. Bildes ausrichten (ResizeObserver,
-  // robust gegen Skalierung/Fenstergröße/Bild-Transforms). Nur 4-Spalten-Layout.
-  useLayoutEffect(() => {
-    if (rhein) return;
-    const align = () => {
-      const r2 = rootRef.current, c2 = imgColRef.current, q2 = qRowRef.current;
-      if (!r2 || !c2 || !q2) return;
-      const scale = r2.getBoundingClientRect().width / width || 1;
-      const last = c2.lastElementChild as HTMLElement | null;
-      if (!last) return;
-      // flex:1 (=flex-basis:0%) würde eine explizite Höhe überschreiben → flex:none.
-      q2.style.flex = "0 0 auto"; q2.style.height = "";
-      const target = (last.getBoundingClientRect().bottom - q2.getBoundingClientRect().top) / scale;
-      if (target > 8) q2.style.height = `${target}px`; else { q2.style.flex = ""; q2.style.height = ""; }
-    };
-    const root = rootRef.current, col = imgColRef.current;
-    const ro = new ResizeObserver(() => requestAnimationFrame(align));
-    if (root) ro.observe(root);
-    if (col) ro.observe(col);
-    const raf = requestAnimationFrame(align);
-    return () => { ro.disconnect(); cancelAnimationFrame(raf); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [width, height, wide, rhein, questions, imgTop, imgBottom, meta.questionsHeadline, meta.winnerCount]);
+  // HINWEIS: Die frühere JS-Höhenausrichtung der Fragenspalte (align()) wurde entfernt.
+  // Seit die beiden Bilder als direkte Flex-Kinder gerendert werden, sind Bild- und
+  // Fragenspalte über reines CSS (flex:1) automatisch gleich hoch. Die alte JS-Messung
+  // lief im Export unzuverlässig (Bild noch nicht geladen → falsche Höhe) und drückte
+  // die letzte Frage samt Telemedia-Hinweis in die Teilnahmebedingungen.
 
   // Auflösungs-Zeilen: solutionWords per Zeile oder Komma getrennt. Eine evtl.
   // enthaltene Überschrift wird gefiltert — die setzt der Renderer selbst.
@@ -5144,14 +5172,17 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   // Logo-Größen-Logik wie in den anderen Layouts (4,5 % Fläche, max 32×10 %).
   const [logoDim, setLogoDim] = useState<{ w: number; h: number } | null>(null);
   useEffect(() => { setLogoDim(null); }, [theme.publisherLogo]);
-  const targetLogoArea = width * height * 0.045;
+  // Im breiten "ohne Gewinner"-Layout (wide) Logos kleiner halten, damit breite
+  // Wortmarken (OTZ/TLZ/TA) die schmale Spalte 1 nicht füllen und den Story-Text
+  // verdrängen.
+  const targetLogoArea = width * height * (wide ? 0.032 : 0.045);
   const onLogoLoad: React.ReactEventHandler<HTMLImageElement> = (e) => {
     const img = e.currentTarget;
     if (!img.naturalWidth || !img.naturalHeight) return;
     const aspect = img.naturalWidth / img.naturalHeight;
     const h = Math.sqrt(targetLogoArea / aspect);
     const w = aspect * h;
-    const scale = Math.min(1, (width * 0.16) / w, (height * 0.08) / h);
+    const scale = Math.min(1, (width * (wide ? 0.13 : 0.16)) / w, (height * (wide ? 0.06 : 0.08)) / h);
     setLogoDim({ w: Math.round(w * scale), h: Math.round(h * scale) });
   };
 
@@ -5159,7 +5190,9 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
   // "Heute 1000€ gewinnen" mit dem Hauptgewinn des Quiz.
   const badgeLines = (meta.stoererText || `Heute\n${topPrize}\ngewinnen`)
     .split(/\n/).map(s => s.trim()).filter(Boolean);
-  const stoererD = Math.min(width * 0.095, height * 0.19) * (isSAAR ? 1.3 : 1);
+  const stoererD = Math.min(width * 0.11, height * 0.22) * (isSAAR ? 1.35 : (isSHZgroup ? 1.2 : 1.18));
+  // Service-Hotline aus den TNB lösen → prominent darüber (P3).
+  const { hotline: svcHotline, body: termsBody } = splitServiceHotline(meta.termsText || "");
 
   // Hilfen: setMeta dispatcht Meta-Patches; wrap macht ein Element frei
   // anpassbar (verschieben, skalieren, ausblenden); ed macht Texte inline
@@ -5422,12 +5455,20 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           </div>
         </div>
 
-        {/* FUSSZEILE: Teilnahmebedingungen über volle Breite */}
+        {/* FUSSZEILE: Service-Hotline prominent ÜBER den TNB (P3) */}
         {(meta.termsText || edit) && wrap("terms",
-          <div style={{ color: cTerms, fontSize: px(6), lineHeight: 1.25,
-            borderTop: "1px solid #D8D2C8", paddingTop: px(4),
-            textAlign: "justify", hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
-            {ed(meta.termsText, v => setMeta({ termsText: v }), { multiline: true, placeholder: "Teilnahmebedingungen" })}
+          <div lang="de">
+            {svcHotline && (
+              <div style={{ color: cPrize, fontWeight: 700, fontSize: px(9.5), lineHeight: 1.2, marginBottom: px(3) }}>{svcHotline}</div>
+            )}
+            <div style={{ color: cTerms, fontSize: px(7.5), lineHeight: 1.25,
+              borderTop: "1px solid #D8D2C8", paddingTop: px(4),
+              textAlign: "justify", hyphens: "auto" as const, WebkitHyphens: "auto" as const }}>
+              {edit
+                ? <InlineEditable value={termsBody} multiline placeholder="Teilnahmebedingungen"
+                    onChange={v => setMeta({ termsText: svcHotline ? `${v} ${svcHotline}` : v })} />
+                : termsBody}
+            </div>
           </div>,
           { marginTop: px(6), flexShrink: 0 })}
       </div>
@@ -5436,20 +5477,58 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
 
   return (
     <div ref={rootRef} onClick={() => onSelectBlock(null)}
-      style={{ width, height, position: "relative", background: "#FFFFFF", color: "#1A1A1A",
+      style={{ width, height, position: "relative",
+        // SHZ-Redesign (Simona/Andreas): Strandszene als Hintergrund "untergezogen"
+        // (Bild blendet von rechts nach links aus → links bleibt der Text lesbar).
+        background: isStrandBg ? "linear-gradient(to right, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.42) 22%, rgba(255,255,255,0.12) 45%, rgba(255,255,255,0) 62%), url('/shz_bg_strand3.png') center / cover no-repeat, #FFFFFF" : "#FFFFFF",
+        backgroundOrigin: "border-box", backgroundClip: "border-box",
+        color: "#1A1A1A",
         fontFamily: theme.fontFamily, overflow: "hidden", boxSizing: "border-box",
         display: "flex", flexDirection: "column", padding: pad }}>
 
       {/* ANZEIGE-Kennzeichnung oben links + rechts (SAAR/BEIG: ausgeblendet) */}
-      {!hideAnzeige && wrap("anzeige",
+      {isFunke ? (
+        // FUNKE (Oskar Hoyer): genau EIN "Anzeige"-Hinweis oben rechts. Direkt
+        // gerendert (nicht via wrap), damit ein evtl. ausgeblendeter "anzeige"-
+        // Transform ihn nicht unterdrückt.
+        <div style={{ display: "flex", justifyContent: "flex-end",
+          fontSize: px(8), fontWeight: 700, letterSpacing: 2, color: "#1A1A1A" }}>
+          <span>ANZEIGE</span>
+        </div>
+      ) : (!hideAnzeige && wrap("anzeige",
         <><span>ANZEIGE</span><span>ANZEIGE</span></>,
         { display: "flex", justifyContent: "space-between",
-          fontSize: px(8), fontWeight: 700, letterSpacing: 2, color: "#1A1A1A" })}
+          fontSize: px(8), fontWeight: 700, letterSpacing: 2, color: "#1A1A1A" }))}
+
+      {/* SHZ-Redesign (Simona): Spieltag als dunkelblaue Pille oben links +
+          Banknoten-Fächer oben rechts (wie Geldregen/Fehlersuche). */}
+      {isSHZgroup && wrap("shz_spieltag",
+        <div style={{ display: "inline-block", background: cPrize, color: "#FFFFFF",
+          fontWeight: 700, fontSize: px(15), padding: `${px(5)} ${px(15)}`,
+          borderRadius: px(22), whiteSpace: "nowrap", boxShadow: "0 1px 4px rgba(0,0,0,0.18)" }}>
+          Spieltag {spieltagNo} von 27
+        </div>,
+        { position: "absolute", top: px(5), left: px(5), zIndex: 6 })}
+      {/* Fächer: in "ohne Gewinner" groß rechts; in "mit Gewinner" KLEIN in der
+          oberen rechten Ecke (über der Gewinner-Überschrift, ohne Kollision). */}
+      {isSHZgroup && wrap("shz_fan",
+        <img src="/nuernberg/euronoten_faecher.png" alt="" style={{ width: "100%", display: "block", transform: "rotate(14deg)" }} />,
+        { position: "absolute", top: px(winnersCol ? 78 : 82), right: px(6), width: px(180), zIndex: 4 }, true)}
+
+      {/* Spieltag-Pille für alle übrigen Gruppen (P6, Wunsch Julija/Yasmina):
+          SHZ zeigt sie schon oben links, Nürnberg im Kicker. */}
+      {!isSHZgroup && !isNuern && wrap("spieltag_pill",
+        <div style={{ display: "inline-block", background: cPrize, color: "#FFFFFF", fontWeight: 700,
+          fontSize: px(11), padding: `${px(3)} ${px(10)}`, borderRadius: px(20), whiteSpace: "nowrap",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.18)" }}>
+          Spieltag {spieltagNo} von 27
+        </div>,
+        { position: "absolute", top: px(18), right: px(6), zIndex: 6 })}
 
       {/* KOPF Nürnberg (VNP): Kicker + roter Verlaufs-Balken mit weißem Titel + Geldfächer */}
       {isNuern && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: px(2), marginBottom: px(5) }}>
-          <div style={{ fontWeight: 700, fontSize: px(11), letterSpacing: px(0.4), color: "#3A3A3A" }}>GEWINNSPIEL »WISSENSQUIZ«</div>
+          <div style={{ fontWeight: 700, fontSize: px(11), letterSpacing: px(0.4), color: "#3A3A3A" }}>GEWINNSPIEL »WISSENSQUIZ HOCH 5«</div>
           <div style={{ fontWeight: 700, fontSize: px(11), color: "#FFFFFF", background: "#E6007E", padding: `${px(3)} ${px(11)}` }}>{nuTag}</div>
         </div>
       )}
@@ -5476,8 +5555,13 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
 
       {/* KOPF: runder Störer links, zentrierte Headline + Untertitel */}
       {!isNuern && (
-      <div style={{ display: "flex", alignItems: "flex-start", gap: px(14), marginTop: px(4) }}>
-        {wrap("stoerer",
+      <div style={{ display: "flex", alignItems: "flex-start", gap: px(14), marginTop: px(isSHZgroup ? 34 : 4) }}>
+        {/* SHZ (Simona, 18.6.): runder Störer war zu klein → ganz raus; stattdessen
+            bleibt die Spieltag-Pille oben links. Unsichtbarer Platzhalter in
+            Störer-Breite hält den Titel mittig. */}
+        {isSHZgroup
+          ? <div style={{ flex: "0 0 auto", width: stoererD, height: stoererD, visibility: "hidden" as const }} />
+          : wrap("stoerer",
           <div style={{ width: stoererD, height: stoererD, borderRadius: "50%",
             background: cBadge, color: "#FFFFFF",
             display: "flex", flexDirection: "column", alignItems: "center",
@@ -5510,7 +5594,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           { flex: "0 0 auto", marginTop: px(2), order: rhein ? 2 : 0 })}
         <div style={{ flex: 1, textAlign: rhein ? "left" : "center", minWidth: 0, order: rhein ? 1 : 0 }}>
           {wrap("title",
-            <div style={{ color: cTitle, fontWeight: 700, fontSize: px(isSAAR ? 31.5 : 51), lineHeight: 1.05,
+            <div style={{ color: cTitle, fontWeight: 700, fontSize: px(isSAAR ? 31.5 : (isSHZgroup ? 51 : 44)), lineHeight: 1.05,
               whiteSpace: isSAAR ? "nowrap" : "normal" }}>
               {edit
                 ? <InlineEditable value={effectiveTitle(quiz)} placeholder="Titel der Aktion"
@@ -5518,7 +5602,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 : (effectiveTitle(quiz) || "Titel der Aktion")}
             </div>)}
           {wrap("intro",
-            <div style={{ color: cIntro, fontSize: px(19.5), lineHeight: 1.25, marginTop: px(4) }}>
+            <div style={{ color: cIntro, fontSize: px(isSHZgroup ? 21 : 19.5), lineHeight: 1.2, marginTop: px(isSHZgroup ? 2 : 4) }}>
               {ed(meta.subtitle, v => setMeta({ subtitle: v }), { multiline: true, placeholder: "Untertitel" })}
             </div>)}
         </div>
@@ -5528,7 +5612,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
       )}
 
       {/* HAUPTBEREICH: vier Spalten */}
-      <div style={{ flex: 1, display: "flex", gap: px(12), marginTop: px(10), minHeight: 0 }}>
+      <div style={{ flex: 1, display: "flex", gap: px(12), marginTop: px(isSHZgroup ? 4 : 10), minHeight: 0 }}>
 
         {/* SPALTE 1: redaktioneller Text, Auflösung, Kleingedrucktes, Logo.
             Bewusst OHNE overflow:hidden — der Freiform-Editor erlaubt es,
@@ -5587,18 +5671,28 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
             </div>,
             // Kleiner Abstand zum Blocksatz; "Auflösung" sitzt direkt darunter.
             { marginTop: px(4), flexShrink: 0 })}
-          {/* Spacer schiebt das Logo an die Spaltenunterkante (über die Fußzeile). */}
-          <div style={{ flex: "1 1 0", minHeight: px(4) }} />
+          {/* Spacer schiebt das Logo an die Spaltenunterkante (über die Fußzeile).
+              minHeight garantiert einen sichtbaren Abstand Story→Logo, damit der
+              (ggf. abgeschnittene) Story-Text nicht ins Logo läuft (z. B. OTZ/TLZ/TA). */}
+          <div style={{ flex: "1 1 0", minHeight: px(wide ? 14 : 8) }} />
           {/* Kostenhinweis (Telemedia) steht unter jeder Telefonnummer in der
               Fragenspalte — hier links entfällt er. */}
-          {!rhein && !isBEIG && wrap("publisherLogo",
+          {!rhein && !isSHZgroup && wrap("publisherLogo",
             theme.publisherLogo
               ? <img key={theme.publisherLogo} onLoad={onLogoLoad}
                   src={theme.publisherLogo} alt=""
-                  style={{
+                  style={ wide ? {
+                    // Breites "ohne Gewinner"-Layout: FESTES, kleines Logo-Feld —
+                    // deterministisch, unabhängig von onLoad/logoDim. Der Export-
+                    // Renderer (modern-screenshot) löst `height:auto` nicht auf, daher
+                    // wurden Wortmarken (OTZ/TLZ/TA) im Export riesig und liefen in den
+                    // Story-Text. objectFit:contain hält das Seitenverhältnis.
+                    width: px(96), height: px(34), maxWidth: "100%",
+                    objectFit: "contain", display: "block",
+                  } : {
                     width: logoDim ? `${logoDim.w}px` : `${Math.round(Math.sqrt(targetLogoArea))}px`,
                     height: logoDim ? `${logoDim.h}px` : "auto",
-                    objectFit: "contain", display: "block",
+                    maxHeight: px(88), objectFit: "contain", display: "block",
                   }} />
               : <span style={{ display: "inline-block", border: `1px dashed ${cPrize}`,
                   color: cPrize, fontSize: px(9), fontWeight: 700, padding: px(5),
@@ -5610,25 +5704,24 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         {/* SPALTE 2: zwei gestapelte Bilder */}
         <div ref={imgColRef} style={{ flex: imgFlex, display: "flex", flexDirection: "column", gap: px(8), minWidth: 0 }}>
           {/* Bilder werden auf Datenebene passend zugeschnitten (fitCardImage);
-              objectFit:cover gleicht Rest-Differenzen aus. */}
-          {wrap("img_top",
-            <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
-              {imgTop
-                ? <img src={imgTop} alt="" draggable={false}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                : <div style={{ display: "flex", alignItems: "center", justifyContent: "center",
-                    width: "100%", height: "100%", color: "#A89F93", fontSize: px(11) }}>Bild zu Frage 4</div>}
-            </div>,
-            { flex: 1, minHeight: 0 }, true)}
-          {wrap("img_bottom",
-            <div style={{ height: "100%", overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
-              {imgBottom
-                ? <img src={imgBottom} alt="" draggable={false}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                : <div style={{ display: "flex", alignItems: "center", justifyContent: "center",
-                    width: "100%", height: "100%", color: "#A89F93", fontSize: px(11) }}>Bild zu Frage 5</div>}
-            </div>,
-            { flex: 1, minHeight: 0 }, true)}
+              objectFit:cover gleicht Rest-Differenzen aus.
+              SHZ: feste, kleinere Bildhöhe als DIREKTE Flex-Kinder (kein Adjustable-
+              Wrapper, der die Höhe pinnt) — so bleiben die Bilder im oberen Bereich
+              und laufen garantiert NICHT in die Teilnahmebedingungen. */}
+          {/* Bilder als DIREKTE Flex-Kinder für ALLE Gruppen — nicht mehr im
+              Adjustable-Box-Modus, der die gespeicherte Höhe t.h fixierte (dadurch
+              lief das zweite Bild in die Teilnahmebedingungen). flex:1 verteilt
+              beide Bilder gleichmäßig und hält sie sicher oberhalb der Fußzeile. */}
+          <div style={{ flex: 1, minHeight: 0, overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
+            {imgTop
+              ? <img src={imgTop} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", color: "#A89F93", fontSize: px(11) }}>Bild zu Frage 4</div>}
+          </div>
+          <div style={{ flex: 1, minHeight: 0, overflow: "hidden", background: "#EFE9E2", borderRadius: px(3) }}>
+            {imgBottom
+              ? <img src={imgBottom} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", color: "#A89F93", fontSize: px(11) }}>Bild zu Frage 5</div>}
+          </div>
         </div>
 
         {/* SPALTE 3: Fragen mit Preis-Badges + großes !?-Wasserzeichen.
@@ -5644,10 +5737,14 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                 { placeholder: DEFAULT_QUESTIONS_HEADLINE }) }
               {!edit && !meta.questionsHeadline && DEFAULT_QUESTIONS_HEADLINE}
             </div>,
-            { marginTop: px(8), marginBottom: px(2) })}
+            { marginTop: px(3), marginBottom: px(2) })}
           {/* Abstand Überschrift→1. Frage als marginTop am Container (kein Transform). */}
           <div ref={qRowRef} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
-            justifyContent: "space-between", gap: px(1), marginTop: px(wide ? 14 : 11) }}>
+            // space-between verteilt die Fragen über die volle (per CSS = Bildhöhe)
+            // Spaltenhöhe; die letzte Frage inkl. Telemedia-Hinweis endet damit an der
+            // Unterkante des unteren Bildes, oberhalb der Teilnahmebedingungen.
+            justifyContent: "space-between",
+            gap: px(wide ? 12 : 1), marginTop: px(wide ? 14 : 5) }}>
             {questions.map((q, qi) => {
               const prize = prizes.find(p => p.id === q.prizeTierId) || prizes[0];
               if (!(q.text || q.phoneNumber) && !edit) return null;
@@ -5685,15 +5782,15 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                           Frage verankert, aus dem Textfluss gelöst — einzeln
                           verschieb-/skalier-/editier-/löschbar. Der Fragetext
                           reserviert rechts Platz dafür. */}
-                      <div style={{ color: cQuestion, fontSize: px((wide ? 16 : 13) * (isSAAR ? 1.18 : 1)), fontWeight: 700,
-                        lineHeight: 1.25, paddingRight: px(wide ? 66 : 46) }}>
+                      <div style={{ color: cQuestion, fontSize: px((wide ? 16 : 13) * (isSAAR ? 1.18 : (!wide ? 0.85 : 1))), fontWeight: 700,
+                        lineHeight: !wide && !isSAAR ? 1.12 : 1.25, paddingRight: px(wide ? 66 : 46) }}>
                         {edit
                           ? <InlineEditable value={q.text} placeholder="Frage eingeben"
                               onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { text: v } })} />
                           : q.text}
                       </div>
                       {prize && wrap(`prize_${q.id}`,
-                        <span style={{ display: "inline-block", background: cBadge, color: "#FFFFFF",
+                        <span style={{ display: "inline-block", background: cPill, color: "#FFFFFF",
                           fontSize: px(wide ? 16 : 12), fontWeight: 700, padding: `${px(wide ? 2.5 : 1.5)} ${px(wide ? 12 : 9)}`,
                           borderRadius: px(wide ? 12 : 9), whiteSpace: "nowrap", textAlign: "center" }}>
                           {edit
@@ -5705,14 +5802,14 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                         { position: "absolute", top: 0, right: 0 })}
                       {/* Telefonnummer deutlich größer; Kostenhinweis (Telemedia)
                           steht unter JEDER Nummer. */}
-                      <div style={{ color: cPhone, fontSize: px(wide ? 20 : 16), fontWeight: 700, letterSpacing: 0.3 }}>
+                      <div style={{ color: cPhone, fontSize: px(wide ? 20 : (isSAAR ? 16 : 14)), fontWeight: 700, letterSpacing: 0.3, lineHeight: 1.1 }}>
                         {edit
                           ? <InlineEditable value={q.phoneNumber ?? ""} placeholder="Telefonnummer"
                               onChange={v => dispatch!({ type: "UPDATE_QUESTION", id: q.id, payload: { phoneNumber: v } })} />
                           : (isSAAR ? `☎︎ ${q.phoneNumber ?? ""}` : q.phoneNumber)}
                       </div>
                       {meta.phoneTermsText && (
-                        <div style={{ color: cTerms, fontSize: px(wide ? 11 : 9), lineHeight: 1.2 }}>
+                        <div style={{ color: cTerms, fontSize: px(wide ? 11 : 8), lineHeight: 1.1, marginTop: px(wide ? -2 : 0) }}>
                           {cleanPhoneTerms(meta.phoneTermsText)}
                         </div>
                       )}
@@ -5734,30 +5831,38 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
           {/* Gewinner-Überschrift als EIGENER Block: separat verschieb-,
               skalier-, editier- und ausblendbar. */}
           {wrap("winnersHeadline",
-            <div style={{ color: cPrize, fontSize: px(wide ? 23 : 19), fontWeight: 700, lineHeight: 1.15 }}>
+            <div style={{ color: cPrize, fontSize: px(wide ? 23 : 19), fontWeight: 700, lineHeight: 1.15,
+              textAlign: "left", paddingLeft: px(isFunke ? 5 : 0) }}>
               {ed(meta.winnersText || "Unsere neuen Gewinner:", v => setMeta({ winnersText: v }), { placeholder: "Gewinner-Überschrift" })}
             </div>,
-            { marginTop: px(8), marginBottom: px(8), flexShrink: 0 })}
-          {wrap("winners",
-            <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+            // Gleiche Größe + gleicher Abstand zur ersten Box wie Fragen-Überschrift→1. Frage
+            // (marginBottom 2 + qRow marginTop 5 = 7).
+            { marginTop: px(isSHZgroup ? 3 : 8), marginBottom: px(isSHZgroup ? 7 : 8), flexShrink: 0 })}
+          {/* Gewinner-Liste als DIREKTES Flex-Kind (wie die Fragenspalte qRow),
+              NICHT in Adjustable gewrappt — sonst bricht die Flex-Höhenkette und
+              die Boxen stauchen sich. So verteilt space-between exakt wie die Fragen. */}
+          {(
               <div style={{ flex: 1, minHeight: 0, display: "flex",
-                flexDirection: "column", justifyContent: "space-between", gap: px(5) }}>
+                flexDirection: "column", justifyContent: "space-between", gap: px(isSHZgroup ? 4 : 5) }}>
                 {Array.from({ length: 5 }).map((_, i) => {
                   const w = winners[i];
                   const prize = prizes[i];
                   return (
-                    <div key={w?.id || i} style={{ flex: 1, background: "#EDEFF2", borderRadius: px(3),
-                      display: "flex", alignItems: "center", gap: px(8), padding: px(5), minHeight: 0 }}>
-                      <div style={{ width: px(52), height: "92%", background: "#D7DBE0",
-                        borderRadius: px(2), overflow: "hidden", flexShrink: 0,
+                    // SHZ: Boxen füllen die Spalte bis zum letzten Telemedia-Hinweis
+                    // (gleiche Unterkante wie die Fragenspalte) — kompakte Schrift,
+                    // damit nichts in Logo/TNB läuft (Wunsch Andreas).
+                    <div key={w?.id || i} style={{ flex: isSHZgroup ? "0 0 auto" : 1, background: isSHZgroup ? "transparent" : "#EDEFF2", borderRadius: px(3),
+                      display: "flex", alignItems: "center", gap: px(isSHZgroup ? 8 : 8), padding: px(isSHZgroup ? 2 : 5), minHeight: 0 }}>
+                      <div style={{ width: px(isSHZgroup ? 50 : 52), height: isSHZgroup ? px(50) : "86%", background: isSHZgroup ? "#FFFFFF" : "#D7DBE0",
+                        borderRadius: px(isSHZgroup ? 4 : 2), overflow: "hidden", flexShrink: 0,
                         display: "flex", alignItems: "center", justifyContent: "center" }}>
                         {w?.photo
                           ? <img src={w.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                           : <span style={{ color: "#A3AAB3", fontSize: px(7) }}>Foto</span>}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ color: "#333", fontSize: px(13), fontWeight: 700,
-                          lineHeight: 1.15, overflow: "hidden" }}>
+                        <div style={{ color: isSHZgroup ? cPrize : "#333", fontSize: px(isSHZgroup ? 14 : 13), fontWeight: 700,
+                          lineHeight: 1.12, overflow: "hidden" }}>
                           {edit && w
                             ? <InlineEditable value={w.text} placeholder="Vorname Nachname"
                                 onChange={v => dispatch!({ type: "UPDATE_WINNER", id: w.id, payload: { text: v } })} />
@@ -5765,7 +5870,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                         </div>
                         {/* Voll deckendes Verlagsblau — keine Transparenz,
                             sonst wirken die Beträge grau. */}
-                        <div style={{ color: cPrize, fontSize: px(19),
+                        <div style={{ color: cPrize, fontSize: px(isSHZgroup ? 18 : 19),
                           fontWeight: 800, lineHeight: 1.0 }}>
                           {prize ? getPrizeLabel(prize) : ""}
                         </div>
@@ -5774,8 +5879,7 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
                   );
                 })}
               </div>
-            </div>,
-            { flex: 1, minHeight: 0 }, true)}
+          )}
         </div>
         )}
       </div>
@@ -5833,27 +5937,48 @@ function RedaktionellRenderer({ quiz, width, height, selectedBlockId, onSelectBl
         </div>
       )}
 
-      {/* FUSSZEILE: lange Teilnahmebedingungen über volle Breite (sehr klein) */}
+      {/* FUSSZEILE: Service-Hotline prominent ÜBER den TNB; TNB größer (P3) */}
       {(meta.termsText || edit) && wrap("terms",
-        (isBEIG && theme.publisherLogo) ? (
+        (isSHZgroup && theme.publisherLogo) ? (
           // BEIG (Wunsch Simona): Logo unten rechts NEBEN den TNB.
-          <div style={{ display: "flex", alignItems: "flex-end", gap: px(10),
+          <div style={{ display: "flex", alignItems: "stretch", gap: px(10),
             borderTop: "1px solid #D8D2C8", paddingTop: px(4) }}>
-            <div style={{ flex: 1, color: cTerms, fontSize: px(6), lineHeight: 1.25,
-              textAlign: "justify", hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
-              {ed(meta.termsText, v => setMeta({ termsText: v }), { multiline: true, placeholder: "Teilnahmebedingungen" })}
+            <div style={{ flex: 1 }} lang="de">
+              {svcHotline && (
+                <div style={{ color: cPrize, fontWeight: 700, fontSize: px(9.5), lineHeight: 1.2, marginBottom: px(3) }}>{svcHotline}</div>
+              )}
+              <div style={{ color: cTerms, fontSize: px(7.5), lineHeight: 1.25,
+                textAlign: "justify", hyphens: "auto" as const, WebkitHyphens: "auto" as const }}>
+                {edit
+                  ? <InlineEditable value={termsBody} multiline placeholder="Teilnahmebedingungen"
+                      onChange={v => setMeta({ termsText: svcHotline ? `${v} ${svcHotline}` : v })} />
+                  : termsBody}
+              </div>
             </div>
-            <img key={theme.publisherLogo} onLoad={onLogoLoad} src={theme.publisherLogo} alt=""
-              style={{ height: px(24), width: "auto", objectFit: "contain", flexShrink: 0, alignSelf: "flex-end" }} />
+            {/* Logo so hoch wie der TNB-Block (Wunsch Simona/Andreas): Der Wrapper dehnt
+                sich per alignSelf:stretch auf die TNB-Höhe, das (absolut gesetzte) Logo
+                füllt ihn ganz (objectFit:contain) — keine zirkuläre Höhenabhängigkeit. */}
+            <div style={{ alignSelf: "stretch", position: "relative", width: px(160), flexShrink: 0 }}>
+              <img key={theme.publisherLogo} onLoad={onLogoLoad} src={theme.publisherLogo} alt=""
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", objectPosition: "right center" }} />
+            </div>
           </div>
         ) : (
-          <div style={{ color: cTerms, fontSize: px(6),
-            lineHeight: 1.25, borderTop: "1px solid #D8D2C8", paddingTop: px(4),
-            textAlign: "justify", hyphens: "auto" as const, WebkitHyphens: "auto" as const }} lang="de">
-            {ed(meta.termsText, v => setMeta({ termsText: v }), { multiline: true, placeholder: "Teilnahmebedingungen" })}
+          <div lang="de">
+            {svcHotline && (
+              <div style={{ color: cPrize, fontWeight: 700, fontSize: px(9.5), lineHeight: 1.2, marginBottom: px(3) }}>{svcHotline}</div>
+            )}
+            <div style={{ color: cTerms, fontSize: px(7.5),
+              lineHeight: 1.25, borderTop: "1px solid #D8D2C8", paddingTop: px(4),
+              textAlign: "justify", hyphens: "auto" as const, WebkitHyphens: "auto" as const }}>
+              {edit
+                ? <InlineEditable value={termsBody} multiline placeholder="Teilnahmebedingungen"
+                    onChange={v => setMeta({ termsText: svcHotline ? `${v} ${svcHotline}` : v })} />
+                : termsBody}
+            </div>
           </div>
         ),
-        { marginTop: px(6), flexShrink: 0 })}
+        { marginTop: px(wide ? 14 : 6), flexShrink: 0 })}
 
       {/* GITTER-OVERLAY (nur Editor, und nur während ein Element AUSGEWÄHLT ist):
           feine Linien alle 2,5 %, kräftigere alle 10 % — passend zum Einrasten
